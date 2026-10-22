@@ -2,7 +2,7 @@
 # Uses its own empty records folder (SWEEPWISE_DATA), so the person's real Sweepwise history and settings are untouched.
 # Output: tools/screens/<screen>.png and tools/screens/RESULT.json ({ ui_errors, errors, shots }).
 param(
-    [string[]]$Screens = @('welcome1', 'welcome2', 'welcome3', 'keyguide', 'home', 'boost', 'email', 'security', 'help', 'support', 'about', 'settings', 'supportcard', 'light:home', 'light:settings'),
+    [string[]]$Screens = @('terms', 'welcome1', 'welcome2', 'welcome3', 'keyguide', 'home', 'boost', 'email', 'security', 'help', 'support', 'about', 'settings', 'supportcard', 'light:home', 'light:settings'),
     [int]$WaitSeconds = 7
 )
 $ErrorActionPreference = 'Stop'
@@ -15,7 +15,7 @@ $dark = Join-Path $data 'dark'
 $light = Join-Path $data 'light'
 New-Item -ItemType Directory -Force -Path $dark, $light | Out-Null
 # The light-theme records folder starts with the welcome already done and the Light theme chosen.
-Set-Content -Path (Join-Path $light 'settings.json') -Value '{ "theme": "light", "welcome_done": true }' -Encoding ASCII
+Set-Content -Path (Join-Path $light 'settings.json') -Value '{ "theme": "light", "welcome_done": true, "terms_version": 1 }' -Encoding ASCII
 
 $shots = @()
 foreach ($item in $Screens) {

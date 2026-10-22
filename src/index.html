@@ -240,6 +240,13 @@ main:focus { outline:none; }
 .welcome h2 { font-size:24px; margin:14px 0 8px; } .welcome h2:focus { outline:none; } .welcome p { color:var(--muted); margin:0 0 12px; }
 .wsteps { display:flex; gap:6px; } .wsteps i { width:30px; height:5px; border-radius:999px; background:var(--line); } .wsteps i.on { background:var(--teal); }
 .wstep[hidden] { display:none; }
+.welcome.terms { width:min(780px, 94vw); }
+.terms-box { max-height:min(50vh, 440px); overflow-y:auto; margin:12px 0; padding:14px 18px; background:var(--input); border:1px solid var(--line); border-radius:12px; font:14px/1.6 Georgia, "Times New Roman", serif; color:var(--text); }
+.terms-box h3 { font-size:16px; margin:0 0 2px; } .welcome .terms-box p { color:var(--text); margin:0 0 10px; }
+.welcome .terms-box p.ver { color:var(--muted); font-style:italic; } .terms-box .sub { padding-left:1.4em; }
+.terms-tick { display:flex; gap:10px; align-items:flex-start; margin:6px 0 4px; cursor:pointer; }
+.terms-tick input { width:18px; height:18px; margin-top:2px; accent-color:var(--teal); flex:0 0 18px; }
+.welcome .terms-msg { min-height:1.4em; color:var(--warn); margin:6px 0 0; }
 .promises { list-style:none; padding:0; margin:14px 0 6px; display:grid; gap:10px; }
 .promises li { position:relative; padding:12px 14px 12px 46px; background:var(--card2); border:1px solid var(--line); border-radius:12px; }
 .promises li::before { content:""; position:absolute; left:18px; top:50%; width:13px; height:7px; border-left:3px solid var(--teal); border-bottom:3px solid var(--teal); transform:translateY(-75%) rotate(-45deg); }
@@ -485,6 +492,16 @@ main:focus { outline:none; }
   </div>
   <form class="chat-in" id="chatForm"><input id="chatText" autocomplete="off" placeholder="Ask Sweepwise..." aria-label="Message"><button class="btn primary" type="submit">Send</button></form>
 </aside>
+<div class="welcome-back" id="terms" role="dialog" aria-modal="true" aria-labelledby="tTitle" hidden>
+  <div class="welcome terms">
+    <h2 id="tTitle" tabindex="-1" data-i18n="terms.title">Before you start: the Sweepwise test terms</h2>
+    <p data-i18n="terms.intro">Please read the terms. Sweepwise only runs once you agree to them.</p>
+    <div class="terms-box" id="termsBox" tabindex="0" aria-label="Sweepwise Test Terms"><p data-i18n="terms.loading">Loading the terms...</p></div>
+    <label class="terms-tick" for="termsAgree"><input type="checkbox" id="termsAgree"><span data-i18n="terms.agree">I have read the Sweepwise Test Terms (version 1) and agree to be legally bound by them.</span></label>
+    <p class="terms-msg" id="termsMsg" role="status"></p>
+    <div class="row2"><button class="btn" id="termsNo" data-i18n="terms.decline">Decline</button><button class="btn primary" id="termsYes" disabled data-i18n="terms.accept">I Agree</button></div>
+  </div>
+</div>
 <div class="welcome-back" id="welcome" role="dialog" aria-modal="true" aria-labelledby="wTitle" hidden>
   <div class="welcome">
     <div class="wsteps" aria-hidden="true"><i class="on"></i><i></i><i></i></div>
@@ -593,7 +610,7 @@ main:focus { outline:none; }
   // Keyboard: Tab stays inside an open dialog or the welcome; Escape closes a dialog, or else the chat panel.
   function focusables(box) { return Array.prototype.filter.call(box.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'), function (x) { return !x.disabled && x.offsetParent !== null; }); }
   document.addEventListener('keydown', function (e) {
-    var box = $('modalBack').classList.contains('on') ? $('modalBack') : !$('welcome').hidden ? $('welcome') : null;
+    var box = $('modalBack').classList.contains('on') ? $('modalBack') : !$('terms').hidden ? $('terms') : !$('welcome').hidden ? $('welcome') : null;
     if (e.key === 'Tab' && box) {
       var f = focusables(box); if (!f.length) return;
       var first = f[0], last = f[f.length - 1];
@@ -1122,6 +1139,31 @@ main:focus { outline:none; }
     pick(which === 'openai' ? 'openai' : 'claude');
   }
   // ---------- welcome (answer 25): what it does + promises, two choices, a first scan that shows before it cleans ----------
+  // ---------- the test terms: agreed once (here, or on Windows in the installer) before Sweepwise is used ----------
+  var termsLoaded = false, welcomeDone = false;
+  function openTerms() {
+    $('terms').hidden = false;
+    if (!termsLoaded) {
+      termsLoaded = true;
+      fetch('i18n/terms.en.html').then(function (r) { if (!r.ok) throw new Error(String(r.status)); return r.text(); })
+        .then(function (h) { $('termsBox').innerHTML = h; })
+        .catch(function () { termsLoaded = false; $('termsBox').textContent = t('terms.failed', 'The terms could not be loaded. Close Sweepwise and open it again.'); });
+    }
+    setTimeout(function () { $('tTitle').focus(); }, 30);
+  }
+  $('termsAgree').addEventListener('change', function () { $('termsYes').disabled = !$('termsAgree').checked; });
+  $('termsYes').addEventListener('click', function () {
+    var b = $('termsYes'); b.disabled = true; $('termsMsg').textContent = '';
+    api('/api/terms/accept', {}).then(function () {
+      $('terms').hidden = true;
+      if (!welcomeDone) openWelcome(); else $('main').focus();
+    }, function (e) { b.disabled = !$('termsAgree').checked; $('termsMsg').textContent = String(e.message || e); });
+  });
+  $('termsNo').addEventListener('click', function () {
+    $('termsMsg').textContent = t('terms.declined', 'Sweepwise only runs once you agree to the terms, so it will close now.');
+    $('termsNo').disabled = true; $('termsYes').disabled = true;
+    setTimeout(function () { api('/api/quit', {}).catch(function () {}); }, 1200);
+  });
   function openWelcome(step) { $('welcome').hidden = false; wGo(step || 1); }
   function wGo(n) {
     Array.prototype.forEach.call(document.querySelectorAll('.wstep'), function (x) { x.hidden = x.dataset.step !== String(n); });
@@ -1148,13 +1190,16 @@ main:focus { outline:none; }
     applyTheme(st.theme); applyAdvanced(st.advanced);
     if (s.version) $('verText').textContent = 'Sweepwise ' + s.version;
     if (s.reminder_prompt) $('remBanner').hidden = false;
-    if (!st.welcome_done) openWelcome();
+    welcomeDone = !!st.welcome_done;
+    if (!st.terms_ok) openTerms(); else if (!welcomeDone) openWelcome();
     startScreen(s.start_screen);
     loadUpdate(); setTimeout(loadUpdate, 30000); setInterval(loadUpdate, 3600000);
   }
   // For screenshots and testing only (SWEEPWISE_SCREEN): open a given screen or step at start.
   function startScreen(name) {
     if (!name) return;
+    if (name === 'terms') { $('welcome').hidden = true; openTerms(); return; }
+    $('terms').hidden = true;
     if (/^welcome[123]?$/.test(name)) { openWelcome(+(name.slice(7) || 1)); return; }
     $('welcome').hidden = true;
     if (name === 'keyguide') { show('settings'); setTimeout(function () { keyGuide('claude'); }, 800); return; }

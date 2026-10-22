@@ -300,5 +300,13 @@
  "tab.disk_map": "Disk map",
  "tab.space_finder": "Duplicates & big files",
  "set.learned.title": "What Sweepwise learned",
- "set.learned.desc": "Rules it noticed, your own rules, how you use your PC and the things you said no to. Nothing is learned silently."
+ "set.learned.desc": "Rules it noticed, your own rules, how you use your PC and the things you said no to. Nothing is learned silently.",
+ "terms.title": "Before you start: the Sweepwise test terms",
+ "terms.intro": "Please read the terms. Sweepwise only runs once you agree to them.",
+ "terms.loading": "Loading the terms...",
+ "terms.agree": "I have read the Sweepwise Test Terms (version 1) and agree to be legally bound by them.",
+ "terms.accept": "I Agree",
+ "terms.decline": "Decline",
+ "terms.declined": "Sweepwise only runs once you agree to the terms, so it will close now.",
+ "terms.failed": "The terms could not be loaded. Close Sweepwise and open it again."
 }

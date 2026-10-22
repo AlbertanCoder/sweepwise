@@ -1,0 +1,12 @@
+{
+  "bundle": {
+    "licenseFile": "installer/terms.rtf",
+    "windows": {
+      "nsis": {
+        "installerHooks": "installer/hooks.nsh",
+        "headerImage": "installer/header.bmp",
+        "sidebarImage": "installer/sidebar.bmp"
+      }
+    }
+  }
+}

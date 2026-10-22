@@ -333,6 +333,7 @@ pub fn status(eng: &Arc<Engine>) -> Value {
             "theme": eng.setting("theme").as_str().unwrap_or("dark"),
             "advanced": eng.setting("advanced").as_bool().unwrap_or(false),
             "welcome_done": eng.setting("welcome_done").as_bool().unwrap_or(false),
+            "terms_ok": eng.terms_ok(),
             "update_check": eng.setting("update_check").as_bool().unwrap_or(true),
             "reminder": eng.setting("reminder").as_bool().unwrap_or(false),
             "auto_clean": eng.setting("auto_clean").as_bool().unwrap_or(false),

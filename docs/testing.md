@@ -17,7 +17,9 @@ two whenever Sweepwise reminds you, for two to three weeks.
 1. Open the test download link you were sent and save the file.
 2. Open it. Because the test version isn't signed with a paid certificate yet, Windows may show
    **"Windows protected your PC"**. Click **More info**, then **Run anyway**.
-3. Sweepwise opens with a short welcome. Read the three promises, choose whether you want a weekly reminder, and skip
+3. The installer shows the Sweepwise Test Terms. Read them and click **I Agree**; it won't install without your OK.
+   (On Mac and Linux, Sweepwise shows the same terms the first time it opens.)
+4. Sweepwise opens with a short welcome. Read the three promises, choose whether you want a weekly reminder, and skip
    the AI key unless you already have one.
 
 ## Day one: please try these

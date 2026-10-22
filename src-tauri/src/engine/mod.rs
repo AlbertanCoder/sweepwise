@@ -287,6 +287,14 @@ impl Engine {
         let _ = util::write_json(&self.cfg.settings_file(), &s);
     }
 
+    /// The test terms (src/i18n/terms.en.html) are accepted once: in Sweepwise itself (`/api/terms/accept`), or on
+    /// Windows by the installer's I Agree page, which installer/hooks.nsh records (silent installs skip the page and
+    /// record nothing). Practice mode ignores the installer's record.
+    pub fn terms_ok(&self) -> bool {
+        self.setting("terms_version").as_u64().unwrap_or(0) >= TERMS_VERSION
+            || (!self.cfg.test && installer_terms(INSTALLER_KEY) >= TERMS_VERSION)
+    }
+
     /// POST /api/settings: the person's display choices (only these keys, only these values).
     pub fn save_setting(&self, key: &str, value: Value) -> Result<Value, String> {
         let ok = match key {
@@ -411,6 +419,19 @@ impl Engine {
             "/api/settings" => self.save_setting(&s("key"), body.get("value").cloned().unwrap_or(Value::Null)),
             "/api/welcome/done" => {
                 self.set_setting("welcome_done", json!(true));
+                Ok(json!({ "ok": true }))
+            }
+            "/api/terms/accept" => {
+                self.set_setting("terms_version", json!(TERMS_VERSION));
+                self.set_setting("terms_at", json!(util::iso(util::now())));
+                Ok(json!({ "ok": true }))
+            }
+            // Declining the terms closes Sweepwise, the way an installer's Cancel does.
+            "/api/quit" => {
+                std::thread::spawn(|| {
+                    std::thread::sleep(std::time::Duration::from_millis(300));
+                    std::process::exit(0);
+                });
                 Ok(json!({ "ok": true }))
             }
             "/api/support" => Ok(support::state(self)),
@@ -590,10 +611,58 @@ fn open_place(cfg: &Config, what: &str) -> Result<Value, String> {
     Ok(json!({ "ok": true }))
 }
 
+/// Version of the test terms people agree to; raising it asks everyone again.
+pub const TERMS_VERSION: u64 = 1;
+/// Where the Windows installer records that the person clicked I Agree (installer/hooks.nsh).
+const INSTALLER_KEY: &str = r"Software\AlbertanCoder\Sweepwise";
+
+/// The terms version the Windows installer recorded, or 0.
+#[cfg(windows)]
+fn installer_terms(sub: &str) -> u64 {
+    use winreg::{enums::HKEY_CURRENT_USER, RegKey};
+    RegKey::predef(HKEY_CURRENT_USER)
+        .open_subkey(sub)
+        .and_then(|k| k.get_value::<String, _>("TermsAccepted"))
+        .ok()
+        .and_then(|v| v.trim().parse().ok())
+        .unwrap_or(0)
+}
+#[cfg(not(windows))]
+fn installer_terms(_sub: &str) -> u64 {
+    0
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use testutil::engine as test_engine;
+
+    #[test]
+    fn terms_are_accepted_once_and_remembered() {
+        let (e, root) = test_engine("terms");
+        assert!(!e.terms_ok(), "a new records folder has not agreed yet");
+        assert_eq!(e.route("/api/status", None).unwrap()["settings"]["terms_ok"], false);
+        e.route("/api/terms/accept", Some(json!({}))).unwrap();
+        assert!(e.terms_ok());
+        assert_eq!(e.setting("terms_version"), json!(TERMS_VERSION));
+        assert!(e.setting("terms_at").as_str().map_or(false, |s| s.starts_with("20")));
+        assert_eq!(e.route("/api/status", None).unwrap()["settings"]["terms_ok"], true);
+        testutil::clean(&root);
+    }
+
+    #[cfg(windows)]
+    #[test]
+    fn the_installers_agreement_counts() {
+        use winreg::{enums::HKEY_CURRENT_USER, RegKey};
+        let sub = format!(r"Software\AlbertanCoder\SweepwiseTest{}", std::process::id());
+        assert_eq!(installer_terms(&sub), 0, "nothing recorded");
+        let (k, _) = RegKey::predef(HKEY_CURRENT_USER).create_subkey(&sub).unwrap();
+        k.set_value("TermsAccepted", &"1".to_string()).unwrap();
+        assert_eq!(installer_terms(&sub), 1);
+        k.set_value("TermsAccepted", &"junk".to_string()).unwrap();
+        assert_eq!(installer_terms(&sub), 0, "anything else counts as not agreed");
+        let _ = RegKey::predef(HKEY_CURRENT_USER).delete_subkey_all(&sub);
+    }
 
     #[test]
     fn old_records_move_once_and_program_files_stay() {
