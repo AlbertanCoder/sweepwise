@@ -211,6 +211,8 @@ html:not([data-os="windows"]) .win-only { display:none !important; }
 .skip:focus { left:14px; }
 main:focus { outline:none; }
 .footlinks { display:grid; gap:2px; margin-bottom:10px; }
+.nav-bottom { margin:0 -12px 10px; }
+.back { background:none; border:0; padding:0 0 6px; color:var(--muted); font-size:13px; } .back:hover { color:var(--teal); }
 .footlinks button { background:none; border:0; padding:4px 0; text-align:left; color:var(--muted); font-size:13px; }
 .footlinks button:hover, .footlinks button.on { color:var(--teal); }
 .banner { display:flex; gap:12px; align-items:center; flex-wrap:wrap; padding:14px 18px; margin:0 0 18px; border:1px solid var(--teal2); border-radius:14px; background:linear-gradient(90deg, rgba(45,212,191,.10), transparent 70%), var(--card); }
@@ -257,15 +259,15 @@ main:focus { outline:none; }
     <button data-view="list"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg><span data-i18n="nav.approve_list">Approve list</span><span class="badge" id="navCount"></span></button>
     <button data-view="boost"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3.3 19a9 9 0 1 1 17.4 0"/><path d="M12 14l4.5-4.5"/><circle cx="12" cy="14" r="1.5"/></svg><span data-i18n="nav.boost">Speed Boost</span></button>
     <button data-view="email"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg><span data-i18n="nav.email">Email</span></button>
-    <button data-view="organizer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.8 4.2L18 9l-4.2 1.8L12 15l-1.8-4.2L6 9l4.2-1.8z"/><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9z"/></svg><span data-i18n="nav.ai_organizer">AI Organizer</span></button>
-    <button data-view="diskmap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="10" height="11" rx="1"/><rect x="15" y="3" width="6" height="6" rx="1"/><rect x="15" y="11" width="6" height="10" rx="1"/><rect x="3" y="16" width="10" height="5" rx="1"/></svg><span data-i18n="nav.disk_map">Disk map</span></button>
-    <button data-view="finder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="9" height="12" rx="1.5"/><rect x="8" y="8" width="9" height="12" rx="1.5"/></svg><span data-i18n="nav.space_finder">Space Finder</span></button>
-    <button data-view="brain"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/></svg><span data-i18n="nav.sweepwise_brain">Sweepwise Brain</span><span class="badge" id="navBrain"></span></button>
+    <button hidden id="navOrganizer" data-view="organizer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.8 4.2L18 9l-4.2 1.8L12 15l-1.8-4.2L6 9l4.2-1.8z"/><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9z"/></svg><span data-i18n="nav.ai_organizer">AI Organizer</span></button>
+    <button data-view="storage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="10" height="11" rx="1"/><rect x="15" y="3" width="6" height="6" rx="1"/><rect x="15" y="11" width="6" height="10" rx="1"/><rect x="3" y="16" width="10" height="5" rx="1"/></svg><span data-i18n="nav.storage">Storage</span></button>
     <button data-view="security"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.4 8.6-8 10-4.6-1.4-8-5-8-10V6z"/></svg><span data-i18n="nav.security">Security</span><span class="badge" id="navSec"></span></button>
     <button data-view="history"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 3"/></svg><span data-i18n="nav.history_undo">History &amp; Undo</span></button>
-    <button data-view="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span data-i18n="nav.settings">Settings</span></button>
   </nav>
   <div class="foot">
+    <nav class="nav nav-bottom" aria-label="Settings">
+      <button data-view="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span data-i18n="nav.settings">Settings</span></button>
+    </nav>
     <div class="footlinks"><button data-view="help" data-i18n="nav.help">Help</button><button data-view="support" data-i18n="nav.support">Support Sweepwise</button><button data-view="about" data-i18n="nav.about">About &amp; privacy</button></div>
     <span data-i18n="foot.promise">Nothing personal changes without your OK. Everything can be undone except uninstalls.</span><div class="ver" id="verText">Sweepwise</div></div>
 </aside>
@@ -286,7 +288,6 @@ main:focus { outline:none; }
           <button class="big" id="bigBtn" data-i18n="button.scan_clean" title="Cleans junk, scans for viruses, then lists suggestions for your OK.">Scan &amp; Clean</button>
           <button class="btn" data-run="quick" data-i18n="tile.quick_scan.title">Quick Scan</button>
           <button class="btn" data-ask="full" data-i18n="tile.full_scan.title">Full Scan</button>
-          <button class="btn" data-run="clean" data-i18n="tile.clean.title">Clean</button>
           <button class="btn" data-ask="deep" data-i18n="tile.deep_clean.title">Deep Clean</button>
         </div>
       </div>
@@ -356,24 +357,24 @@ main:focus { outline:none; }
   </section>
 
   <section class="view" id="v-diskmap">
-    <h1 data-i18n="h1.disk_map">Disk map</h1><p class="sub">What fills your drive. Bigger block = more space. Click a block to look inside; this only reads sizes and changes nothing.</p>
+    <h1 data-i18n="h1.storage">Storage</h1><div class="tabs" role="tablist" aria-label="Storage"><button role="tab" aria-selected="true" data-show="diskmap" data-i18n="tab.disk_map">Disk map</button><button role="tab" aria-selected="false" data-show="finder" data-i18n="tab.space_finder">Duplicates &amp; big files</button></div><p class="sub">What fills your drive. Bigger block = more space. Click a block to look inside; this only reads sizes and changes nothing.</p>
     <div style="display:flex; gap:12px; align-items:center; margin-bottom:12px; flex-wrap:wrap"><button class="btn primary" id="dmRun" data-i18n="button.map_my_drive">Map my drive</button><span class="pill" id="dmWhen">Not mapped yet</span><div class="crumbs" id="dmCrumbs"></div></div>
     <div class="dmwrap"><div class="dmmap" id="dmMap"></div><div class="card seccard dmside" id="dmSide"><p class="s">Press Map my drive. It takes about a minute and only reads sizes.</p></div></div>
   </section>
 
   <section class="view" id="v-finder">
-    <h1 data-i18n="h1.space_finder">Space Finder</h1><p class="sub">Finds exact duplicate files (same content, checked by fingerprint) and big files you have not opened in 6 months. Nothing is binned until you tick and approve, and Undo brings it back.</p>
+    <h1 data-i18n="h1.storage">Storage</h1><div class="tabs" role="tablist" aria-label="Storage"><button role="tab" aria-selected="false" data-show="diskmap" data-i18n="tab.disk_map">Disk map</button><button role="tab" aria-selected="true" data-show="finder" data-i18n="tab.space_finder">Duplicates &amp; big files</button></div><p class="sub">Finds exact duplicate files (same content, checked by fingerprint) and big files you have not opened in 6 months. Nothing is binned until you tick and approve, and Undo brings it back.</p>
     <div class="card seccard"><h3>Where to look</h3>
       <div class="chips" id="fdRoots" style="margin:8px 0 12px"><button class="chip on" data-froot="Desktop">Desktop</button><button class="chip on" data-froot="Documents">Documents</button><button class="chip on" data-froot="Downloads">Downloads</button><button class="chip on" data-froot="Pictures">Pictures</button><button class="chip on" data-froot="Videos">Videos</button></div>
       <div class="links" style="margin:0"><button class="btn primary" id="fdGo" data-i18n="button.find">Find</button><span class="pill">Private-looking files, code projects and AppData are never opened.</span></div></div>
     <div id="fdBody" style="margin-top:20px"></div>
     <div class="actions" id="fdActions" style="display:none"><button class="btn primary" id="fdApprove" data-i18n="button.bin_ticked_files">Bin ticked files</button><button class="btn" id="fdUndo" disabled>Undo</button><span id="fdStatus" style="color:var(--muted); flex:1 1 260px; font-size:14px"></span></div>
-    <h2>Browser caches <span class="count">every Chrome and Edge profile; emptied by Clean while the browser is closed</span></h2>
+    <h2>Browser caches <span class="count">every Chrome and Edge profile; emptied by Scan &amp; Clean while the browser is closed</span></h2>
     <div class="card rows" id="fdBrowsers"></div>
   </section>
 
   <section class="view" id="v-brain">
-    <h1 data-i18n="h1.sweepwise_brain">Sweepwise Brain</h1><p class="sub">What Sweepwise has learned about how you like things, out in the open. Nothing is learned silently: every new rule waits for your OK, and you can change or delete any of it.</p>
+    <button class="back" data-show="settings">&#8249; Settings</button><h1 data-i18n="h1.sweepwise_brain">What Sweepwise learned</h1><p class="sub">What Sweepwise has learned about how you like things, out in the open. Nothing is learned silently: every new rule waits for your OK, and you can change or delete any of it.</p>
     <h2>Sweepwise noticed <span class="count" id="brSugCount"></span></h2><div id="brSug"></div>
     <h2 data-i18n="h2.your_rules">Your rules</h2><div class="card rows" id="brRules"></div>
     <h2>About you <span class="count">shared with your AI helper when it plans or chats; names only</span></h2>
@@ -394,7 +395,8 @@ main:focus { outline:none; }
   </section>
 
   <section class="view" id="v-settings">
-    <h1 data-i18n="h1.settings">Settings</h1><p class="sub">Sweepwise runs on your PC only. Keys are encrypted for your Windows account, never shown again, and never leave your PC except to sign in to their own service.</p>
+    <h1 data-i18n="h1.settings">Settings</h1><p class="sub">Sweepwise runs on your PC only. Keys are kept encrypted on this computer, never shown again, and never leave it except to sign in to their own service.</p>
+    <div class="card set"><div><b data-i18n="set.learned.title">What Sweepwise learned</b><span data-i18n="set.learned.desc">Rules it noticed, your own rules, how you use your PC and the things you said no to. Nothing is learned silently.</span></div><button class="btn" data-show="brain"><span data-i18n="button.open">Open</span><span class="badge" id="navBrain" style="margin-left:8px"></span></button></div>
 
     <h2 data-i18n="h2.appearance">Appearance</h2>
     <div class="card set"><div><b data-i18n="set.theme.title">Theme</b><span data-i18n="set.theme.desc">Dark is Sweepwise's signature look. Light is easier in bright rooms.</span></div><div class="seg" role="radiogroup" aria-label="Theme"><button role="radio" aria-checked="true" data-theme-pick="dark" id="themeDark">Dark</button><button role="radio" aria-checked="false" data-theme-pick="light" id="themeLight">Light</button></div></div>
@@ -474,7 +476,7 @@ main:focus { outline:none; }
     <div class="card seccard"><ul class="promises" style="margin:0"><li data-i18n="about.promise.1">Nothing personal changes without your OK.</li><li data-i18n="about.promise.2">Everything can be undone, except uninstalling a program.</li><li data-i18n="about.promise.3">Your files only ever go to the Recycle Bin, and Sweepwise never empties it.</li><li data-i18n="about.promise.4">Windows maintenance uses Microsoft's own tools only: no registry cleaners, no tricks.</li></ul></div>
   </section>
 </main>
-<button id="chatFab" aria-label="Ask Sweepwise"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg><span>Ask Sweepwise</span></button>
+<button id="chatFab" aria-label="Ask Sweepwise" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg><span>Ask Sweepwise</span></button>
 <aside id="chat" aria-label="Chat with Sweepwise">
   <div class="chat-head"><b data-i18n="tile.ask_sweepwise.title">Ask Sweepwise</b><span data-i18n="tile.ask_sweepwise.desc">Answers from Sweepwise's own data. Anything it suggests waits for your click.</span><button class="btn sm" id="chatClose" aria-label="Close chat">Close</button></div>
   <div class="chat-body" id="chatBody">
@@ -550,10 +552,14 @@ main:focus { outline:none; }
   }).catch(function () {});
   var current = 'home';
   function show(v) {
+    if (v === 'storage') v = show.storage || 'diskmap';
+    if (v === 'diskmap' || v === 'finder') show.storage = v;
     current = v;
+    Array.prototype.forEach.call(document.querySelectorAll('[role="tab"][data-show]'), function (t) { if (t.dataset.show === 'diskmap' || t.dataset.show === 'finder') t.setAttribute('aria-selected', String(t.dataset.show === v)); });
+    var navv = { diskmap: 'storage', finder: 'storage', brain: 'settings', work: 'home' }[v] || v;
     Array.prototype.forEach.call(document.querySelectorAll('.view'), function (x) { x.classList.toggle('on', x.id === 'v-' + v); });
     Array.prototype.forEach.call(document.querySelectorAll('.nav button, .footlinks button'), function (x) {
-      var here = x.dataset.view === v || (v === 'work' && x.dataset.view === 'home');
+      var here = x.dataset.view === navv;
       x.classList.toggle('on', here); if (here) x.setAttribute('aria-current', 'page'); else x.removeAttribute('aria-current');
     });
     if (v === 'home') loadStatus();
@@ -622,9 +628,14 @@ main:focus { outline:none; }
       lastTemp = s.temp_c;
       var sp = s.security ? s.security.problems : '';
       $('navSec').textContent = sp || '';
+      aiParts(s.ai_on);
       setBusy(s.job_running);
       if (s.job_running && current === 'home') { show('work'); pollJob(); }
     }).catch(function (e) { $('homeSub').textContent = 'Could not reach the Sweepwise engine: ' + e.message; });
+  }
+  function aiParts(on) {
+    $('navOrganizer').hidden = !on; $('chatFab').hidden = !on;
+    if (!on && current === 'organizer') show('home');
   }
   // What needs the person: short pills that open the right page (at most 3, the rest one click away).
   function attention(s) {
@@ -1028,7 +1039,7 @@ main:focus { outline:none; }
   // ---------- settings ----------
   function tag(id, on, onText, offText) { var t = $(id); t.textContent = on ? onText : offText; t.className = 'tag ' + (on ? 'good' : ''); }
   function loadSettings() {
-    api('/api/ai').then(function (a) { tag('aiState', a.connected, 'on (' + a.provider + ', ' + a.model + ')', 'off'); $('aiRemove').style.display = a.connected ? '' : 'none'; }).catch(function () {});
+    api('/api/ai').then(function (a) { aiParts(a.connected); tag('aiState', a.connected, 'on (' + a.provider + ', ' + a.model + ')', 'off'); $('aiRemove').style.display = a.connected ? '' : 'none'; }).catch(function () {});
     api('/api/status').then(function (s) {
       var st = s.settings || {};
       themeButtons(st.theme || 'dark'); swSet($('advSwitch'), st.advanced); swSet($('remSwitch'), st.reminder); swSet($('updSwitch'), st.update_check !== false);
@@ -1413,7 +1424,7 @@ main:focus { outline:none; }
     api('/api/browsers').then(function (d) {
       var b = d.browsers || [];
       $('fdBrowsers').innerHTML = b.length ? b.map(function (x) {
-        return '<div class="row"><div></div><div><span class="t">' + esc(x.browser) + ' · ' + esc(x.profile) + '</span><span class="w">' + (x.open ? esc(x.browser) + ' is open; close it, then run Clean to empty this.' : 'Emptied the next time you run Clean.') + '</span></div><div class="what">' + size(x.bytes) + '</div><div class="res"></div></div>';
+        return '<div class="row"><div></div><div><span class="t">' + esc(x.browser) + ' · ' + esc(x.profile) + '</span><span class="w">' + (x.open ? esc(x.browser) + ' is open; close it, then run Scan & Clean to empty this.' : 'Emptied the next time you run Scan & Clean.') + '</span></div><div class="what">' + size(x.bytes) + '</div><div class="res"></div></div>';
       }).join('') + '<div class="row"><div></div><div><span class="w">Passwords, history, cookies, bookmarks and offline site data are never touched.</span></div><div class="what"><button class="btn sm primary" id="fdClean" data-i18n="button.run_clean_now">Run Clean now</button></div><div></div></div>' : '<div class="empty" style="padding:18px">No Chrome or Edge caches found.</div>';
       if ($('fdClean')) $('fdClean').addEventListener('click', function () { run('clean'); });
     }).catch(function () {});

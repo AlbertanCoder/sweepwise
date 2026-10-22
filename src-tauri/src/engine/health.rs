@@ -322,6 +322,8 @@ pub fn status(eng: &Arc<Engine>) -> Value {
         "last_run": last,
         "pending": pending,
         "job_running": eng.job_running(),
+        // AI Organizer and Ask Sweepwise only show once the person has added an AI key.
+        "ai_on": super::ai::connected(&eng.cfg),
         "security": sec.map(|s| json!({ "checked": s["checked"], "problems": sec_problems })),
         "roots": roots,
         "platform": std::env::consts::OS,

@@ -24,7 +24,7 @@
  "h1.security": "Security",
  "h1.settings": "Settings",
  "h1.space_finder": "Space Finder",
- "h1.sweepwise_brain": "Sweepwise Brain",
+ "h1.sweepwise_brain": "What Sweepwise learned",
  "h1.your_pc": "Your PC",
  "h2.ai_helper": "AI helper",
  "h2.more": "More",
@@ -294,5 +294,11 @@
  "help.10.a@mac": "Until Apple has checked (notarized) Sweepwise, macOS asks before opening it the first time. Open System Settings > Privacy & Security, scroll down and click Open Anyway. You only need to do this once.",
  "help.12.a@mac": "Drag Sweepwise from Applications to the Trash. Its own records live in a folder you can open from this page; delete that folder too if you want every trace gone.",
  "about.promise.4@mac": "Mac maintenance uses macOS's own tools only (launchctl, Spotlight, Time Machine, Software Update), plus Homebrew and ClamAV when you ask: no tricks.",
- "sub.boost@mac": "Make your Mac feel new again: fewer apps starting when you sign in, less junk, unused apps moved to the Trash and up-to-date apps. Every change waits for your OK, and Time Machine makes a snapshot first when it can."
+ "sub.boost@mac": "Make your Mac feel new again: fewer apps starting when you sign in, less junk, unused apps moved to the Trash and up-to-date apps. Every change waits for your OK, and Time Machine makes a snapshot first when it can.",
+ "nav.storage": "Storage",
+ "h1.storage": "Storage",
+ "tab.disk_map": "Disk map",
+ "tab.space_finder": "Duplicates & big files",
+ "set.learned.title": "What Sweepwise learned",
+ "set.learned.desc": "Rules it noticed, your own rules, how you use your PC and the things you said no to. Nothing is learned silently."
 }
