@@ -1,0 +1,43 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Sweepwise",
+  "version": "0.1.0",
+  "identifier": "com.albertancoder.sweepwise",
+  "build": {
+    "frontendDist": "../src"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "label": "main",
+        "title": "Sweepwise",
+        "width": 1200,
+        "height": 820,
+        "minWidth": 900,
+        "minHeight": 620,
+        "center": true,
+        "theme": "Dark"
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; style-src-attr 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' ipc: http://ipc.localhost; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "publisher": "AlbertanCoder",
+    "copyright": "Copyright (C) 2026 AlbertanCoder. Licensed under the GNU GPL v3.",
+    "category": "Utility",
+    "shortDescription": "Free PC care: clean, scan, organize. Funded by its users.",
+    "longDescription": "Sweepwise cleans junk, checks your protection, finds duplicates and big forgotten files, maps your drive and (optionally, with your own AI key) helps organize your folders. Nothing personal changes without your OK, everything can be undone, and nothing is ever collected.",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ]
+  }
+}

@@ -1,0 +1,48 @@
+[package]
+name = "sweepwise"
+version = "0.1.0"
+description = "Sweepwise: free, open-source PC care for Windows, Mac and Linux, funded by the people who use it."
+authors = ["AlbertanCoder"]
+license = "GPL-3.0-or-later"
+edition = "2021"
+
+[lib]
+name = "sweepwise_lib"
+crate-type = ["rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sysinfo = ">=0.30, <0.40"
+chrono = "0.4"
+dirs = "7"
+trash = "5"
+blake3 = "1"
+regex = "1"
+# Talks to Claude or OpenAI when the person adds their own key (and later, the update check).
+ureq = { version = "2.12", features = ["json"] }
+# Email: the same TLS library ureq uses, and the standard list of trusted certificate authorities.
+rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12"] }
+webpki-roots = "1"
+
+# Linux and Mac: secrets are sealed with ChaCha20-Poly1305 (ring, already used by the TLS library).
+[target.'cfg(not(windows))'.dependencies]
+ring = "0.17"
+
+# Linux: the sealing key lives in the system keychain (Secret Service: GNOME Keyring or KWallet), pure Rust.
+[target.'cfg(target_os = "linux")'.dependencies]
+secret-service = { version = "5.2", features = ["rt-async-io-crypto-rust"] }
+
+[target.'cfg(windows)'.dependencies]
+winreg = "0.56"
+wmi = "0.18"
+windows-sys = { version = "0.61", features = ["Win32_Foundation", "Win32_UI_Shell", "Win32_UI_WindowsAndMessaging", "Win32_System_Threading", "Win32_Security_WinTrust", "Win32_Security_Cryptography", "Win32_Security_Cryptography_Catalog", "Win32_System_Registry", "Win32_System_Restore", "Win32_System_Power", "Win32_Storage_FileSystem", "Win32_Graphics_Gdi"] }
+
+[profile.release]
+codegen-units = 4
+lto = "thin"
+strip = true

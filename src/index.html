@@ -1,0 +1,1507 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sweepwise</title>
+<style>
+:root { --bg:#0a1020; --side:#0d1528; --card:#121c33; --card2:#16223d; --line:#22304f; --text:#e7eef9; --muted:#8c9bb8;
+  --teal:#2dd4bf; --teal2:#14b8a6; --tealglow:rgba(45,212,191,.35); --good:#34d399; --warn:#fbbf24; --bad:#f87171;
+  --input:#0b1428; --ai:#a5f3fc; --learn:#93c5fd; --onteal:#032421; --ringbg:#1d2a47; }
+* { box-sizing:border-box; }
+html, body { height:100%; }
+body { margin:0; background:var(--bg); color:var(--text); font:15px/1.5 "Segoe UI Variable Text","Segoe UI",system-ui,sans-serif; display:flex; overflow:hidden; }
+button { font:inherit; color:inherit; cursor:pointer; }
+/* sidebar */
+.side { width:220px; flex:0 0 220px; background:var(--side); border-right:1px solid var(--line); display:flex; flex-direction:column; padding:18px 12px; }
+.brand { display:flex; align-items:center; gap:10px; padding:4px 10px 22px; }
+.brand b { font-size:22px; letter-spacing:.3px; font-weight:650; }
+.nav button { display:flex; align-items:center; gap:12px; width:100%; background:none; border:0; padding:10px 12px; border-radius:10px; color:var(--muted); text-align:left; font-size:15px; }
+.nav button:hover { background:var(--card); color:var(--text); }
+.nav button.on { background:var(--card2); color:var(--text); box-shadow:inset 3px 0 0 var(--teal); }
+.nav svg { width:19px; height:19px; flex:0 0 19px; }
+.badge { margin-left:auto; background:var(--teal2); color:#04201c; font-size:12px; font-weight:700; border-radius:999px; padding:1px 8px; }
+.badge:empty { display:none; }
+.side .foot { margin-top:auto; color:var(--muted); font-size:12px; padding:0 12px; }
+/* main */
+main { flex:1; overflow-y:auto; padding:28px 34px 40px; }
+.view { display:none; max-width:1060px; margin:0 auto; } .view.on { display:block; }
+h1 { font-size:26px; margin:0 0 4px; font-weight:650; } h2 { font-size:18px; margin:28px 0 12px; font-weight:600; }
+.sub { color:var(--muted); margin:0 0 22px; }
+.card { background:var(--card); border:1px solid var(--line); border-radius:16px; }
+/* hero */
+.hero { display:grid; grid-template-columns:230px 1fr; gap:28px; padding:26px 28px; align-items:center;
+  background:radial-gradient(120% 140% at 0% 0%, rgba(45,212,191,.10), transparent 55%), var(--card); }
+.ring { position:relative; width:200px; height:200px; }
+.ring svg { transform:rotate(-90deg); }
+.ring .num { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.ring .num b { font-size:52px; font-weight:700; line-height:1; } .ring .num span { color:var(--muted); font-size:13px; margin-top:6px; }
+.hero h2 { margin:0 0 6px; font-size:22px; }
+.reasons { margin:8px 0 18px; padding:0; list-style:none; color:var(--muted); }
+.reasons li { padding:3px 0 3px 22px; position:relative; }
+.reasons li::before { content:""; position:absolute; left:4px; top:11px; width:8px; height:8px; border-radius:50%; background:var(--warn); }
+.reasons li.ok::before { background:var(--good); }
+.big { background:linear-gradient(135deg, var(--teal), var(--teal2)); color:var(--onteal); border:0; border-radius:14px; padding:15px 34px; font-size:18px; font-weight:700;
+  box-shadow:0 8px 30px var(--tealglow); transition:transform .12s, box-shadow .12s; }
+.big:hover { transform:translateY(-1px); box-shadow:0 10px 36px var(--tealglow); } .big:disabled { opacity:.5; cursor:default; transform:none; }
+.hint { color:var(--muted); font-size:13px; margin-left:14px; }
+/* stats */
+.stats { display:grid; grid-template-columns:repeat(5, 1fr); gap:12px; margin-top:16px; }
+.stat { padding:14px 16px; } .stat .k { color:var(--muted); font-size:13px; } .stat .v { font-size:20px; font-weight:650; margin-top:2px; } .stat .s { color:var(--muted); font-size:12px; }
+.good { color:var(--good); } .warn { color:var(--warn); } .bad { color:var(--bad); }
+/* tiles */
+.tiles { display:grid; grid-template-columns:repeat(4, 1fr); gap:14px; }
+.tile { position:relative; text-align:left; background:var(--card); border:1px solid var(--line); border-radius:16px; padding:18px; min-height:132px; transition:border-color .12s, transform .12s, background .12s; }
+.tile:hover:not(:disabled) { border-color:var(--teal2); transform:translateY(-2px); background:var(--card2); }
+.tile:disabled { opacity:.55; cursor:default; }
+.tile .ic { width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; background:rgba(45,212,191,.12); color:var(--teal); margin-bottom:12px; }
+.tile .ic svg { width:22px; height:22px; }
+.tile b { display:block; font-size:16px; font-weight:600; } .tile span { color:var(--muted); font-size:13px; }
+.tile .count { position:absolute; top:16px; right:16px; background:var(--card2); border:1px solid var(--line); border-radius:999px; padding:1px 10px; font-size:12px; color:var(--text); }
+.tile .count:empty { display:none; }
+.soon { position:absolute; top:16px; right:16px; font-size:11px; color:var(--muted); border:1px dashed var(--line); border-radius:999px; padding:1px 8px; }
+/* working */
+.work { padding:30px; }
+.bar { height:12px; background:var(--card2); border-radius:999px; overflow:hidden; margin:18px 0 10px; }
+.bar i { display:block; height:100%; width:0; background:linear-gradient(90deg, var(--teal2), var(--teal)); border-radius:999px; transition:width .5s; box-shadow:0 0 18px var(--tealglow); }
+.log { font:13px/1.6 "Cascadia Mono", Consolas, monospace; color:var(--muted); background:var(--input); border:1px solid var(--line); border-radius:12px; padding:12px 14px; min-height:120px; white-space:pre-wrap; word-break:break-word; }
+/* list */
+.chips { display:flex; gap:8px; flex-wrap:wrap; margin:0 0 16px; }
+.chip { background:var(--card); border:1px solid var(--line); border-radius:999px; padding:6px 14px; color:var(--muted); font-size:14px; }
+.chip.on { border-color:var(--teal2); color:var(--text); background:var(--card2); }
+.sect { margin-bottom:22px; } .sect h3 { font-size:16px; margin:0 0 4px; } .sect h3 small { color:var(--muted); font-weight:500; margin-left:6px; }
+.sect p { color:var(--muted); font-size:13px; margin:0 0 10px; }
+.rows { overflow:hidden; }
+.row { display:grid; grid-template-columns:34px 1fr 230px 150px; gap:10px; align-items:center; padding:11px 16px; border-bottom:1px solid var(--line); }
+.row:last-child { border-bottom:0; }
+.row input { width:18px; height:18px; accent-color:var(--teal); cursor:pointer; }
+.row .t { font-weight:550; word-break:break-word; } .row .w { color:var(--muted); font-size:13px; display:block; font-weight:400; }
+.row .w strong { color:var(--warn); font-weight:500; }
+.row .what { color:var(--muted); font-size:14px; word-break:break-word; }
+.row .res { font-size:13px; color:var(--muted); }
+.row.done { opacity:.6; } .row.done .res { color:var(--good); } .row.failed .res { color:var(--bad); }
+.actions { position:sticky; bottom:-40px; background:linear-gradient(transparent, var(--bg) 28%); padding:26px 0 18px; display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+.btn { background:var(--card2); border:1px solid var(--line); border-radius:12px; padding:11px 20px; }
+.btn:hover:not(:disabled) { border-color:var(--teal2); } .btn:disabled { opacity:.5; cursor:default; }
+.btn.primary { background:linear-gradient(135deg, var(--teal), var(--teal2)); color:var(--onteal); border:0; font-weight:700; box-shadow:0 6px 22px var(--tealglow); }
+#listStatus, #histStatus { color:var(--muted); flex:1 1 260px; font-size:14px; }
+.empty { padding:40px; text-align:center; color:var(--muted); }
+/* history */
+table { width:100%; border-collapse:collapse; } th, td { text-align:left; padding:12px 16px; border-bottom:1px solid var(--line); }
+th { color:var(--muted); font-weight:600; font-size:13px; } tr:last-child td { border-bottom:0; } .num { text-align:right; }
+.set { padding:20px 22px; margin-bottom:14px; display:flex; gap:18px; align-items:center; }
+.set div { flex:1; } .set b { display:block; } .set span { color:var(--muted); font-size:14px; }
+.toast { position:fixed; right:24px; bottom:24px; background:var(--card2); border:1px solid var(--teal2); border-radius:12px; padding:12px 18px; box-shadow:0 10px 30px rgba(0,0,0,.4); display:none; max-width:380px; }
+/* stage 2-3 */
+:focus-visible { outline:2px solid var(--teal); outline-offset:2px; }
+.tiles { grid-template-columns:repeat(5, 1fr); }
+.tile.admin .ic { background:rgba(251,191,36,.12); color:var(--warn); }
+.pill { display:inline-flex; align-items:center; gap:6px; border:1px solid var(--line); background:var(--card2); border-radius:999px; padding:3px 12px; font-size:13px; color:var(--muted); }
+.pill b { color:var(--text); font-weight:600; }
+.modal-back { position:fixed; inset:0; background:rgba(3,8,20,.66); display:none; align-items:center; justify-content:center; z-index:20; backdrop-filter:blur(3px); }
+.modal-back.on { display:flex; }
+.modal { width:min(560px, 92vw); background:var(--card); border:1px solid var(--line); border-radius:18px; padding:26px 28px; box-shadow:0 30px 80px rgba(0,0,0,.5); }
+.modal h2 { margin:0 0 8px; } .modal p { color:var(--muted); margin:0 0 14px; }
+.modal .opts { display:grid; gap:10px; margin:16px 0 20px; }
+.opt { display:flex; gap:12px; align-items:flex-start; text-align:left; background:var(--card2); border:1px solid var(--line); border-radius:12px; padding:14px; }
+.opt:hover, .opt.sel { border-color:var(--teal2); } .opt b { display:block; } .opt span { color:var(--muted); font-size:13px; }
+.modal .row2 { display:flex; gap:10px; justify-content:flex-end; }
+.secgrid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.seccard { padding:18px 20px; } .seccard h3 { margin:0 0 4px; font-size:16px; display:flex; align-items:center; gap:10px; } .seccard p.s { color:var(--muted); font-size:13px; margin:0 0 10px; }
+.check { display:flex; gap:10px; padding:8px 0; border-top:1px solid var(--line); } .check:first-of-type { border-top:0; }
+.dot { width:10px; height:10px; border-radius:50%; flex:0 0 10px; margin-top:7px; background:var(--good); } .dot.warn { background:var(--warn); } .dot.bad { background:var(--bad); } .dot.info { background:#60a5fa; }
+.check b { display:block; font-weight:550; } .check span { color:var(--muted); font-size:13px; display:block; word-break:break-word; }
+.tag { font-size:12px; border-radius:999px; padding:1px 9px; border:1px solid var(--line); color:var(--muted); } .tag.good { color:var(--good); border-color:rgba(52,211,153,.4); } .tag.warn { color:var(--warn); border-color:rgba(251,191,36,.4); } .tag.bad { color:var(--bad); border-color:rgba(248,113,113,.4); }
+.links { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+.btn.sm { padding:6px 12px; font-size:13px; border-radius:9px; }
+.ai { display:block; margin-top:4px; font-size:13px; color:var(--ai); } .ai button { margin-left:6px; }
+.learned { display:block; font-size:12px; color:var(--learn); margin-top:2px; }
+details.hid { margin:6px 0 0; } details.hid summary { color:var(--muted); font-size:13px; }
+.form { display:grid; gap:10px; margin-top:12px; } .form label { font-size:13px; color:var(--muted); }
+.form input { width:100%; background:var(--input); color:var(--text); border:1px solid var(--line); border-radius:10px; padding:10px 12px; font:inherit; }
+.form input:focus { border-color:var(--teal2); outline:none; }
+.setgrid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; }
+.code { font:700 26px/1 "Cascadia Mono", Consolas, monospace; letter-spacing:3px; color:var(--teal); background:var(--input); border:1px dashed var(--teal2); border-radius:12px; padding:12px 16px; display:inline-block; margin:8px 0; }
+.ver { color:var(--muted); font-size:12px; padding:8px 12px 0; }
+/* stage 5: brain + chat */
+.sugg { display:flex; gap:14px; align-items:center; padding:16px 18px; margin-bottom:10px; background:linear-gradient(90deg, rgba(45,212,191,.08), transparent 60%), var(--card); }
+.sugg div { flex:1; } .sugg b { display:block; } .sugg span { color:var(--muted); font-size:13px; }
+.rulerow { display:flex; gap:12px; align-items:center; padding:12px 16px; border-bottom:1px solid var(--line); } .rulerow:last-child { border-bottom:0; }
+.rulerow div { flex:1; } .rulerow select { background:var(--input); color:var(--text); border:1px solid var(--line); border-radius:8px; padding:6px 8px; font:inherit; }
+#chatFab { position:fixed; right:24px; bottom:24px; z-index:15; display:flex; align-items:center; gap:8px; border:0; border-radius:999px; padding:12px 18px;
+  background:linear-gradient(135deg, var(--teal), var(--teal2)); color:var(--onteal); font-weight:700; box-shadow:0 10px 30px var(--tealglow); transition:transform .15s; }
+#chatFab:hover { transform:translateY(-2px); } #chatFab svg { width:18px; height:18px; }
+#chat { position:fixed; top:0; right:0; bottom:0; width:min(420px, 100vw); background:var(--side); border-left:1px solid var(--line); z-index:16; display:flex; flex-direction:column;
+  transform:translateX(105%); transition:transform .28s cubic-bezier(.2,.8,.2,1); box-shadow:-20px 0 60px rgba(0,0,0,.4); }
+#chat.on { transform:none; }
+.chat-head { padding:18px 18px 12px; border-bottom:1px solid var(--line); display:grid; grid-template-columns:1fr auto; gap:2px 10px; }
+.chat-head span { color:var(--muted); font-size:12px; grid-column:1; } .chat-head button { grid-row:1 / 3; grid-column:2; align-self:center; }
+.chat-body { flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:10px; }
+.msg { max-width:88%; padding:10px 14px; border-radius:14px; line-height:1.45; white-space:pre-wrap; word-break:break-word; }
+.msg.bot { background:var(--card2); border:1px solid var(--line); align-self:flex-start; border-bottom-left-radius:4px; }
+.msg.me { background:linear-gradient(135deg, var(--teal), var(--teal2)); color:var(--onteal); align-self:flex-end; border-bottom-right-radius:4px; }
+.msg.err { border-color:rgba(248,113,113,.5); }
+.msg .acts { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+.typing { display:inline-flex; gap:4px; } .typing i { width:7px; height:7px; border-radius:50%; background:var(--muted); animation:blink 1.2s infinite; } .typing i:nth-child(2) { animation-delay:.2s; } .typing i:nth-child(3) { animation-delay:.4s; }
+@keyframes blink { 0%, 80%, 100% { opacity:.25; } 40% { opacity:1; } }
+.starters { display:flex; flex-wrap:wrap; gap:6px; } .starters button { background:var(--card); border:1px solid var(--line); border-radius:999px; padding:6px 12px; font-size:13px; color:var(--text); }
+.starters button:hover { border-color:var(--teal2); }
+.chat-in { display:flex; gap:8px; padding:12px 14px 16px; border-top:1px solid var(--line); }
+.chat-in input { flex:1; background:var(--input); color:var(--text); border:1px solid var(--line); border-radius:10px; padding:10px 12px; font:inherit; } .chat-in input:focus { border-color:var(--teal2); outline:none; }
+/* stage 6: disk map, trends, motion */
+.tiles { grid-template-columns:repeat(4, 1fr); }
+.trends { display:grid; grid-template-columns:repeat(4, 1fr); gap:12px; }
+.trend { padding:14px 16px 10px; } .trend .k { color:var(--muted); font-size:13px; } .trend .v { font-size:20px; font-weight:650; } .trend .s { color:var(--muted); font-size:12px; min-height:16px; }
+.trend svg { display:block; width:100%; height:86px; margin-top:6px; overflow:visible; }
+.dmwrap { display:grid; grid-template-columns:1fr 290px; gap:14px; }
+.dmmap { position:relative; height:max(440px, calc(100vh - 250px)); background:var(--card); border:1px solid var(--line); border-radius:16px; overflow:hidden; }
+.dm-box { user-select:none; position:absolute; border-radius:7px; box-sizing:border-box; border:1px solid rgba(10,16,32,.55); padding:6px 8px; overflow:hidden; cursor:pointer; color:#fff;
+  transition:left .35s cubic-bezier(.2,.8,.2,1), top .35s cubic-bezier(.2,.8,.2,1), width .35s cubic-bezier(.2,.8,.2,1), height .35s cubic-bezier(.2,.8,.2,1), filter .15s; }
+.dm-box:hover { filter:brightness(1.18); } .dm-box.sel { outline:2px solid #fff; outline-offset:-3px; }
+.dm-box b { display:block; font-size:12px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-shadow:0 1px 2px rgba(0,0,0,.4); }
+.dm-box span { font-size:11px; opacity:.85; }
+.dm-box.flat { cursor:default; }
+.crumbs { display:flex; gap:4px; flex-wrap:wrap; align-items:center; font-size:14px; } .crumbs button { background:none; border:0; color:var(--teal); padding:2px 4px; } .crumbs i { color:var(--muted); font-style:normal; }
+.dmside h3 { margin:0 0 6px; word-break:break-word; } .dmside .big2 { font-size:28px; font-weight:700; } .dmside .links { flex-direction:column; align-items:stretch; }
+.view.on { animation:viewIn .38s cubic-bezier(.2,.8,.2,1); }
+@keyframes viewIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
+.skel { background:linear-gradient(90deg, var(--card) 0%, var(--card2) 50%, var(--card) 100%); background-size:200% 100%; animation:shimmer 1.2s infinite linear; border-radius:14px; height:64px; margin-bottom:10px; border:1px solid var(--line); }
+@keyframes shimmer { from { background-position:200% 0; } to { background-position:-200% 0; } }
+.btn:active, .big:active, .tile:active:not(:disabled), .chip:active { transform:scale(.97); }
+.spin { width:22px; height:22px; flex:0 0 22px; } .spin circle { transform-origin:center; animation:spin 1s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+.done-mark { display:none; align-items:center; gap:14px; margin:6px 0 4px; position:relative; }
+.done-mark svg { width:54px; height:54px; } .done-mark path { stroke-dasharray:48; stroke-dashoffset:48; animation:draw .6s .1s ease-out forwards; }
+.done-mark circle.ring2 { stroke-dasharray:160; stroke-dashoffset:160; animation:draw .7s ease-out forwards; }
+@keyframes draw { to { stroke-dashoffset:0; } }
+.burst { position:absolute; left:27px; top:27px; width:0; height:0; pointer-events:none; }
+.burst i { position:absolute; width:6px; height:6px; border-radius:50%; background:var(--teal); opacity:0; animation:fly .9s ease-out forwards; }
+@keyframes fly { 0% { transform:translate(0,0) scale(1); opacity:1; } 100% { transform:translate(var(--dx), var(--dy)) scale(.3); opacity:0; } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; } }
+@media (max-width:1100px) { .trends { grid-template-columns:repeat(2, 1fr); } .dmwrap { grid-template-columns:1fr; } }
+@media (max-width:1100px) { .tiles { grid-template-columns:repeat(3, 1fr); } .secgrid, .setgrid { grid-template-columns:1fr; } }
+@media (max-width:900px) { .stats { grid-template-columns:repeat(2, 1fr); } .tiles { grid-template-columns:repeat(2, 1fr); } .hero { grid-template-columns:1fr; } .row { grid-template-columns:34px 1fr; } .row .what, .row .res { grid-column:2; } }
+/* public polish: light theme, welcome, help, support, banners, switches, keyboard use */
+:root[data-theme="light"] { --bg:#f3f6fb; --side:#ffffff; --card:#ffffff; --card2:#eef3fa; --line:#d5deeb; --text:#0f1b2d; --muted:#55657d;
+  --teal:#0b8577; --teal2:#086b60; --tealglow:rgba(11,133,119,.22); --good:#047857; --warn:#b45309; --bad:#c62828;
+  --input:#f8fafc; --ai:#0e7490; --learn:#1d4ed8; --onteal:#ffffff; --ringbg:#e2e8f0; }
+:root[data-theme="light"] .modal-back { background:rgba(15,27,45,.35); }
+:root[data-theme="light"] .toast, :root[data-theme="light"] .modal, :root[data-theme="light"] #chat, :root[data-theme="light"] .welcome { box-shadow:0 12px 34px rgba(15,27,45,.16); }
+:root[data-theme="light"] .badge { color:#ffffff; }
+.ring svg > circle:first-of-type { stroke:var(--ringbg); }
+[hidden] { display:none !important; }
+html:not([data-os="windows"]) .win-only { display:none !important; }
+.skip { position:absolute; left:-9999px; top:10px; z-index:60; background:var(--teal); color:var(--onteal); padding:9px 16px; border-radius:10px; font-weight:700; text-decoration:none; }
+.skip:focus { left:14px; }
+main:focus { outline:none; }
+.footlinks { display:grid; gap:2px; margin-bottom:10px; }
+.footlinks button { background:none; border:0; padding:4px 0; text-align:left; color:var(--muted); font-size:13px; }
+.footlinks button:hover, .footlinks button.on { color:var(--teal); }
+.banner { display:flex; gap:12px; align-items:center; flex-wrap:wrap; padding:14px 18px; margin:0 0 18px; border:1px solid var(--teal2); border-radius:14px; background:linear-gradient(90deg, rgba(45,212,191,.10), transparent 70%), var(--card); }
+.banner[hidden] { display:none; } .banner > div { flex:1 1 260px; } .banner b { display:block; } .banner span { color:var(--muted); font-size:13px; }
+.switch { position:relative; width:48px; height:28px; flex:0 0 48px; border-radius:999px; border:1px solid var(--line); background:var(--card2); padding:0; }
+.switch i { position:absolute; top:4px; left:4px; width:18px; height:18px; border-radius:50%; background:var(--muted); transition:left .15s, background .15s; }
+.switch[aria-checked="true"] { background:var(--teal2); border-color:var(--teal2); } .switch[aria-checked="true"] i { left:24px; background:#ffffff; }
+.switch:disabled { opacity:.5; }
+.seg, .set .seg { display:inline-flex; border:1px solid var(--line); border-radius:12px; overflow:hidden; flex:0 0 auto; }
+.seg button { background:var(--card2); border:0; padding:8px 16px; color:var(--muted); }
+.seg button[aria-checked="true"] { background:var(--teal2); color:#ffffff; font-weight:600; }
+.adv { display:none !important; } body.advanced .adv { display:block !important; }
+.faq { margin-bottom:10px; } .faq summary { cursor:pointer; padding:14px 18px; font-weight:600; list-style:none; display:flex; justify-content:space-between; gap:12px; }
+.faq summary::-webkit-details-marker { display:none; } .faq summary::after { content:"+"; color:var(--teal); font-weight:700; } .faq[open] summary::after { content:"\2212"; }
+.faq p { margin:0; padding:0 18px 16px; color:var(--muted); }
+.supgrid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; } .supgrid .btn { margin-top:6px; }
+.fine { color:var(--muted); font-size:13px; margin:8px 0 0; }
+.supportcard { display:flex; gap:16px; align-items:center; flex-wrap:wrap; padding:18px 20px; margin-top:16px; border-color:var(--teal2); background:linear-gradient(90deg, rgba(45,212,191,.10), transparent 70%), var(--card); }
+.supportcard[hidden] { display:none; } .supportcard > div:nth-child(2) { flex:1 1 240px; } .supportcard b { display:block; } .supportcard span { color:var(--muted); font-size:13px; }
+.heart { width:44px; height:44px; flex:0 0 44px; border-radius:12px; display:flex; align-items:center; justify-content:center; background:rgba(45,212,191,.14); color:var(--teal); }
+.heart svg { width:22px; height:22px; }
+.welcome-back { position:fixed; inset:0; z-index:40; display:flex; align-items:center; justify-content:center; padding:20px; background:radial-gradient(120% 120% at 30% 0%, rgba(45,212,191,.16), transparent 60%), var(--bg); }
+.welcome-back[hidden] { display:none; }
+.welcome { width:min(640px, 94vw); max-height:94vh; overflow-y:auto; background:var(--card); border:1px solid var(--line); border-radius:22px; padding:30px 34px; box-shadow:0 30px 80px rgba(0,0,0,.4); }
+.welcome h2 { font-size:24px; margin:14px 0 8px; } .welcome h2:focus { outline:none; } .welcome p { color:var(--muted); margin:0 0 12px; }
+.wsteps { display:flex; gap:6px; } .wsteps i { width:30px; height:5px; border-radius:999px; background:var(--line); } .wsteps i.on { background:var(--teal); }
+.wstep[hidden] { display:none; }
+.promises { list-style:none; padding:0; margin:14px 0 6px; display:grid; gap:10px; }
+.promises li { position:relative; padding:12px 14px 12px 46px; background:var(--card2); border:1px solid var(--line); border-radius:12px; }
+.promises li::before { content:""; position:absolute; left:18px; top:50%; width:13px; height:7px; border-left:3px solid var(--teal); border-bottom:3px solid var(--teal); transform:translateY(-75%) rotate(-45deg); }
+.welcome .row2 { display:flex; gap:10px; justify-content:flex-end; margin-top:20px; flex-wrap:wrap; }
+.welcome .set { margin:14px 0; padding:16px 18px; }
+.welcome .seccard { margin:0; }
+.steps { margin:6px 0 12px; padding-left:22px; } .steps li { margin:7px 0; }
+.tabs { display:flex; gap:6px; margin:4px 0 12px; } .tabs button { background:var(--card2); border:1px solid var(--line); border-radius:999px; padding:6px 14px; color:var(--muted); }
+.tabs button[aria-selected="true"] { border-color:var(--teal2); color:var(--text); }
+@media (max-width:900px) { .supgrid { grid-template-columns:1fr; } }
+</style></head><body>
+<a class="skip" href="#main" data-i18n="a11y.skip">Skip to content</a>
+<aside class="side">
+  <div class="brand"><svg width="34" height="34" viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="lg" x1="20%" y1="5%" x2="80%" y2="96%"><stop offset="0" stop-color="#5eead4"/><stop offset="1" stop-color="#0d9488"/></linearGradient><clipPath id="shieldClip"><path d="M50 5 C62 13 76 16 90 17 C92 52 80 80 50 96 C20 80 8 52 10 17 C24 16 38 13 50 5 Z"/></clipPath></defs><path d="M50 5 C62 13 76 16 90 17 C92 52 80 80 50 96 C20 80 8 52 10 17 C24 16 38 13 50 5 Z" fill="url(#lg)"/><g clip-path="url(#shieldClip)"><g transform="translate(1.3,1.6)" fill="rgba(4,40,40,.28)"><line x1="70.5" y1="20.5" x2="45.6" y2="55.2" stroke="rgba(4,40,40,.28)" stroke-width="4.6" stroke-linecap="round"/><path d="M37.18 53.98 L49.27 62.86 L44.07 82.61 C35 80.6 25 73 19.89 64.85 Z"/></g><line x1="70.5" y1="20.5" x2="45.6" y2="55.2" stroke="#fff" stroke-width="4.6" stroke-linecap="round"/><path d="M37.18 53.98 L49.27 62.86 L44.07 82.61 C35 80.6 25 73 19.89 64.85 Z" fill="#fff"/><path d="M39.95 51.05 L51.23 59.34 L48.87 62.56 L37.58 54.27 Z" fill="#0a1020"/><path d="M69 55 Q69 62 76 62 Q69 62 69 69 Q69 62 62 62 Q69 62 69 55 Z" fill="#fff"/><path d="M78.5 44 Q78.5 48 82.5 48 Q78.5 48 78.5 52 Q78.5 48 74.5 48 Q78.5 48 78.5 44 Z" fill="#ccfbf1"/></g><path d="M50 5 C62 13 76 16 90 17 C92 52 80 80 50 96 C20 80 8 52 10 17 C24 16 38 13 50 5 Z" fill="none" stroke="rgba(255,255,255,.43)" stroke-width="1.8"/></svg><b>Sweepwise</b></div>
+  <nav class="nav">
+    <button data-view="home" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span data-i18n="nav.home">Home</span></button>
+    <button data-view="list"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg><span data-i18n="nav.approve_list">Approve list</span><span class="badge" id="navCount"></span></button>
+    <button data-view="boost"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3.3 19a9 9 0 1 1 17.4 0"/><path d="M12 14l4.5-4.5"/><circle cx="12" cy="14" r="1.5"/></svg><span data-i18n="nav.boost">Speed Boost</span></button>
+    <button data-view="email"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg><span data-i18n="nav.email">Email</span></button>
+    <button data-view="organizer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.8 4.2L18 9l-4.2 1.8L12 15l-1.8-4.2L6 9l4.2-1.8z"/><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9z"/></svg><span data-i18n="nav.ai_organizer">AI Organizer</span></button>
+    <button data-view="diskmap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="10" height="11" rx="1"/><rect x="15" y="3" width="6" height="6" rx="1"/><rect x="15" y="11" width="6" height="10" rx="1"/><rect x="3" y="16" width="10" height="5" rx="1"/></svg><span data-i18n="nav.disk_map">Disk map</span></button>
+    <button data-view="finder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="9" height="12" rx="1.5"/><rect x="8" y="8" width="9" height="12" rx="1.5"/></svg><span data-i18n="nav.space_finder">Space Finder</span></button>
+    <button data-view="brain"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/></svg><span data-i18n="nav.sweepwise_brain">Sweepwise Brain</span><span class="badge" id="navBrain"></span></button>
+    <button data-view="security"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.4 8.6-8 10-4.6-1.4-8-5-8-10V6z"/></svg><span data-i18n="nav.security">Security</span><span class="badge" id="navSec"></span></button>
+    <button data-view="history"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 3"/></svg><span data-i18n="nav.history_undo">History &amp; Undo</span></button>
+    <button data-view="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span data-i18n="nav.settings">Settings</span></button>
+  </nav>
+  <div class="foot">
+    <div class="footlinks"><button data-view="help" data-i18n="nav.help">Help</button><button data-view="support" data-i18n="nav.support">Support Sweepwise</button><button data-view="about" data-i18n="nav.about">About &amp; privacy</button></div>
+    <span data-i18n="foot.promise">Nothing personal changes without your OK. Everything can be undone except uninstalls.</span><div class="ver" id="verText">Sweepwise</div></div>
+</aside>
+<main id="main" tabindex="-1">
+  <div class="banner" id="updBanner" role="status" hidden><div><b id="updTitle">A new version of Sweepwise is ready</b><span id="updSub"></span></div><button class="btn sm" id="updNotes" data-i18n="button.whats_new">What's new</button><button class="btn sm primary" id="updGo" data-i18n="button.update">Update</button><button class="btn sm" id="updHide" data-i18n="button.not_now">Not now</button></div>
+  <section class="view on" id="v-home">
+    <h1 data-i18n="h1.your_pc">Your PC</h1><p class="sub" id="homeSub" data-i18n="sub.homeSub">Checking...</p>
+    <div class="banner" id="remBanner" hidden><div><b data-i18n="rem.title">It's been a week since your last clean-up</b><span data-i18n="rem.desc">Want Sweepwise to run Scan &amp; Clean now? Nothing personal changes without your OK.</span></div><button class="btn sm primary" id="remGo" data-i18n="button.scan_clean">Scan &amp; Clean</button><button class="btn sm" id="remHide" data-i18n="button.not_now">Not now</button></div>
+    <div class="card hero">
+      <div class="ring"><svg width="200" height="200" viewBox="0 0 200 200"><circle cx="100" cy="100" r="86" fill="none" stroke="#1d2a47" stroke-width="14"/>
+        <circle id="ringArc" cx="100" cy="100" r="86" fill="none" stroke="url(#rg)" stroke-width="14" stroke-linecap="round" stroke-dasharray="540.4" stroke-dashoffset="540.4" style="transition:stroke-dashoffset 1s"/>
+        <defs><linearGradient id="rg"><stop offset="0" stop-color="#14b8a6"/><stop offset="1" stop-color="#5eead4"/></linearGradient></defs></svg>
+        <div class="num"><b id="score">--</b><span>health score</span></div></div>
+      <div>
+        <h2 id="scoreWord">Checking your PC</h2>
+        <ul class="reasons" id="reasons"></ul>
+        <button class="big" id="bigBtn" data-i18n="button.scan_clean">Scan &amp; Clean</button><span class="hint">Cleans junk, scans for viruses, then lists suggestions for your OK.</span>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="card stat"><div class="k">Free memory</div><div class="v" id="sRam">--</div><div class="s" id="sRam2"></div></div>
+      <div class="card stat"><div class="k">Free space</div><div class="v" id="sDisk">--</div><div class="s" id="sDisk2"></div></div>
+      <div class="card stat"><div class="k">Temperature</div><div class="v" id="sTemp">--</div><div class="s" id="sTemp2"></div></div>
+      <div class="card stat"><div class="k">Virus protection</div><div class="v" id="sProt">--</div><div class="s" id="sProt2"></div></div>
+      <div class="card stat"><div class="k">Last scan</div><div class="v" id="sScan">--</div><div class="s" id="sScan2"></div></div>
+    </div>
+    <h2 data-i18n="h2.trends">Trends</h2>
+    <div class="trends">
+      <div class="card trend"><div class="k">Health score</div><div class="v" id="tScore">--</div><div class="s" id="tScoreS"></div><svg id="cScore" aria-label="Health score over time"></svg></div>
+      <div class="card trend"><div class="k">Free space on C:</div><div class="v" id="tFree">--</div><div class="s" id="tFreeS"></div><svg id="cFree" aria-label="Free space over time"></svg></div>
+      <div class="card trend"><div class="k">Space freed by Sweepwise</div><div class="v" id="tFreed">--</div><div class="s" id="tFreedS"></div><svg id="cFreed" aria-label="Space freed per week"></svg></div>
+      <div class="card trend"><div class="k">Threats found</div><div class="v" id="tThreat">--</div><div class="s" id="tThreatS"></div><svg id="cThreat" aria-label="Threats found per week"></svg></div>
+    </div>
+    <h2 data-i18n="h2.tools">Tools</h2>
+    <div class="tiles">
+      <button class="tile" data-run="quick"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg></div><b data-i18n="tile.quick_scan.title">Quick Scan</b><span data-i18n="tile.quick_scan.desc">Windows Security checks the places viruses usually hide. 1-2 minutes.</span></button>
+      <button class="tile" data-ask="full"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.4 8.6-8 10-4.6-1.4-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg></div><b data-i18n="tile.full_scan.title">Full Scan</b><span data-i18n="tile.full_scan.desc">Every file on your PC. Starts only when your PC is cool.</span></button>
+      <button class="tile" data-run="clean"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21l6-6M14 4l6 6-8 8-6-6z"/><path d="M5 19l-2 2"/></svg></div><b data-i18n="tile.clean.title">Clean</b><span data-i18n="tile.clean.desc">Clears temp files and caches now, then lists the rest for your OK.</span></button>
+      <button class="tile admin" data-ask="deep"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M10 11v6M14 11v6M5 7l1 13h12l1-13M9 7V4h6v3"/></svg></div><b data-i18n="tile.deep_clean.title">Deep Clean</b><span data-i18n="tile.deep_clean.desc">Windows' own system cleanup and repair. Asks for admin.</span></button>
+      <button class="tile" data-goto="security"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.4 8.6-8 10-4.6-1.4-8-5-8-10V6z"/><path d="M12 8v4M12 16h.01"/></svg></div><b data-i18n="tile.security.title">Security</b><span data-i18n="tile.security.desc">Protection, odd startup items, risky Chrome extensions, updates.</span><em class="count" id="cSecurity"></em></button>
+      <button class="tile" data-goto="startup"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"/></svg></div><b data-i18n="tile.optimize.title">Optimize</b><span data-i18n="tile.optimize.desc">Programs that start with Windows and slow it down.</span><em class="count" id="cStartup"></em></button>
+      <button class="tile" data-goto="organize"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div><b data-i18n="tile.organize.title">Organize</b><span data-i18n="tile.organize.desc">Loose files sorted into folders, old AI leftovers to the Recycle Bin.</span><em class="count" id="cOrganize"></em></button>
+      <button class="tile" data-goto="uninstall"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M15 17.5h6"/></svg></div><b data-i18n="tile.programs.title">Programs</b><span data-i18n="tile.programs.desc">Programs you have not opened in 6 months.</span><em class="count" id="cPrograms"></em></button>
+      <button class="tile" data-goto="organizer"><div class="ic" style="background:rgba(165,243,252,.12); color:#a5f3fc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.8 4.2L18 9l-4.2 1.8L12 15l-1.8-4.2L6 9l4.2-1.8z"/><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9z"/></svg></div><b data-i18n="tile.ai_organizer.title">AI Organizer</b><span data-i18n="tile.ai_organizer.desc">Your AI helper plans a tidy-up of your folders. Every step waits for your OK.</span></button>
+      <button class="tile" data-goto="diskmap"><div class="ic" style="background:rgba(139,92,246,.14); color:#c4b5fd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="10" height="11" rx="1"/><rect x="15" y="3" width="6" height="6" rx="1"/><rect x="15" y="11" width="6" height="10" rx="1"/><rect x="3" y="16" width="10" height="5" rx="1"/></svg></div><b data-i18n="tile.disk_map.title">Disk map</b><span data-i18n="tile.disk_map.desc">See what fills your drive and click into any folder.</span></button>
+      <button class="tile" data-goto="finder"><div class="ic" style="background:rgba(96,165,250,.14); color:#93c5fd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="9" height="12" rx="1.5"/><rect x="8" y="8" width="9" height="12" rx="1.5"/><circle cx="18" cy="6" r="3"/><path d="M20.2 8.2L22 10"/></svg></div><b data-i18n="tile.space_finder.title">Space Finder</b><span data-i18n="tile.space_finder.desc">Exact duplicate files and big files you forgot about.</span></button>
+    </div>
+  </section>
+
+  <section class="view" id="v-work">
+    <h1 id="workTitle">Working...</h1><p class="sub">You can keep using your PC. Nothing personal changes until you approve it.</p>
+    <div class="card work">
+      <div class="done-mark" id="doneMark"><svg viewBox="0 0 54 54" fill="none"><circle class="ring2" cx="27" cy="27" r="24" stroke="#2dd4bf" stroke-width="3"/><path d="M16 28l7 7 15-16" stroke="#2dd4bf" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="burst" id="burst"></div><b style="font-size:18px">All done</b></div>
+      <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:center"><div style="display:flex; gap:10px; align-items:center"><svg class="spin" id="workSpin" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#1d2a47" stroke-width="3"/><circle cx="12" cy="12" r="9" stroke="#2dd4bf" stroke-width="3" stroke-linecap="round" stroke-dasharray="14 60"/></svg><b id="workStep">Starting...</b></div><span class="pill" id="workTemp"></span></div>
+      <div class="bar"><i id="workBar"></i></div>
+      <div class="sub" id="workTime" style="margin:0 0 14px"></div>
+      <div class="log" id="workLog"></div>
+      <div style="margin-top:18px; display:none" id="workDone"><button class="btn primary" id="workReview" data-i18n="button.review_suggestions">Review suggestions</button> <button class="btn" id="workHome" data-i18n="button.back_to_home">Back to Home</button></div>
+      <div class="card supportcard" id="supportCard" hidden><div class="heart" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21l-1.4-1.3C5.4 15 2 12 2 8.2 2 5.2 4.4 3 7.3 3c1.7 0 3.4.8 4.7 2.1C13.3 3.8 15 3 16.7 3 19.6 3 22 5.2 22 8.2c0 3.8-3.4 6.8-8.6 11.5z"/></svg></div><div><b id="supText">If Sweepwise helped, you can buy me a coffee.</b><span data-i18n="support.card.desc">Sweepwise is free for everyone and kept going by people who chip in. It unlocks nothing: everything is already free.</span></div><div class="links" style="margin:0"><button class="btn sm primary" id="supGo" data-i18n="button.support">Support Sweepwise</button><button class="btn sm" id="supLater" data-i18n="button.maybe_later">Maybe later</button><button class="btn sm" id="supNever" data-i18n="button.dont_ask_again">Don't ask again</button></div></div>
+    </div>
+  </section>
+
+  <section class="view" id="v-list">
+    <h1 data-i18n="h1.approve_list">Approve list</h1><p class="sub" id="listSub" data-i18n="sub.listSub">Tick what you want. Nothing happens until you press Approve.</p>
+    <div class="chips" id="chips"></div>
+    <div id="listBody"></div>
+    <div class="actions"><button class="btn primary" id="approveBtn" data-i18n="button.approve_ticked_items">Approve ticked items</button><button class="btn" id="undoBtn" disabled>Undo this run</button><span id="listStatus"></span></div>
+  </section>
+
+  <section class="view" id="v-history">
+    <h1 data-i18n="h1.history_undo">History &amp; Undo</h1><p class="sub">Every Sweepwise run. Undo puts back what was moved, binned, trashed or turned off in that run.</p>
+    <div class="card" id="histBody"></div>
+    <p id="histStatus" style="margin-top:14px"></p>
+  </section>
+
+  <section class="view" id="v-organizer">
+    <h1 data-i18n="h1.ai_organizer">AI Organizer</h1><p class="sub">The AI looks at the <b>names</b> in the folders you pick (never what is inside) and plans a tidy-up: new folders, moves and clearer names. Every step waits for your OK, and Undo puts it all back. Code projects and private-looking files are never touched.</p>
+    <div class="card seccard" id="orgSetup">
+      <h3>1. Pick the folders</h3>
+      <div class="chips" id="orgRoots" style="margin:8px 0 14px">
+        <button class="chip on" data-root="Desktop">Desktop</button><button class="chip on" data-root="Downloads">Downloads</button><button class="chip" data-root="Documents">Documents</button><button class="chip" data-root="Pictures">Pictures</button><button class="chip" data-root="Videos">Videos</button>
+      </div>
+      <h3>2. Anything specific? <span style="color:var(--muted); font-weight:400; font-size:13px">(optional)</span></h3>
+      <div class="form" style="margin-top:6px"><input id="orgAsk" maxlength="500" placeholder="e.g. put all my resumes and cover letters in one folder" aria-label="What to organize"></div>
+      <div class="links" style="margin-top:14px"><button class="btn primary" id="orgGo" data-i18n="button.3_make_a_plan">3. Make a plan</button><span class="pill" id="orgNote">Uses your own AI key; usually under a minute.</span></div>
+    </div>
+    <div id="orgPlan" style="margin-top:22px"></div>
+    <div class="actions" id="orgActions" style="display:none"><button class="btn primary" id="orgApprove" data-i18n="button.approve_ticked_steps">Approve ticked steps</button><button class="btn" id="orgUndo" disabled>Undo this plan</button><span id="orgStatus" style="color:var(--muted); flex:1 1 260px; font-size:14px"></span></div>
+  </section>
+
+  <section class="view" id="v-diskmap">
+    <h1 data-i18n="h1.disk_map">Disk map</h1><p class="sub">What fills your drive. Bigger block = more space. Click a block to look inside; this only reads sizes and changes nothing.</p>
+    <div style="display:flex; gap:12px; align-items:center; margin-bottom:12px; flex-wrap:wrap"><button class="btn primary" id="dmRun" data-i18n="button.map_my_drive">Map my drive</button><span class="pill" id="dmWhen">Not mapped yet</span><div class="crumbs" id="dmCrumbs"></div></div>
+    <div class="dmwrap"><div class="dmmap" id="dmMap"></div><div class="card seccard dmside" id="dmSide"><p class="s">Press Map my drive. It takes about a minute and only reads sizes.</p></div></div>
+  </section>
+
+  <section class="view" id="v-finder">
+    <h1 data-i18n="h1.space_finder">Space Finder</h1><p class="sub">Finds exact duplicate files (same content, checked by fingerprint) and big files you have not opened in 6 months. Nothing is binned until you tick and approve, and Undo brings it back.</p>
+    <div class="card seccard"><h3>Where to look</h3>
+      <div class="chips" id="fdRoots" style="margin:8px 0 12px"><button class="chip on" data-froot="Desktop">Desktop</button><button class="chip on" data-froot="Documents">Documents</button><button class="chip on" data-froot="Downloads">Downloads</button><button class="chip on" data-froot="Pictures">Pictures</button><button class="chip on" data-froot="Videos">Videos</button></div>
+      <div class="links" style="margin:0"><button class="btn primary" id="fdGo" data-i18n="button.find">Find</button><span class="pill">Private-looking files, code projects and AppData are never opened.</span></div></div>
+    <div id="fdBody" style="margin-top:20px"></div>
+    <div class="actions" id="fdActions" style="display:none"><button class="btn primary" id="fdApprove" data-i18n="button.bin_ticked_files">Bin ticked files</button><button class="btn" id="fdUndo" disabled>Undo</button><span id="fdStatus" style="color:var(--muted); flex:1 1 260px; font-size:14px"></span></div>
+    <h2>Browser caches <span class="count">every Chrome and Edge profile; emptied by Clean while the browser is closed</span></h2>
+    <div class="card rows" id="fdBrowsers"></div>
+  </section>
+
+  <section class="view" id="v-brain">
+    <h1 data-i18n="h1.sweepwise_brain">Sweepwise Brain</h1><p class="sub">What Sweepwise has learned about how you like things, out in the open. Nothing is learned silently: every new rule waits for your OK, and you can change or delete any of it.</p>
+    <h2>Sweepwise noticed <span class="count" id="brSugCount"></span></h2><div id="brSug"></div>
+    <h2 data-i18n="h2.your_rules">Your rules</h2><div class="card rows" id="brRules"></div>
+    <h2>About you <span class="count">shared with your AI helper when it plans or chats; names only</span></h2>
+    <div class="card seccard"><div id="brFacts"></div>
+      <div class="form"><label for="brNotes">Your own notes for the AI (for example: "keep school stuff in Documents\School", "never touch my Projects folder")</label>
+        <textarea id="brNotes" rows="3" maxlength="2000" style="width:100%; background:var(--input); color:var(--text); border:1px solid var(--line); border-radius:10px; padding:10px 12px; font:inherit; resize:vertical"></textarea>
+        <div class="links" style="margin:0"><button class="btn primary" id="brSave" data-i18n="button.save_notes">Save notes</button></div></div></div>
+    <h2 data-i18n="h2.habits">How you use your PC</h2>
+    <div class="card seccard"><p class="s" data-i18n="habits.desc">Learned on this PC only, from the files and apps you open. Files you opened in the last two weeks are left out of tidy-ups. The AI only ever sees folder and app names.</p><div id="habitsBody"></div><div class="links"><button class="btn sm" id="habitsForget" data-i18n="button.forget_habits">Forget habits</button></div></div>
+    <h2 data-i18n="h2.things_you_said_no_to">Things you said no to</h2>
+    <div class="card seccard"><p class="s">When you leave a suggestion unticked and approve the rest, Sweepwise remembers. Once: it starts unticked. Twice: it is hidden. Forget it to have it suggested again.</p><div id="learnBody"></div></div>
+  </section>
+
+  <section class="view" id="v-security">
+    <h1 data-i18n="h1.security">Security</h1><p class="sub" id="secSub" data-i18n="sub.secSub">Windows Security does the virus protection. Sweepwise checks that it is all switched on and looks for things that should not be there. This check only reads; it changes nothing.</p>
+    <div style="display:flex; gap:12px; align-items:center; margin-bottom:18px; flex-wrap:wrap"><button class="btn primary" id="secRun" data-i18n="button.run_security_check">Run Security check</button><button class="btn win-only" id="secMrt" data-i18n="button.mrt">Malicious Software Removal Tool</button><button class="btn win-only" id="secOffline" data-i18n="button.offline_scan">Offline scan</button><span class="pill" id="secWhen">Not checked yet</span></div>
+    <div class="secgrid" id="secBody"></div>
+  </section>
+
+  <section class="view" id="v-settings">
+    <h1 data-i18n="h1.settings">Settings</h1><p class="sub">Sweepwise runs on your PC only. Keys are encrypted for your Windows account, never shown again, and never leave your PC except to sign in to their own service.</p>
+
+    <h2 data-i18n="h2.appearance">Appearance</h2>
+    <div class="card set"><div><b data-i18n="set.theme.title">Theme</b><span data-i18n="set.theme.desc">Dark is Sweepwise's signature look. Light is easier in bright rooms.</span></div><div class="seg" role="radiogroup" aria-label="Theme"><button role="radio" aria-checked="true" data-theme-pick="dark" id="themeDark">Dark</button><button role="radio" aria-checked="false" data-theme-pick="light" id="themeLight">Light</button></div></div>
+    <div class="card set"><div><b data-i18n="set.advanced.title">Show advanced details</b><span data-i18n="set.advanced.desc">Extra detail for tech-savvy people: full file paths and the rule behind each suggestion.</span></div><button class="switch" role="switch" aria-checked="false" id="advSwitch" aria-label="Show advanced details"><i></i></button></div>
+    <h2 data-i18n="h2.reminders_updates">Reminders and updates</h2>
+    <div class="card set"><div><b data-i18n="set.reminder.title">Weekly reminder</b><span data-i18n="set.reminder.desc">On Sundays at 6 pm Sweepwise asks whether to run. It never runs on its own, and stays quiet if you cleaned that week.</span></div><button class="switch" role="switch" aria-checked="false" id="remSwitch" aria-label="Weekly reminder"><i></i></button></div>
+    <div class="card set"><div><b data-i18n="set.auto.title">Weekly auto-clean</b><span data-i18n="set.auto_link.desc">Temporary files and caches only, every Sunday, if you switch it on on the Speed Boost page.</span></div><button class="btn" data-show="boost" data-i18n="button.set_up">Set up</button></div>
+    <div class="card set"><div><b data-i18n="set.updates.title">Check for updates once a day</b><span id="updState">Asks GitHub which version is newest. Nothing about you is sent. Never updates without your click.</span></div><button class="btn sm" id="updCheck" data-i18n="button.check_now">Check now</button><button class="switch" role="switch" aria-checked="true" id="updSwitch" aria-label="Check for updates once a day"><i></i></button></div>
+    <h2 data-i18n="h2.ai_helper">AI helper</h2>
+    <div class="card seccard"><h3>AI key (Claude or OpenAI) <span class="tag" id="aiState">checking</span></h3>
+      <p class="s">Optional, and off until you add a key. It powers the AI Organizer, the chat and smarter suggestions for files Sweepwise is unsure about. Only names, sizes and dates are sent, never what is inside a file, and anything that looks private (passwords, IDs, bank, tax, legal) is never sent. Use your own key from Anthropic (Claude) or OpenAI: their small charges go to your account with them, never to Sweepwise. Sweepwise checks the key for free and keeps it encrypted for your Windows account.</p>
+      <div class="form"><input id="aiKey" type="password" placeholder="sk-ant-... (Claude) or sk-... (OpenAI)" aria-label="AI key, Claude or OpenAI" autocomplete="off">
+        <div class="links" style="margin:0"><button class="btn primary" id="aiSave" type="button">Save and check key</button><button class="btn sm" id="aiGuide" type="button" data-i18n="button.key_guide">How to get a key</button><button class="btn sm" data-open="anthropic_keys" type="button">Get a Claude key</button><button class="btn sm" data-open="openai_keys" type="button">Get an OpenAI key</button><button class="btn sm" id="aiRemove" type="button">Remove key</button></div></div>
+    </div>
+    <h2 data-i18n="h2.more">More</h2>
+    <div class="card set"><div><b data-i18n="tile.review_folder.title">Review folder</b><span data-i18n="tile.review_folder.desc">Files Sweepwise was unsure about go to Documents\_Review for you to sort.</span></div><button class="btn" data-open="review">Open folder</button></div>
+    <div class="card set win-only"><div><b data-i18n="tile.windows_security.title">Windows Security</b><span data-i18n="tile.windows_security.desc">Protection history, quarantine and real-time protection settings.</span></div><button class="btn" data-open="security">Open</button></div>
+    <h2 data-i18n="h2.support_about">Support and about</h2>
+    <div class="card set"><div><b data-i18n="set.support.title">Support Sweepwise</b><span data-i18n="set.support.desc">Free for everyone, kept going by people who chip in. Optional, and it unlocks nothing: everything is already free.</span></div><button class="btn primary" data-show="support" data-i18n="button.support">Support Sweepwise</button></div>
+    <div class="card set"><div><b data-i18n="set.about.title">About &amp; privacy</b><span data-i18n="set.about.desc">Version, licence, and exactly what Sweepwise does and doesn't send.</span></div><button class="btn" data-show="about" data-i18n="button.open">Open</button></div>
+  </section>
+  <section class="view" id="v-email">
+    <h1 data-i18n="h1.email">Email</h1><p class="sub" data-i18n="sub.email">Clears old newsletters and promotions out of your inbox. Sweepwise reads only sender and subject lines, never your emails, and never touches mail from people you write to, banks, government, health, security alerts or receipts. Everything goes to your own Trash, and Undo puts it back.</p>
+    <div class="card seccard"><h3 data-i18n="email.accounts.title">Your email accounts</h3><div id="mailAccounts"></div>
+      <p class="s" data-i18n="email.add.desc">Gmail, Yahoo and iCloud use an app password: a separate password just for Sweepwise, so your real password is never shared. Outlook and Hotmail use Microsoft's own sign-in page.</p>
+      <div class="form">
+        <select id="mailProvider" aria-label="Email provider" style="background:var(--input); color:var(--text); border:1px solid var(--line); border-radius:10px; padding:10px 12px; font:inherit"></select>
+        <input id="mailEmail" type="email" placeholder="you@gmail.com" aria-label="Email address" autocomplete="off">
+        <input id="mailPass" type="password" placeholder="App password (not your normal password)" aria-label="App password" autocomplete="off">
+        <div id="mailOther" hidden style="display:grid; gap:10px; grid-template-columns:1fr 120px"><input id="mailHost" placeholder="imap.example.com" aria-label="Mail server"><input id="mailPort" placeholder="993" aria-label="Port"></div>
+        <div class="links" style="margin:0" id="mailPassButtons"><button class="btn primary" id="mailConnect" type="button" data-i18n="button.connect">Connect</button><button class="btn sm" id="mailGuide" type="button" data-i18n="button.app_password_guide">How to make an app password</button></div>
+        <div id="mailOutlook" hidden><div class="links" style="margin:0"><button class="btn primary" id="mailMs" type="button" data-i18n="button.sign_in_microsoft">Sign in with Microsoft</button></div><p class="s" id="mailMsState" style="margin:8px 0 0"></p></div>
+      </div></div>
+    <div class="links" style="margin:16px 0 6px"><button class="btn primary" id="mailScan" data-i18n="button.scan_email">Scan email</button><button class="btn" id="mailAi" hidden data-i18n="button.ask_ai_senders">Ask AI about these senders</button></div>
+    <div id="mailList"></div>
+    <div class="actions" id="mailActions" style="display:none"><button class="btn primary" id="mailApprove" data-i18n="button.move_to_trash">Move ticked to Trash</button><button class="btn" id="mailUndo" data-i18n="button.undo">Undo</button><span id="mailStatus" style="color:var(--muted); flex:1 1 260px; font-size:14px"></span></div>
+  </section>
+
+  <section class="view" id="v-boost">
+    <h1 data-i18n="h1.boost">Speed Boost</h1><p class="sub" data-i18n="sub.boost">Make your PC feel new again with Microsoft's own tools: fewer programs starting with Windows, less junk, lighter settings on slow PCs and up-to-date apps. Every change waits for your OK, and Windows makes a restore point first.</p>
+    <div class="card seccard" id="boostReport"></div>
+    <div class="links" style="margin:14px 0 6px"><button class="btn primary" id="boostFind" data-i18n="button.find_speedups">Find speed-ups</button><button class="btn" id="boostReview" data-i18n="button.review_speedups">Review speed-ups</button><button class="btn" id="boostMeasure" data-i18n="button.measure_now">Measure now</button></div>
+    <h2 data-i18n="h2.keep_new">Keep it like new</h2>
+    <div class="card set"><div><b data-i18n="set.auto.title">Weekly auto-clean</b><span data-i18n="set.auto.desc">Off unless you switch it on. Every Sunday at 5 pm Sweepwise quietly clears temporary files and caches only: never your files, never moves anything. Each one shows in History.</span></div><button class="switch" role="switch" aria-checked="false" id="autoSwitch" aria-label="Weekly auto-clean"><i></i></button></div>
+    <div class="card set win-only"><div><b data-i18n="set.storage_sense.title">Storage Sense</b><span data-i18n="set.storage_sense.desc">Windows' own automatic clean-up. If you turn it on in Windows Settings, check it is not set to empty your Recycle Bin or Downloads unless you want that.</span></div><button class="btn" data-open="storage_sense" data-i18n="button.open">Open</button></div>
+    <div class="card set win-only"><div><b data-i18n="set.drivers.title">Driver updates</b><span data-i18n="set.drivers.desc">Drivers come only from Windows Update (optional updates). Sweepwise never uses third-party driver tools.</span></div><button class="btn" data-open="optional_updates" data-i18n="button.open">Open</button></div>
+  </section>
+
+  <section class="view" id="v-help">
+    <h1 data-i18n="h1.help">Help</h1><p class="sub" data-i18n="sub.help">Plain-English answers to common questions. Still stuck? Ask on GitHub: questions are answered there in public, so the next person finds the answer too.</p>
+    <div id="helpList"></div>
+    <div class="links"><button class="btn" data-open="discussions" data-i18n="button.ask_question">Ask a question</button><button class="btn" data-open="issues" data-i18n="button.report_problem">Report a problem</button><button class="btn" data-open="data_folder" data-i18n="button.open_data_folder">Open Sweepwise's own records</button></div>
+  </section>
+
+  <section class="view" id="v-support">
+    <h1 data-i18n="h1.support">Support Sweepwise</h1><p class="sub" data-i18n="sub.support">Sweepwise is free for everyone: no ads, no tracking, no paid version. It's made by one person, AlbertanCoder, and kept going by people who choose to chip in.</p>
+    <div class="supgrid">
+      <div class="card seccard"><h3 data-i18n="support.once.title">Buy me a coffee</h3><p class="s" data-i18n="support.once.desc">One time, any amount. US$3 buys a coffee; $5 or $10 helps a lot. Card or PayPal through Ko-fi, no account needed.</p><button class="btn primary" data-open="kofi" data-i18n="button.kofi">Buy me a coffee on Ko-fi</button></div>
+      <div class="card seccard"><h3 data-i18n="support.monthly.title">Support every month</h3><p class="s" data-i18n="support.monthly.desc">From US$2 a month, on Ko-fi or GitHub Sponsors. Stop any time.</p><button class="btn" data-open="sponsors" data-i18n="button.sponsors">Sponsor on GitHub</button></div>
+    </div>
+    <p class="fine" data-i18n="support.fine">This isn't a charity, so support isn't tax-deductible. Ko-fi and GitHub handle the payment; Sweepwise never sees your card details. Every feature stays free either way, and if you like, your name can go on the Supporters page on the website.</p>
+    <h2 data-i18n="h2.other_ways">Other ways to help</h2>
+    <div class="card seccard"><p class="s" data-i18n="support.other">Tell a friend who needs a tidier PC, report a problem, or suggest an idea on GitHub. Translations into other languages are welcome too.</p><div class="links"><button class="btn sm" data-open="issues" data-i18n="button.report_problem">Report a problem</button><button class="btn sm" data-open="discussions" data-i18n="button.suggest_idea">Suggest an idea</button></div></div>
+  </section>
+
+  <section class="view" id="v-about">
+    <h1 data-i18n="h1.about">About &amp; privacy</h1><p class="sub" id="aboutVer">Sweepwise</p>
+    <div class="secgrid">
+      <div class="card seccard"><h3 data-i18n="about.privacy.title">We collect nothing</h3><p class="s" data-i18n="about.privacy.desc">No account, no tracking, no analytics, no crash reports. Your files, scans and choices stay on this PC.</p>
+        <div class="check"><i class="dot info"></i><div><b data-i18n="about.update.title">Update check</b><span data-i18n="about.update.desc">Once a day Sweepwise asks GitHub which version is newest. Nothing about you or your PC is sent. You can switch it off in Settings.</span></div></div><div class="check"><i class="dot info"></i><div><b data-i18n="about.ai.title">AI helper (only if you add a key)</b><span data-i18n="about.ai.desc">Names, sizes and dates go to Claude or OpenAI, never what is inside your files. Private-looking names are never sent.</span></div></div><div class="check"><i class="dot info"></i><div><b data-i18n="about.records.title">Your records</b><span data-i18n="about.records.desc">Sweepwise keeps its history, settings and Undo records in its own folder on this PC. Open it any time.</span></div></div>
+        <div class="links"><button class="btn sm" data-open="data_folder" data-i18n="button.open_data_folder">Open Sweepwise's own records</button></div></div>
+      <div class="card seccard"><h3 data-i18n="about.licence.title">Free and open source</h3><p class="s" data-i18n="about.licence.desc">Sweepwise is free software under the GNU General Public License, version 3. You can use it, study it, share it and change it. Anyone who shares a changed version must share their code under the same licence, so Sweepwise can never be taken closed and sold.</p>
+        <p class="s" data-i18n="about.warranty">Sweepwise comes with absolutely no warranty, to the extent permitted by law. Made by AlbertanCoder.</p>
+        <div class="links"><button class="btn sm" data-open="license" data-i18n="button.read_licence">Read the licence</button><button class="btn sm" data-open="source" data-i18n="button.source_code">Source code on GitHub</button></div></div>
+    </div>
+    <h2 data-i18n="h2.promises">Safety promises</h2>
+    <div class="card seccard"><ul class="promises" style="margin:0"><li data-i18n="about.promise.1">Nothing personal changes without your OK.</li><li data-i18n="about.promise.2">Everything can be undone, except uninstalling a program.</li><li data-i18n="about.promise.3">Your files only ever go to the Recycle Bin, and Sweepwise never empties it.</li><li data-i18n="about.promise.4">Windows maintenance uses Microsoft's own tools only: no registry cleaners, no tricks.</li></ul></div>
+  </section>
+</main>
+<button id="chatFab" aria-label="Ask Sweepwise"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg><span>Ask Sweepwise</span></button>
+<aside id="chat" aria-label="Chat with Sweepwise">
+  <div class="chat-head"><b data-i18n="tile.ask_sweepwise.title">Ask Sweepwise</b><span data-i18n="tile.ask_sweepwise.desc">Answers from Sweepwise's own data. Anything it suggests waits for your click.</span><button class="btn sm" id="chatClose" aria-label="Close chat">Close</button></div>
+  <div class="chat-body" id="chatBody">
+    <div class="msg bot">Hi there. Ask me anything about your PC: what's using space, whether you're safe, or what to tidy.</div>
+    <div class="starters" id="chatStarters"><button>What's using my space?</button><button>Is my PC safe right now?</button><button>Tidy my Downloads</button><button>What should I do next?</button></div>
+  </div>
+  <form class="chat-in" id="chatForm"><input id="chatText" autocomplete="off" placeholder="Ask Sweepwise..." aria-label="Message"><button class="btn primary" type="submit">Send</button></form>
+</aside>
+<div class="welcome-back" id="welcome" role="dialog" aria-modal="true" aria-labelledby="wTitle" hidden>
+  <div class="welcome">
+    <div class="wsteps" aria-hidden="true"><i class="on"></i><i></i><i></i></div>
+    <div class="wstep" data-step="1">
+      <div style="margin-top:18px"><svg width="64" height="64" viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="lgW" x1="20%" y1="5%" x2="80%" y2="96%"><stop offset="0" stop-color="#5eead4"/><stop offset="1" stop-color="#0d9488"/></linearGradient><clipPath id="shieldClipW"><path d="M50 5 C62 13 76 16 90 17 C92 52 80 80 50 96 C20 80 8 52 10 17 C24 16 38 13 50 5 Z"/></clipPath></defs><path d="M50 5 C62 13 76 16 90 17 C92 52 80 80 50 96 C20 80 8 52 10 17 C24 16 38 13 50 5 Z" fill="url(#lgW)"/><g clip-path="url(#shieldClipW)"><g transform="translate(1.3,1.6)" fill="rgba(4,40,40,.28)"><line x1="70.5" y1="20.5" x2="45.6" y2="55.2" stroke="rgba(4,40,40,.28)" stroke-width="4.6" stroke-linecap="round"/><path d="M37.18 53.98 L49.27 62.86 L44.07 82.61 C35 80.6 25 73 19.89 64.85 Z"/></g><line x1="70.5" y1="20.5" x2="45.6" y2="55.2" stroke="#fff" stroke-width="4.6" stroke-linecap="round"/><path d="M37.18 53.98 L49.27 62.86 L44.07 82.61 C35 80.6 25 73 19.89 64.85 Z" fill="#fff"/><path d="M39.95 51.05 L51.23 59.34 L48.87 62.56 L37.58 54.27 Z" fill="#0a1020"/><path d="M69 55 Q69 62 76 62 Q69 62 69 69 Q69 62 62 62 Q69 62 69 55 Z" fill="#fff"/><path d="M78.5 44 Q78.5 48 82.5 48 Q78.5 48 78.5 52 Q78.5 48 74.5 48 Q78.5 48 78.5 44 Z" fill="#ccfbf1"/></g><path d="M50 5 C62 13 76 16 90 17 C92 52 80 80 50 96 C20 80 8 52 10 17 C24 16 38 13 50 5 Z" fill="none" stroke="rgba(255,255,255,.43)" stroke-width="1.8"/></svg></div>
+      <h2 id="wTitle" data-i18n="welcome.1.title">Welcome to Sweepwise</h2>
+      <p data-i18n="welcome.1.desc">Sweepwise clears out junk, checks that your PC is protected and suggests tidy-ups, in plain English. Three promises:</p>
+      <ul class="promises"><li data-i18n="welcome.promise.1">Nothing personal changes without your OK.</li><li data-i18n="welcome.promise.2">Everything can be undone (except uninstalling a program).</li><li data-i18n="welcome.promise.3">Nothing is collected: no account, no tracking.</li></ul>
+      <div class="row2"><button class="btn primary" data-wnext="2" data-i18n="button.next">Next</button></div>
+    </div>
+    <div class="wstep" data-step="2" hidden>
+      <h2 data-i18n="welcome.2.title">Two quick choices</h2>
+      <div class="card set"><div><b data-i18n="set.reminder.title">Weekly reminder</b><span data-i18n="welcome.reminder.desc">On Sundays at 6 pm Sweepwise asks whether to run. It never runs on its own.</span></div><button class="switch" role="switch" aria-checked="true" id="wRem" aria-label="Weekly reminder"><i></i></button></div>
+      <div class="card seccard"><h3 data-i18n="welcome.ai.title">AI helper (optional)</h3><p class="s" data-i18n="welcome.ai.desc">Have a Claude or OpenAI key? Add it for the AI Organizer and chat. You can skip this and add one later in Settings.</p>
+        <div class="form"><input id="wKey" type="password" placeholder="sk-ant-... or sk-..." aria-label="AI key, optional" autocomplete="off"><div class="links" style="margin:0"><button class="btn sm" id="wGuide" type="button" data-i18n="button.how_get_key">How do I get one?</button></div></div></div>
+      <div class="row2"><button class="btn" data-wnext="1" data-i18n="button.back">Back</button><button class="btn primary" id="wNext2" data-i18n="button.next">Next</button></div>
+    </div>
+    <div class="wstep" data-step="3" hidden>
+      <h2 data-i18n="welcome.3.title">Your first scan</h2>
+      <p data-i18n="welcome.3.desc">Sweepwise will measure the junk on your PC and show you exactly what it would remove. Nothing is deleted until you press Clean now.</p>
+      <div class="row2"><button class="btn" id="wLater" data-i18n="button.not_now">Not now</button><button class="btn primary" id="wScan" data-i18n="button.start_first_scan">Start my first scan</button></div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="modal-back" id="modalBack"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle"><h2 id="mTitle"></h2><div id="mBody"></div><div class="row2"><button class="btn" id="mCancel" data-i18n="button.cancel">Cancel</button><button class="btn primary" id="mOk" data-i18n="button.start">Start</button></div></div></div>
+<script>
+(function () {
+  var T = new URLSearchParams(location.search).get('t') || '';
+  var $ = function (id) { return document.getElementById(id); };
+  var TAURI = window.__TAURI__ && window.__TAURI__.core;
+  // Which system this is: a few words and buttons differ (Trash or Recycle Bin, ClamAV or Windows Security).
+  var UA = navigator.userAgent || '';
+  var OS = /Windows/i.test(UA) ? 'windows' : /Macintosh|Mac OS X/i.test(UA) ? 'mac' : /Linux|X11|CrOS/i.test(UA) ? 'linux' : 'windows';
+  document.documentElement.setAttribute('data-os', OS);
+  var BIN = OS === 'windows' ? 'Recycle Bin' : 'Trash';
+  function words(s) { return OS === 'windows' || s == null ? s : String(s).replace(/Recycle Bin/g, 'Trash'); }
+  function api(path, body) {
+    if (TAURI) return TAURI.invoke('api', { path: path, body: body || null }).catch(function (e) { throw new Error(String(e)); });
+    var opt = body ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : {};
+    return fetch(path + (path.indexOf('?') >= 0 ? '&' : '?') + 't=' + encodeURIComponent(T), opt).then(function (r) { return r.json().then(function (d) { if (!r.ok && d && d.message) throw new Error(d.message); return d; }); });
+  }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  // Same units as File Explorer and Sweepwise's own messages (1 GB = 1024 MB).
+  function size(b) { b = +b || 0; if (b >= 1073741824) return (b / 1073741824).toFixed(1) + ' GB'; if (b >= 1048576) return Math.round(b / 1048576) + ' MB'; if (b >= 1024) return Math.round(b / 1024) + ' KB'; return b + ' B'; }
+  function short(p) { return String(p || '').replace(/^[A-Z]:\\Users\\[^\\]+\\/i, '').replace(/^\/(home|Users)\/[^\/]+\//, '~/'); }
+  function when(s) { if (!s) return ''; var d = new Date(s); return isNaN(d) ? s : d.toLocaleString(undefined, { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }); }
+  function ago(s) { if (!s) return 'never'; var h = (Date.now() - new Date(s)) / 36e5; if (h < 1) return 'just now'; if (h < 24) return Math.round(h) + ' h ago'; return Math.round(h / 24) + ' days ago'; }
+  function toast(msg) { var t = $('toast'); t.textContent = msg; t.style.display = 'block'; clearTimeout(toast.h); toast.h = setTimeout(function () { t.style.display = 'none'; }, 5000); }
+  // Screen errors go to a small file on this PC only (never sent anywhere), so problems can be found and fixed.
+  function report(msg) { try { api('/api/ui_error', { msg: String(msg).slice(0, 500) }).catch(function () {}); } catch (e) {} }
+  window.addEventListener('error', function (e) { report('error: ' + (e.message || e) + ' line ' + (e.lineno || '?')); });
+  window.addEventListener('unhandledrejection', function (e) { report('promise: ' + ((e.reason && e.reason.message) || e.reason)); });
+  document.addEventListener('securitypolicyviolation', function (e) { report('blocked by page security: ' + e.violatedDirective + ' ' + e.blockedURI); });
+  function swOn(sw) { return sw.getAttribute('aria-checked') === 'true'; }
+  function swSet(sw, v) { sw.setAttribute('aria-checked', String(!!v)); }
+
+
+  // ---------- words (i18n/en.json; other languages can be added as i18n/<code>.json) ----------
+  var STR = {};
+  function t(k, fallback) { return words(STR[k + '@' + OS] || STR[k] || fallback || k); }
+  fetch('i18n/en.json').then(function (r) { return r.json(); }).then(function (d) {
+    STR = d;
+    Array.prototype.forEach.call(document.querySelectorAll('[data-i18n]'), function (el) { var v = d[el.dataset.i18n + '@' + OS] || d[el.dataset.i18n]; if (v) el.textContent = words(v); });
+  }).catch(function () {});
+  var current = 'home';
+  function show(v) {
+    current = v;
+    Array.prototype.forEach.call(document.querySelectorAll('.view'), function (x) { x.classList.toggle('on', x.id === 'v-' + v); });
+    Array.prototype.forEach.call(document.querySelectorAll('.nav button, .footlinks button'), function (x) {
+      var here = x.dataset.view === v || (v === 'work' && x.dataset.view === 'home');
+      x.classList.toggle('on', here); if (here) x.setAttribute('aria-current', 'page'); else x.removeAttribute('aria-current');
+    });
+    if (v === 'home') loadStatus();
+    if (v === 'list') loadList();
+    if (v === 'history') loadHistory();
+    if (v === 'security') loadSecurity();
+    if (v === 'organizer') loadOrganizer();
+    if (v === 'brain') loadBrain();
+    if (v === 'diskmap') loadDiskMap();
+    if (v === 'finder') loadFinder();
+    if (v === 'settings') loadSettings();
+    if (v === 'help') loadHelp();
+    if (v === 'boost') loadBoost();
+    if (v === 'email') loadEmail();
+    if (v === 'about') loadAbout();
+  }
+  // ---------- dialog ----------
+  var modalOk = null;
+  var modalFrom = null;
+  function modal(title, html, okText, onOk) {
+    if (!$('modalBack').classList.contains('on')) modalFrom = document.activeElement;
+    $('mTitle').textContent = title; $('mBody').innerHTML = html; $('mOk').textContent = okText || 'Start';
+    modalOk = onOk; $('modalBack').classList.add('on'); setTimeout(function () { $('mOk').focus(); }, 30);
+  }
+  function closeModal() {
+    if (!$('modalBack').classList.contains('on')) return;
+    $('modalBack').classList.remove('on'); modalOk = null;
+    if (modalFrom && modalFrom.focus) { try { modalFrom.focus(); } catch (e) {} }
+    modalFrom = null;
+  }
+  // Keyboard: Tab stays inside an open dialog or the welcome; Escape closes a dialog, or else the chat panel.
+  function focusables(box) { return Array.prototype.filter.call(box.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'), function (x) { return !x.disabled && x.offsetParent !== null; }); }
+  document.addEventListener('keydown', function (e) {
+    var box = $('modalBack').classList.contains('on') ? $('modalBack') : !$('welcome').hidden ? $('welcome') : null;
+    if (e.key === 'Tab' && box) {
+      var f = focusables(box); if (!f.length) return;
+      var first = f[0], last = f[f.length - 1];
+      if (!box.contains(document.activeElement)) { e.preventDefault(); first.focus(); }
+      else if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    }
+    if (e.key === 'Escape' && !box && $('chat').classList.contains('on')) closeChat();
+  });
+  $('mCancel').addEventListener('click', closeModal);
+  $('modalBack').addEventListener('click', function (e) { if (e.target === $('modalBack')) closeModal(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal(); });
+  $('mOk').addEventListener('click', function () { var f = modalOk; closeModal(); if (f) f(); });
+  Array.prototype.forEach.call(document.querySelectorAll('.nav button, .footlinks button, [data-show]'), function (b) { b.addEventListener('click', function () { show(b.dataset.view || b.dataset.show); }); });
+
+  // ---------- home ----------
+  function loadStatus() {
+    api('/api/status').then(function (s) {
+      firstStatus(s);
+      var sc = s.score; countUp($('score'), sc); dmRoots = s.roots || dmRoots;
+      if (!loadStatus.t || Date.now() - loadStatus.t > 300000) { loadStatus.t = Date.now(); loadTrends(); }
+      $('ringArc').style.strokeDashoffset = 540.4 * (1 - sc / 100);
+      $('scoreWord').textContent = sc >= 85 ? 'Your PC is in great shape' : sc >= 65 ? 'Your PC is doing OK' : 'Your PC needs attention';
+      $('reasons').innerHTML = s.reasons.length ? s.reasons.map(function (r) { return '<li>' + esc(r) + '</li>'; }).join('') : '<li class="ok">Nothing needs your attention.</li>';
+      $('homeSub').textContent = s.last_run ? 'Last clean-up ' + ago(s.last_run.when) + (s.last_run.freed ? ', freed ' + size(s.last_run.freed) : '') + '.' : 'Sweepwise has not run yet.';
+      $('sRam').textContent = s.free_ram_gb + ' GB'; $('sRam').className = 'v ' + (s.free_ram_gb < 1.5 ? 'warn' : ''); $('sRam2').textContent = 'of ' + Math.round(s.total_ram_gb) + ' GB';
+      $('sDisk').textContent = size(s.free_disk); $('sDisk2').textContent = 'of ' + size(s.total_disk) + ' on C:';
+      $('sTemp').textContent = s.temp_c == null ? 'n/a' : s.temp_c + '°C'; $('sTemp').className = 'v ' + (s.temp_c >= 85 ? 'bad' : s.temp_c >= 75 ? 'warn' : 'good');
+      $('sTemp2').textContent = s.temp_c >= 85 ? 'hot: let it cool' : s.temp_c >= 75 ? 'warm' : 'cool';
+      $('sProt').textContent = s.realtime === false ? 'Off' : s.realtime ? 'On' : 'n/a'; $('sProt').className = 'v ' + (s.realtime === false ? 'bad' : 'good');
+      $('sProt2').textContent = s.definitions_age == null ? '' : 'definitions ' + (s.definitions_age === 0 ? 'up to date' : s.definitions_age + ' day(s) old');
+      $('sScan').textContent = ago(s.last_scan); $('sScan2').textContent = s.last_run && s.last_run.scan === 'threats' ? 'threat found' : s.last_scan ? 'no threats' : '';
+      $('navCount').textContent = s.pending || '';
+      lastTemp = s.temp_c;
+      var sp = s.security ? s.security.problems : '';
+      $('navSec').textContent = sp || ''; $('cSecurity').textContent = s.security ? (sp ? sp + ' to check' : 'all good') : 'not run';
+      setBusy(s.job_running);
+      if (s.job_running && current === 'home') { show('work'); pollJob(); }
+    }).catch(function (e) { $('homeSub').textContent = 'Could not reach the Sweepwise engine: ' + e.message; });
+    loadCounts();
+  }
+  function setBusy(b) { $('bigBtn').disabled = b; Array.prototype.forEach.call(document.querySelectorAll('[data-run]'), function (x) { x.disabled = b; }); }
+  function loadCounts() {
+    api('/api/list').then(function (d) {
+      var p = d.proposals || {}, done = d.results || {};
+      function n(keys) { var c = 0; keys.forEach(function (k) { (p[k] || []).forEach(function (i) { if (i.can_do && !(done[i.id] && done[i.id].ok)) c++; }); }); return c || ''; }
+      $('cStartup').textContent = n(['startup']); $('cOrganize').textContent = n(['files', 'ai_leftovers']); $('cPrograms').textContent = n(['uninstall']);
+    }).catch(function () {});
+  }
+
+  // ---------- jobs ----------
+  var lastTemp = null;
+  var titles = { scan_clean: 'Scan & Clean', clean: 'Clean', quick: 'Quick Scan', full: 'Full Scan', deep: 'Deep Clean', deep_repair: 'Deep Clean + repair',
+    security: 'Security check', definitions: 'Virus definitions update', organize: 'AI Organizer', diskmap: 'Disk map', finder: 'Space Finder', mrt: 'Malicious Software Removal Tool', email: 'Email scan' };
+  Array.prototype.forEach.call(document.querySelectorAll('[data-ask]'), function (b) { b.addEventListener('click', function () { ask(b.dataset.ask); }); });
+  // Deep Clean: two modes, plus Windows.old only when it is 10+ days after an upgrade (answer 52), unticked.
+  function deepModal(wo) {
+    var pick = 'deep';
+    var old = wo.offer ? '<label class="opt" style="cursor:pointer"><input type="checkbox" id="dcOld" style="margin-top:4px; width:18px; height:18px; accent-color:var(--teal)"><div><b>Also remove the old copy of Windows (Windows.old)</b><span>Left from an upgrade ' + esc(wo.days) + ' days ago. It frees a lot of space, but going back to your previous version of Windows will no longer be possible.</span></div></label>' : '';
+    var L = OS === 'linux';
+    modal('Deep Clean', (L ? '<p>Clears system files that need admin rights, so your system will ask for your password. If Timeshift is installed, it makes a snapshot first.</p>' : '<p>Uses Microsoft\'s own tools with admin rights. Windows will show an "Allow changes?" box: click <b>Yes</b>. Windows makes a restore point first.</p>') +
+      '<div class="opts"><button class="opt sel" data-m="deep"><div><b>Clean system files</b><span>' + (L ? esc(t('tile.clean_system_files.desc')) : 'Old Windows Update leftovers, error reports, setup logs, caches, and a quick drive optimize. 5-15 minutes. Never empties your Recycle Bin or touches Downloads.') + '</span></div></button>' +
+      '<button class="opt" data-m="deep_repair"><div><b>' + (L ? esc(t('tile.clean_check_and_repair_windows.title')) : 'Clean + check and repair Windows') + '</b><span>' + (L ? esc(t('tile.clean_check_and_repair_windows.desc')) : 'Also runs Microsoft\'s DISM and SFC repair checks. Adds 20-30 minutes and makes your PC work harder.') + '</span></div></button>' + old + '</div>',
+      'Start Deep Clean', function () { var w = $('dcOld'); run(pick, { windows_old: !!(w && w.checked) }); });
+    Array.prototype.forEach.call(document.querySelectorAll('.opt[data-m]'), function (o) {
+      o.addEventListener('click', function () { pick = o.dataset.m; Array.prototype.forEach.call(document.querySelectorAll('.opt[data-m]'), function (x) { x.classList.toggle('sel', x === o); }); });
+    });
+  }
+  function ask(kind) {
+    (function () {
+      if (kind === 'full') {
+        var t = lastTemp == null ? '' : ' Right now it is <b>' + lastTemp + '°C</b>' + (lastTemp > 70 ? ', so Sweepwise will wait for it to cool first.' : ', so it can start straight away.');
+        modal('Full Scan', (OS === 'linux' ? '<p>ClamAV checks every file on your computer. It can take an hour or more, and you can keep working.</p>' +
+          '<p>Sweepwise only starts it when your computer is under 70°C with enough free memory.' + t + '</p>' : '<p>Windows Security checks every file on your PC. It usually takes 30-90 minutes and you can keep working.</p>' +
+          '<p>Windows will not let a scan be paused once it starts, so Sweepwise only starts it when your PC is under 70°C with enough free memory.' + t + '</p>') +
+          '<p>Tip: set your laptop on a hard surface or a stand while it runs.</p>', 'Start Full Scan', function () { run('full'); });
+      } else {
+        api('/api/deep/info').then(function (inf) { deepModal((inf && inf.windows_old) || {}); }).catch(function () { deepModal({}); });
+      }
+    })();
+  }
+  function run(mode, extra) {
+    var body = { mode: mode }; if (extra) { for (var k in extra) body[k] = extra[k]; }
+    api('/api/run', body).then(function () { $('workTitle').textContent = titles[mode] + '...'; $('workDone').style.display = 'none'; show('work'); setBusy(true); pollJob(); })
+      .catch(function (e) { toast(e.message); });
+  }
+  $('bigBtn').addEventListener('click', function () { run('scan_clean'); });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-run]'), function (b) { b.addEventListener('click', function () { run(b.dataset.run); }); });
+  var polling = false;
+  function pollJob() {
+    if (polling) return; polling = true;
+    (function tick() {
+      api('/api/job').then(function (j) {
+        $('workTitle').textContent = (titles[j.mode] || 'Working') + (j.running ? '...' : ': finished');
+        $('workStep').textContent = j.step; $('workBar').style.width = j.percent + '%';
+        $('workTime').textContent = j.running ? 'Running for ' + Math.floor(j.seconds / 60) + ' min ' + (j.seconds % 60) + ' s' : 'Took ' + Math.floor(j.seconds / 60) + ' min ' + (j.seconds % 60) + ' s';
+        $('workLog').textContent = (j.lines || []).join('\n');
+        var tc = j.temp_c;
+        $('workTemp').innerHTML = tc == null ? '' : 'PC temperature <b class="' + (tc >= 85 ? 'bad' : tc >= 75 ? 'warn' : 'good') + '">' + tc + '°C</b>';
+        if (j.running) { $('workSpin').style.display = ''; $('doneMark').style.display = 'none'; setTimeout(tick, 1000); return; }
+        polling = false; setBusy(false);
+        $('workDone').style.display = 'block';
+        var reviewable = j.mode === 'scan_clean' || j.mode === 'clean';
+        var goTo = j.mode === 'security' ? 'security' : j.mode === 'organize' ? 'organizer' : j.mode === 'diskmap' ? 'diskmap' : j.mode === 'finder' ? 'finder' : j.mode === 'email' ? 'email' : 'list';
+        $('workSpin').style.display = 'none';
+        var preview = j.preview && (j.mode === 'scan_clean' || j.mode === 'clean');
+        if ((j.exit_code === 0 || j.exit_code === null) && !preview) celebrate();
+        $('workReview').style.display = reviewable || j.mode === 'security' || j.mode === 'diskmap' || j.mode === 'finder' || j.mode === 'email' || (j.mode === 'organize' && j.run_id) ? '' : 'none';
+        $('workReview').textContent = j.mode === 'security' ? 'See the results' : j.mode === 'organize' ? 'See the plan' : j.mode === 'diskmap' ? 'See the map' : j.mode === 'finder' || j.mode === 'email' ? 'See what was found' : 'Review suggestions';
+        $('workReview').dataset.go = goTo;
+        $('workReview').dataset.clean = '';
+        if (j.support && j.support.text) { $('supText').textContent = j.support.text; $('supportCard').hidden = false; } else { $('supportCard').hidden = true; }
+        // First run: Sweepwise only measured. Nothing is removed until the person presses Clean now.
+        if (preview) {
+          $('workTitle').textContent = titles[j.mode] + ': ready to clean';
+          $('workReview').style.display = ''; $('workReview').textContent = 'Clean now (' + size(j.preview.bytes) + ')'; $('workReview').dataset.clean = j.mode;
+          toast('Nothing has been removed yet. Check the list, then press Clean now.');
+          return;
+        }
+        toast(titles[j.mode] + ' finished.');
+      }).catch(function () { setTimeout(tick, 2000); });
+    })();
+  }
+  $('workReview').addEventListener('click', function () {
+    var c = $('workReview').dataset.clean;
+    if (c) { $('workReview').dataset.clean = ''; run(c, { confirm: true }); return; }
+    show($('workReview').dataset.go || 'list');
+  });
+  $('workHome').addEventListener('click', function () { show('home'); });
+
+  // ---------- approve list ----------
+  var groups = [
+    { key: 'organize', label: 'Organize', sections: ['files', 'ai_leftovers'] },
+    { key: 'boost', label: 'Speed Boost', sections: ['speed', 'program_leftovers', 'updates'] },
+    { key: 'startup', label: 'Startup programs', sections: ['startup'] },
+    { key: 'uninstall', label: 'Programs', sections: ['uninstall'] }
+  ];
+  var info = {
+    files: ['Files to tidy', 'Loose files on your Desktop and in Downloads, sorted into folders. Moves start unticked; only clear junk is ticked. Private-looking files go to a hidden Documents\\_Private folder, unclear ones to Documents\\_Review.'],
+    ai_leftovers: ['AI leftovers', 'Old scratch folders, caches and downloaded models from AI tools. Only clear junk is ticked, and everything goes to the Recycle Bin. Code projects and models are never ticked for you.'],
+    speed: ['Speed-ups', 'Proven Windows settings that make a PC faster. Each can be switched back with Undo, and Windows makes a restore point first.'],
+    program_leftovers: ['Left behind by removed programs', 'Folders that belong to no installed program and have not changed for 6 months. Nothing is ticked: check each one. They go to the Recycle Bin.'],
+    updates: ['App updates', 'Newer versions of your apps, installed with winget (Microsoft\'s own app installer). Nothing is ticked. Close an app before updating it. Updates cannot be undone automatically.'],
+    startup: ['Programs that start with Windows', 'Turning one off only stops it opening by itself. Some need admin; switch those off in Task Manager.'],
+    uninstall: ['Programs not used in 6 months', 'Nothing is ticked. Each program\'s own uninstaller opens. Uninstalls cannot be undone.']
+  };
+  if (OS === 'linux') {
+    info.files[1] = 'Loose files on your Desktop and in Downloads, sorted into folders. Moves start unticked; only clear junk is ticked. Private-looking files go to a hidden Documents/_Private folder, unclear ones to Documents/_Review.';
+    info.speed[1] = 'Proven settings that make a computer faster. Each can be switched back with Undo, and Timeshift makes a snapshot first when it is installed.';
+    info.updates[1] = 'Newer versions of your apps from your system\'s own updater and Flatpak. Nothing is ticked. Your system asks for your password. Updates cannot be undone automatically.';
+    info.startup = ['Programs that start when you sign in', 'Turning one off only stops it opening by itself, just for you. Undo turns it back on.'];
+    info.uninstall = ['Flatpak and Snap apps', 'Nothing is ticked. Linux does not record when apps were last used, so each one is your call. Removing an app cannot be undone.'];
+  }
+  var filter = 'all', listRun = null;
+  function whatOf(s, i) {
+    if (s === 'files') return i.action === 'recycle' ? BIN : 'Move to ' + esc(short(String(i.dest || '').replace(/[\\\/][^\\\/]*$/, '')));
+    if (s === 'ai_leftovers') return size(i.size) + (i.can_do ? ' to ' + BIN : ', list only');
+    if (s === 'email') return i.count + ' email(s) to ' + esc(i.trash_name);
+    if (s === 'startup') return { 'turn off': 'Suggest: turn off', keep: 'Suggest: keep', 'your call': 'Your call' }[i.verdict] || '';
+    if (s === 'uninstall') return (i.size ? size(i.size) + ', ' : '') + (i.last_used ? 'last used ' + i.last_used : 'never seen used');
+    if (s === 'speed') return i.action === 'power_plan' ? 'Switch power plan' : 'Lighter effects';
+    if (s === 'program_leftovers') return size(i.size) + (i.can_do ? ' to ' + BIN : '');
+    if (s === 'updates') return esc(i.version) + ' &#8594; ' + esc(i.available);
+    return '';
+  }
+  function titleOf(s, i) {
+    var t = '<span class="t">' + esc(i.title) + '</span>';
+    var w = i.why ? esc(i.why) : '';
+    if (s === 'email') { w = esc(i.account_label) + ' · ' + w + (i.samples || []).map(function (x) { return '<br>' + esc(x.date) + ' · ' + esc(x.subject); }).join(''); }
+    if (s === 'startup' && i.publisher) w = esc(i.publisher) + (w ? ' · ' + w : '');
+    if (i.note) w += ' <strong>' + esc(i.note) + '</strong>';
+    var extra = '';
+    if (i.learned) extra += '<span class="learned">' + esc(i.learned) + '</span>';
+    var a = aiMap && aiMap[i.id];
+    if (a && i.rule !== 'AI') extra += '<span class="ai">AI suggests: ' + esc(short(a.folder)) + ' · ' + esc(a.reason) + '<button class="btn sm" data-aiuse="' + esc(i.id) + '">Use this</button></span>';
+    if (i.path || i.rule) extra += '<span class="w adv">' + esc(i.path || '') + (i.rule ? ' · rule ' + esc(i.rule) : '') + '</span>';
+    return t + (w ? '<span class="w">' + w + '</span>' : '') + extra;
+  }
+  var aiMap = null;
+  function rowHtml(s, i, res) {
+    var r = res[i.id], done = r && r.ok;
+    var box = i.can_do && !done ? '<input type="checkbox" class="pick" value="' + esc(i.id) + '"' + (i.checked ? ' checked' : '') + ' aria-label="Approve ' + esc(i.title) + '">' : '';
+    return '<div class="row' + (done ? ' done' : r ? ' failed' : '') + '" id="row-' + esc(i.id) + '"><div>' + box + '</div><div>' + titleOf(s, i) + '</div><div class="what">' + whatOf(s, i) + '</div><div class="res">' + (r ? (r.ok ? '✓ ' : '✗ ') + esc(r.message) : '') + '</div></div>';
+  }
+  function loadList() {
+    if (!$('listBody').innerHTML) $('listBody').innerHTML = skel(4);
+    api('/api/list').then(function (d) {
+      listRun = d.run;
+      if (!d.run) { $('listBody').innerHTML = '<div class="card empty">No suggestions yet. Press Scan &amp; Clean on Home.</div>'; $('approveBtn').disabled = true; return; }
+      var p = d.proposals || {}, res = d.results || {};
+      $('listSub').textContent = 'From the scan on ' + when(d.when) + '. Tick what you want; nothing happens until you press Approve.';
+      $('undoBtn').disabled = !d.undo_left;
+      var chips = '<button class="chip' + (filter === 'all' ? ' on' : '') + '" data-f="all">All</button>' + groups.map(function (g) {
+        var c = 0; g.sections.forEach(function (s) { c += (p[s] || []).filter(function (i) { return i.can_do; }).length; });
+        return '<button class="chip' + (filter === g.key ? ' on' : '') + '" data-f="' + g.key + '">' + g.label + ' (' + c + ')</button>';
+      }).join('');
+      aiMap = d.ai || null;
+      if (d.ai_on) chips += '<button class="chip" id="aiAsk" style="margin-left:auto; color:var(--ai)">✨ Ask AI about unclear items</button>';
+      $('chips').innerHTML = chips;
+      if ($('aiAsk')) $('aiAsk').addEventListener('click', function () {
+        var b = $('aiAsk'); b.disabled = true; b.textContent = 'Asking the AI (names only)...';
+        api('/api/ai/suggest', { run: listRun }).then(function (r) {
+          var n = Object.keys((r.files && r.files.suggestions) || {}).length;
+          toast('AI helper: ' + n + ' file suggestion(s), ' + (r.senders || []).length + ' sender suggestion(s).' + (r.files && r.files.skipped_private ? ' ' + r.files.skipped_private + ' private-looking file(s) were not sent.' : ''));
+          loadList();
+        }).catch(function (e) { toast(e.message); b.disabled = false; b.textContent = '✨ Ask AI about unclear items'; });
+      });
+      Array.prototype.forEach.call(document.querySelectorAll('.chip'), function (c) { c.addEventListener('click', function () { filter = c.dataset.f; loadList(); }); });
+      var html = '', any = false;
+      groups.forEach(function (g) {
+        if (filter !== 'all' && filter !== g.key) return;
+        g.sections.forEach(function (s) {
+          var items = p[s] || [];
+          html += '<div class="sect"><h3>' + info[s][0] + '<small>' + items.length + '</small></h3><p>' + esc(words(info[s][1])) + '</p>';
+          var res2 = res;
+          var shown = items.filter(function (i) { return !i.hidden || (res2[i.id] && res2[i.id].ok); });
+          var hid = items.filter(function (i) { return i.hidden && !(res2[i.id] && res2[i.id].ok); });
+          if (!shown.length && !hid.length) { html += '<div class="card empty" style="padding:18px">Nothing here this time.</div></div>'; return; }
+          any = any || shown.some(function (i) { return i.can_do; });
+          if (shown.length) html += '<div class="card rows">' + shown.map(function (i) { return rowHtml(s, i, res2); }).join('') + '</div>';
+          if (hid.length) html += '<details class="hid"><summary>' + hid.length + ' hidden because you said no twice</summary><div class="card rows" style="margin-top:8px">' + hid.map(function (i) { return rowHtml(s, i, res2); }).join('') + '</div></details>';
+          html += '</div>';
+        });
+      });
+      $('listBody').innerHTML = html;
+      $('approveBtn').disabled = !any;
+      Array.prototype.forEach.call(document.querySelectorAll('[data-aiuse]'), function (b) {
+        b.addEventListener('click', function () { api('/api/ai/apply', { run: listRun, id: b.dataset.aiuse }).then(function (r) { toast('Will move to ' + short(r.dest) + ' when you approve.'); loadList(); }).catch(function (e) { toast(e.message); }); });
+      });
+    }).catch(function (e) { $('listBody').innerHTML = '<div class="card empty">' + esc(e.message) + '</div>'; });
+  }
+  var armed = null;
+  function arm(btn, text, fn) {
+    if (armed === btn) { armed = null; btn.textContent = btn.dataset.label; fn(); return; }
+    armed = btn; btn.dataset.label = btn.dataset.label || btn.textContent; btn.textContent = text;
+    setTimeout(function () { if (armed === btn) { armed = null; btn.textContent = btn.dataset.label; } }, 8000);
+  }
+  $('approveBtn').addEventListener('click', function () {
+    var ids = Array.prototype.map.call(document.querySelectorAll('input.pick:checked'), function (x) { return x.value; });
+    var unticked = Array.prototype.map.call(document.querySelectorAll('input.pick:not(:checked)'), function (x) { return x.value; });
+    if (!ids.length) { $('listStatus').textContent = 'Nothing is ticked.'; return; }
+    var un = ids.filter(function (i) { return i.charAt(0) === 'u'; }).length;
+    arm($('approveBtn'), 'Click again to approve ' + ids.length + ' item(s)', function () {
+      $('approveBtn').disabled = true;
+      $('listStatus').textContent = 'Working on ' + ids.length + ' item(s)...' + (un ? ' Uninstall windows will open; follow them.' : '');
+      api('/api/approve', { run: listRun, ids: ids, unticked: unticked }).then(function (d) {
+        var res = d.results || [], ok = res.filter(function (r) { return r.ok; }).length;
+        $('listStatus').textContent = ok + ' of ' + res.length + ' done. Undo this run puts everything back except uninstalls.';
+        loadList(); brainBadge(); toast(ok + ' of ' + res.length + ' done.');
+      }).catch(function (e) { $('listStatus').textContent = e.message; }).then(function () { $('approveBtn').disabled = false; });
+    });
+  });
+  function undoRun(id, btn, statusEl) {
+    arm(btn, 'Click again to undo', function () {
+      btn.disabled = true; statusEl.textContent = 'Undoing...';
+      api('/api/undo', { run: id }).then(function (d) {
+        var lines = (d.results || []).map(function (r) { return (r.ok ? '✓ ' : '✗ ') + (r.title ? r.title + ': ' : '') + r.message; });
+        statusEl.textContent = lines.length ? lines.length + ' change(s) reversed. ' + lines.slice(0, 3).join('  ·  ') + (lines.length > 3 ? ' ...' : '') : 'Nothing to undo.';
+        toast('Undo finished.'); if (current === 'list') loadList(); if (current === 'history') loadHistory(); if (current === 'organizer') loadOrganizer(); if (current === 'finder') loadFinder();
+      }).catch(function (e) { statusEl.textContent = e.message; btn.disabled = false; });
+    });
+  }
+  $('undoBtn').addEventListener('click', function () { undoRun(listRun, $('undoBtn'), $('listStatus')); });
+
+  // ---------- history ----------
+  function loadHistory() {
+    if (!$('histBody').innerHTML) $('histBody').innerHTML = skel(3);
+    api('/api/history').then(function (d) {
+      var runs = d.runs || [];
+      if (!runs.length) { $('histBody').innerHTML = '<div class="empty">No runs yet.</div>'; return; }
+      $('histBody').innerHTML = '<table><thead><tr><th>When</th><th class="num">Freed</th><th>Virus scan</th><th class="num">Approved</th><th></th></tr></thead><tbody>' + runs.map(function (r) {
+        var scan = { clean: '<span class="good">Clean</span>', threats: '<span class="bad">Threat found</span>', 'not run': '<span style="color:var(--muted)">Skipped</span>', failed: '<span class="warn">Did not finish</span>' }[r.scan] || '';
+        if (r.kind === 'organizer') scan = '<span style="color:#a5f3fc">AI Organizer plan</span>';
+        if (r.kind === 'finder') scan = '<span style="color:#93c5fd">Space Finder</span>';
+        if (r.kind === 'auto') scan = '<span class="good">Weekly auto-clean</span>';
+        return '<tr><td>' + esc(when(r.when)) + (r.dry ? ' <span style="color:var(--muted)">(practice)</span>' : '') + '</td><td class="num">' + (r.kind && r.kind !== 'auto' ? '-' : size(r.freed)) + '</td><td>' + scan + '</td><td class="num">' + r.approved + '</td><td class="num">' +
+          (r.undo_left ? '<button class="btn" data-undo="' + esc(r.id) + '">Undo ' + r.undo_left + '</button>' : '') + '</td></tr>';
+      }).join('') + '</tbody></table>';
+      Array.prototype.forEach.call(document.querySelectorAll('[data-undo]'), function (b) { b.addEventListener('click', function () { undoRun(b.dataset.undo, b, $('histStatus')); }); });
+    }).catch(function (e) { $('histBody').innerHTML = '<div class="empty">' + esc(e.message) + '</div>'; });
+  }
+
+  // ---------- tiles that jump to the list / settings ----------
+  Array.prototype.forEach.call(document.querySelectorAll('[data-goto]'), function (b) {
+    b.addEventListener('click', function () { var g = b.dataset.goto; if (g === 'history' || g === 'security' || g === 'organizer' || g === 'diskmap' || g === 'finder') { show(g); return; } filter = g; show('list'); });
+  });
+
+  // ---------- AI Organizer ----------
+  var orgRun = null;
+  Array.prototype.forEach.call(document.querySelectorAll('[data-root]'), function (c) { c.addEventListener('click', function () { c.classList.toggle('on'); }); });
+  var actWord = { mkdir: 'New folder', move: 'Move', recycle: BIN };
+  function loadOrganizer() {
+    api('/api/organize').then(function (d) {
+      $('orgGo').disabled = !d.ai_on;
+      $('orgNote').innerHTML = d.ai_on ? 'Uses your ' + esc(d.provider || 'AI') + ' key; usually under a minute.' : 'Add your Claude or OpenAI key in <b>Settings</b> first.';
+      orgRun = d.run;
+      if (!d.run) { $('orgPlan').innerHTML = ''; $('orgActions').style.display = 'none'; return; }
+      var p = d.plan || {}, steps = p.organize || [], res = d.results || {};
+      var notes = [];
+      if (p.private_skipped) notes.push(p.private_skipped + ' private-looking item(s) were kept out of it');
+      if (p.refused) notes.push(p.refused + ' idea(s) were refused by Sweepwise\'s safety rules');
+      var html = '<h2 style="margin-top:0">The plan <span class="count">' + steps.length + ' step(s) · ' + esc(when(d.when)) + ' · ' + esc((p.roots || []).join(', ')) + '</span></h2>' +
+        (p.organize_summary ? '<p class="sub" style="margin-bottom:10px">' + esc(p.organize_summary) + '</p>' : '') +
+        (notes.length ? '<p class="sub" style="margin-bottom:10px">' + esc(notes.join('; ')) + '.</p>' : '');
+      html += steps.length ? '<div class="card rows">' + steps.map(function (s) {
+        var r = res[s.id], done = r && r.ok;
+        var box = !done ? '<input type="checkbox" class="opick" value="' + esc(s.id) + '" checked aria-label="Approve step">' : '';
+        var word = /^Rename /.test(s.title) ? 'Rename' : (actWord[s.action] || s.action);
+        return '<div class="row' + (done ? ' done' : r ? ' failed' : '') + '"><div>' + box + '</div><div><span class="t">' + esc(s.title) + '</span><span class="w">' + esc(s.why) + '</span></div><div class="what"><span class="tag">' + word + '</span></div><div class="res">' + (r ? (r.ok ? '✓ ' : '✗ ') + esc(r.message) : '') + '</div></div>';
+      }).join('') + '</div>' : '<div class="card empty">The AI found nothing worth changing. Your folders look tidy.</div>';
+      $('orgPlan').innerHTML = html;
+      $('orgActions').style.display = steps.length ? 'flex' : 'none';
+      $('orgUndo').disabled = !d.undo_left;
+    }).catch(function (e) { $('orgPlan').innerHTML = '<div class="card empty">' + esc(e.message) + '</div>'; });
+  }
+  $('orgGo').addEventListener('click', function () {
+    var roots = Array.prototype.map.call(document.querySelectorAll('[data-root].on'), function (c) { return c.dataset.root; });
+    if (!roots.length) { toast('Pick at least one folder.'); return; }
+    run('organize', { roots: roots, request: $('orgAsk').value });
+  });
+  $('orgApprove').addEventListener('click', function () {
+    var ids = Array.prototype.map.call(document.querySelectorAll('input.opick:checked'), function (x) { return x.value; });
+    if (!ids.length) { $('orgStatus').textContent = 'Nothing is ticked.'; return; }
+    arm($('orgApprove'), 'Click again to carry out ' + ids.length + ' step(s)', function () {
+      $('orgApprove').disabled = true; $('orgStatus').textContent = 'Working...';
+      api('/api/organize/approve', { run: orgRun, ids: ids }).then(function (d) {
+        var res = d.results || [], ok = res.filter(function (r) { return r.ok; }).length;
+        $('orgStatus').textContent = ok + ' of ' + res.length + ' done. Undo this plan puts it all back.'; toast(ok + ' of ' + res.length + ' done.'); loadOrganizer(); brainBadge();
+      }).catch(function (e) { $('orgStatus').textContent = e.message; }).then(function () { $('orgApprove').disabled = false; });
+    });
+  });
+  $('orgUndo').addEventListener('click', function () { undoRun(orgRun, $('orgUndo'), $('orgStatus')); });
+
+  // ---------- security ----------
+  function chk(level, title, detail, extra) {
+    return '<div class="check"><i class="dot ' + level + '"></i><div><b data-i18n="tile.esc_title.title">' + esc(title) + '</b><span data-i18n="tile.esc_title.desc">' + detail + '</span>' + (extra || '') + '</div></div>';
+  }
+  function openBtn(what, label) { return '<button class="btn sm" data-open2="' + what + '">' + label + '</button>'; }
+  function loadSecurity() {
+    if (!$('secBody').innerHTML) $('secBody').innerHTML = skel(2) + skel(2);
+    api('/api/security').then(function (d) {
+      var r = d.report;
+      if (!r) { $('secWhen').textContent = 'Not checked yet'; $('secBody').innerHTML = '<div class="card empty" style="grid-column:1/-1">Press Run Security check. It takes a few seconds and changes nothing.</div>'; return; }
+      $('secWhen').textContent = 'Last checked ' + when(r.checked);
+      var prot = (r.protection || []), bad = prot.filter(function (x) { return !x.ok; }).length;
+      var html = '<div class="card seccard"><h3>Protection <span class="tag ' + (bad ? 'bad' : 'good') + '">' + (bad ? bad + ' problem(s)' : 'all on') + '</span></h3><p class="s">' + (OS === 'linux' ? 'Virus scanner, virus definitions, firewall.' : 'Antivirus, real-time and tamper protection, virus definitions, firewall.') + '</p>' +
+        prot.map(function (x) { return chk(x.ok ? '' : 'bad', x.name, esc(x.detail), x.fix === 'update_definitions' && !x.ok ? '<div class="links"><button class="btn sm" data-run2="definitions">Update definitions now</button></div>' : x.fix === 'clamav_install' && !x.ok ? '<div class="links"><button class="btn sm primary" data-run2="clamav_install">Install ClamAV</button></div>' : ''); }).join('') + '</div>';
+      var u = r.updates || {};
+      var uLevel = u.restart_pending ? 'warn' : u.ok ? '' : 'warn';
+      html += '<div class="card seccard"><h3>' + (OS === 'linux' ? 'System updates' : 'Windows Update') + ' <span class="tag ' + (uLevel ? 'warn' : 'good') + '">' + (u.restart_pending ? 'restart needed' : u.ok ? 'up to date' : 'check it') + '</span></h3><p class="s">Updates fix the security holes viruses use.</p>' +
+        chk(u.restart_pending ? 'warn' : '', u.restart_pending ? 'A restart is needed' : 'No restart needed', u.restart_pending ? (OS === 'linux' ? 'Updates were installed that finish when you restart.' : 'Windows installed updates that finish when you restart.') : 'Nothing is waiting on a restart.') +
+        (OS === 'linux' && u.pending != null ? chk(u.pending ? 'warn' : '', 'Updates waiting', u.pending ? u.pending + ' update(s) are ready to install.' : 'Everything is up to date.') : '') +
+        chk(u.ok ? '' : 'warn', 'Last update installed', u.last_update ? esc(when(u.last_update)) + ' (' + u.days_since + ' days ago)<br>' + esc(u.last_title || '') : 'Unknown') +
+        '<div class="links">' + (OS === 'linux' ? openBtn('software_updates', 'Open Software Updater') : openBtn('windows_update', 'Open Windows Update')) + '</div></div>';
+      var auto = r.autoruns || [];
+      html += '<div class="card seccard"><h3>' + (OS === 'linux' ? 'Programs that start by themselves' : 'Startup items and scheduled tasks') + ' <span class="tag ' + (auto.length ? 'warn' : 'good') + '">' + (auto.length ? auto.length + ' to look at' : 'nothing odd') + '</span></h3><p class="s">Programs that run by themselves from unusual places, hidden scripts, unsigned programs, or entries pointing at deleted programs. Sweepwise only lists them.</p>' +
+        (auto.length ? auto.map(function (a) { return chk('warn', a.name + ' · ' + a.kind, esc((a.reasons || []).join('; ')) + '<br><span style="font-family:Consolas,monospace;font-size:12px">' + esc(String(a.command).slice(0, 160)) + '</span>'); }).join('') : chk('', 'Nothing suspicious', 'Every startup item and task looks normal.')) +
+        (OS === 'linux' ? '' : '<div class="links">' + openBtn('startup_apps', 'Open Startup apps') + openBtn('task_scheduler', 'Open Task Scheduler') + '</div>') + '</div>';
+      var ext = (r.extensions || []).filter(function (e) { return e.level !== 'ok'; }).sort(function (a, b) { return (a.level === 'check' ? 0 : 1) - (b.level === 'check' ? 0 : 1); });
+      var nCheck = ext.filter(function (e) { return e.level === 'check'; }).length;
+      html += '<div class="card seccard"><h3>Browser extensions <span class="tag ' + (nCheck ? 'warn' : 'good') + '">' + (nCheck ? nCheck + ' worth a look' : 'nothing risky') + '</span></h3><p class="s">Extensions can see what you do online. Yellow ones deserve a real look; blue ones are powerful but normal for their kind. Remove any you do not use.</p>' +
+        (ext.length ? ext.map(function (e) { return chk(e.level === 'check' ? 'warn' : 'info', e.name + ' · ' + e.profile, esc((e.reasons || []).join('; '))); }).join('') : chk('', 'All clear', 'No extensions with risky permissions.')) +
+        '<div class="links">' + openBtn('chrome_extensions', 'Open Chrome extensions') + '</div></div>';
+      var post = r.posture || [];
+      if (post.length) {
+        var pw = post.filter(function (p) { return p.level === 'warn'; }).length;
+        html += '<div class="card seccard"><h3>' + (OS === 'linux' ? 'Safety switches' : 'Windows safety switches') + ' <span class="tag ' + (pw ? 'warn' : 'good') + '">' + (pw ? pw + ' to look at' : 'all good') + '</span></h3><p class="s">Built-in protections that paid security suites check too.</p>' +
+          post.map(function (p) { return chk(p.level === 'good' ? '' : p.level === 'warn' ? 'warn' : 'info', p.name, esc(p.detail), p.fix && p.level !== 'good' ? '<div class="links">' + openBtn(p.fix, 'Open settings') + '</div>' : ''); }).join('') + '</div>';
+      }
+      var hij = r.hijack || [], hc = hij.filter(function (h) { return h.level === 'check'; }).length;
+      html += '<div class="card seccard"><h3>Browser and network hijacks <span class="tag ' + (hc ? 'warn' : 'good') + '">' + (hc ? hc + ' worth a look' : 'nothing odd') + '</span></h3><p class="s">Search engine, proxy, hosts file and settings forced on your browsers.</p>' +
+        (hij.length ? hij.map(function (h) { return chk(h.level === 'check' ? 'warn' : 'info', h.name, esc(h.detail)); }).join('') : chk('', 'All clear', 'Nothing is redirecting your browsing.')) + '</div>';
+      var pv = r.privacy || [];
+      if (pv.length) html += '<div class="card seccard"><h3>Camera and microphone</h3><p class="s">Apps that used them in the last 30 days (Windows\' own record).</p>' +
+        pv.map(function (p) { return chk(p.level === 'warn' ? 'warn' : 'info', p.name, esc(p.detail), p.fix ? '<div class="links">' + openBtn(p.fix, 'Privacy settings') + '</div>' : ''); }).join('') + '</div>';
+      $('secBody').innerHTML = html;
+      Array.prototype.forEach.call(document.querySelectorAll('[data-open2]'), function (b) { b.addEventListener('click', function () { api('/api/open', { what: b.dataset.open2 }).catch(function (e) { toast(e.message); }); }); });
+      Array.prototype.forEach.call(document.querySelectorAll('[data-run2]'), function (b) { b.addEventListener('click', function () { run(b.dataset.run2); }); });
+    }).catch(function (e) { $('secBody').innerHTML = '<div class="card empty">' + esc(e.message) + '</div>'; });
+  }
+  $('secRun').addEventListener('click', function () { run('security'); });
+  $('secMrt').addEventListener('click', function () {
+    modal('Malicious Software Removal Tool', '<p>Microsoft\'s own tool looks for common harmful software and removes it. It needs admin rights, so Windows will ask "Allow changes?". A quick scan takes about 5-15 minutes.</p>', 'Start', function () { run('mrt'); });
+  });
+  $('secOffline').addEventListener('click', function () {
+    modal('Microsoft Defender Offline scan', '<p>For stubborn malware that hides while Windows runs. Your PC restarts and scans for about 15 minutes before Windows starts, so save your work first.</p>' +
+      '<ol class="steps"><li>Press Open Windows Security.</li><li>Choose Scan options.</li><li>Pick Microsoft Defender Offline scan, then Scan now.</li></ol>', 'Open Windows Security', function () { api('/api/open', { what: 'offline_scan' }).catch(function (e) { toast(e.message); }); });
+  });
+
+  // ---------- settings ----------
+  function tag(id, on, onText, offText) { var t = $(id); t.textContent = on ? onText : offText; t.className = 'tag ' + (on ? 'good' : ''); }
+  function loadSettings() {
+    api('/api/ai').then(function (a) { tag('aiState', a.connected, 'on (' + a.provider + ', ' + a.model + ')', 'off'); $('aiRemove').style.display = a.connected ? '' : 'none'; }).catch(function () {});
+    api('/api/status').then(function (s) {
+      var st = s.settings || {};
+      themeButtons(st.theme || 'dark'); swSet($('advSwitch'), st.advanced); swSet($('remSwitch'), st.reminder); swSet($('updSwitch'), st.update_check !== false);
+    }).catch(function () {});
+    updStateText();
+  }
+  // ---------- theme, advanced details, reminder, updates (Settings) ----------
+  function applyTheme(th) { document.documentElement.setAttribute('data-theme', th === 'light' ? 'light' : 'dark'); }
+  function applyAdvanced(v) { document.body.classList.toggle('advanced', !!v); }
+  function themeButtons(th) { swSet($('themeDark'), th !== 'light'); swSet($('themeLight'), th === 'light'); }
+  Array.prototype.forEach.call(document.querySelectorAll('[data-theme-pick]'), function (b) {
+    b.addEventListener('click', function () { var th = b.dataset.themePick; applyTheme(th); themeButtons(th); api('/api/settings', { key: 'theme', value: th }).catch(function (e) { toast(e.message); }); });
+  });
+  $('advSwitch').addEventListener('click', function () { var v = !swOn($('advSwitch')); swSet($('advSwitch'), v); applyAdvanced(v); api('/api/settings', { key: 'advanced', value: v }).catch(function (e) { toast(e.message); }); });
+  $('remSwitch').addEventListener('click', function () {
+    var sw = $('remSwitch'), v = !swOn(sw); sw.disabled = true;
+    api('/api/reminder', { on: v }).then(function () { swSet(sw, v); toast(v ? 'Weekly reminder is on: Sundays at 6 pm.' : 'Weekly reminder is off.'); })
+      .catch(function (e) { toast(e.message); }).then(function () { sw.disabled = false; });
+  });
+  $('updSwitch').addEventListener('click', function () { var sw = $('updSwitch'), v = !swOn(sw); swSet(sw, v); api('/api/settings', { key: 'update_check', value: v }).then(function () { updStateText(); loadUpdate(); }).catch(function (e) { toast(e.message); }); });
+  $('updCheck').addEventListener('click', function () {
+    var b = $('updCheck'); b.disabled = true;
+    api('/api/update/check', {}).then(function (u) { updStateText(u); loadUpdate(); toast(u.newer ? 'A new version is ready.' : u.error ? u.error : 'You have the newest version.'); })
+      .catch(function (e) { toast(e.message); }).then(function () { b.disabled = false; });
+  });
+  function updStateText(u) {
+    function put(u) {
+      $('updState').textContent = !u.enabled ? 'Off. Sweepwise will not look for new versions.'
+        : u.newer ? 'Version ' + String(u.latest).replace(/^v/, '') + ' is ready (you have ' + u.current + ').'
+        : u.checked ? 'You have ' + u.current + ', the newest version. Last checked ' + ago(u.checked) + '.'
+        : t('set.updates.desc');
+    }
+    if (u) put(u); else api('/api/update').then(put).catch(function () {});
+  }
+  // ---------- update banner (answer 15: never updates without a click) ----------
+  var updInfo = null;
+  function loadUpdate() {
+    api('/api/update').then(function (u) {
+      var hidden = false; try { hidden = sessionStorage.getItem('updHide') === String(u.latest); } catch (e) {}
+      if (!u.newer || hidden) { $('updBanner').hidden = true; return; }
+      updInfo = u;
+      $('updTitle').textContent = 'Sweepwise ' + String(u.latest).replace(/^v/, '') + ' is ready';
+      $('updSub').textContent = u.name ? String(u.name) : 'A newer version with fixes and improvements.';
+      $('updBanner').hidden = false;
+    }).catch(function () {});
+  }
+  function openUpdate() { api('/api/open', { what: 'update' }).then(function () { toast('The download page opened in your browser.'); }).catch(function (e) { toast(e.message); }); }
+  $('updGo').addEventListener('click', openUpdate);
+  $('updNotes').addEventListener('click', function () { modal(t('button.whats_new', "What's new"), '<p style="white-space:pre-wrap">' + esc((updInfo && updInfo.notes) || 'No notes for this version.') + '</p>', t('button.update', 'Update'), openUpdate); });
+  $('updHide').addEventListener('click', function () { try { sessionStorage.setItem('updHide', String(updInfo && updInfo.latest)); } catch (e) {} $('updBanner').hidden = true; });
+  // ---------- weekly reminder banner ----------
+  $('remGo').addEventListener('click', function () { $('remBanner').hidden = true; run('scan_clean'); });
+  $('remHide').addEventListener('click', function () { $('remBanner').hidden = true; });
+  // ---------- Support card (after a real win, at most once a month) ----------
+  $('supGo').addEventListener('click', function () { api('/api/support/answer', { answer: 'opened' }).catch(function () {}); $('supportCard').hidden = true; show('support'); });
+  $('supLater').addEventListener('click', function () { api('/api/support/answer', { answer: 'later' }).catch(function () {}); $('supportCard').hidden = true; toast('No problem. Sweepwise will not ask again for at least a month.'); });
+  $('supNever').addEventListener('click', function () { api('/api/support/answer', { answer: 'never' }).catch(function () {}); $('supportCard').hidden = true; toast('Got it. Sweepwise will not ask again. The Support page stays in the menu if you ever want it.'); });
+  // ---------- Help and About ----------
+  function loadHelp(tries) {
+    var n = 1, out = '';
+    while (STR['help.' + n + '.q']) { out += '<details class="faq card"><summary>' + esc(t('help.' + n + '.q')) + '</summary><p>' + esc(t('help.' + n + '.a')) + '</p></details>'; n++; }
+    if (out) { $('helpList').innerHTML = out; return; }
+    if ((tries || 0) < 20) setTimeout(function () { loadHelp((tries || 0) + 1); }, 250);
+  }
+  function loadAbout() { api('/api/about').then(function (a) { $('aboutVer').textContent = 'Sweepwise ' + a.version + ' · by ' + a.maker + ' · licence ' + a.licence; }).catch(function () {}); }
+  // ---------- AI key guide (answer 50) ----------
+  function keyGuide(which) {
+    var tabs = '<div class="tabs" role="tablist"><button type="button" role="tab" data-kg="claude">Claude</button><button type="button" role="tab" data-kg="openai">OpenAI</button></div>';
+    modal(t('guide.title', 'How to get an AI key'), tabs + '<div id="kgBody"></div><p class="fine">' + esc(t('guide.cost')) + '</p>', t('button.got_it', 'Got it'), function () { if (current === 'settings') $('aiKey').focus(); });
+    function pick(p) {
+      Array.prototype.forEach.call(document.querySelectorAll('[data-kg]'), function (b) { b.setAttribute('aria-selected', String(b.dataset.kg === p)); });
+      var n = 1, items = '';
+      while (STR['guide.' + p + '.' + n]) { items += '<li>' + esc(t('guide.' + p + '.' + n)) + '</li>'; n++; }
+      if (!items) items = '<li>Open the page below, create a key, set a monthly limit, then paste the key into Sweepwise.</li>';
+      var where = p === 'claude' ? 'anthropic_keys' : 'openai_keys';
+      $('kgBody').innerHTML = '<ol class="steps">' + items + '</ol><button type="button" class="btn sm" id="kgOpen">' + esc(p === 'claude' ? t('button.open_anthropic') : t('button.open_openai')) + '</button>';
+      $('kgOpen').addEventListener('click', function () { api('/api/open', { what: where }).catch(function (e) { toast(e.message); }); });
+    }
+    Array.prototype.forEach.call(document.querySelectorAll('[data-kg]'), function (b) { b.addEventListener('click', function () { pick(b.dataset.kg); }); });
+    pick(which === 'openai' ? 'openai' : 'claude');
+  }
+  // ---------- welcome (answer 25): what it does + promises, two choices, a first scan that shows before it cleans ----------
+  function openWelcome(step) { $('welcome').hidden = false; wGo(step || 1); }
+  function wGo(n) {
+    Array.prototype.forEach.call(document.querySelectorAll('.wstep'), function (x) { x.hidden = x.dataset.step !== String(n); });
+    Array.prototype.forEach.call(document.querySelectorAll('.wsteps i'), function (x, i) { x.classList.toggle('on', i < n); });
+    var h = document.querySelector('.wstep[data-step="' + n + '"] h2'); if (h) { h.setAttribute('tabindex', '-1'); h.focus(); }
+  }
+  function finishWelcome() { $('welcome').hidden = true; api('/api/welcome/done', {}).catch(function () {}); $('main').focus(); }
+  Array.prototype.forEach.call(document.querySelectorAll('[data-wnext]'), function (b) { b.addEventListener('click', function () { wGo(+b.dataset.wnext); }); });
+  $('wRem').addEventListener('click', function () { swSet($('wRem'), !swOn($('wRem'))); });
+  $('wGuide').addEventListener('click', function () { keyGuide('claude'); });
+  $('wNext2').addEventListener('click', function () {
+    var b = $('wNext2'), key = $('wKey').value.trim(); b.disabled = true;
+    var steps = [api('/api/reminder', { on: swOn($('wRem')) }).catch(function (e) { toast(e.message); })];
+    if (key) steps.push(api('/api/ai/key', { key: key }).then(function (r) { $('wKey').value = ''; toast('AI helper is on (' + r.provider + ').' + (r.note ? ' ' + r.note : '')); }));
+    Promise.all(steps).then(function () { wGo(3); }).catch(function (e) { toast(e.message); }).then(function () { b.disabled = false; });
+  });
+  $('wScan').addEventListener('click', function () { finishWelcome(); run('scan_clean'); });
+  $('wLater').addEventListener('click', finishWelcome);
+  // ---------- first status: settings, welcome, reminder, update check ----------
+  var started = false;
+  function firstStatus(s) {
+    if (started) return; started = true;
+    var st = s.settings || {};
+    applyTheme(st.theme); applyAdvanced(st.advanced);
+    if (s.version) $('verText').textContent = 'Sweepwise ' + s.version;
+    if (s.reminder_prompt) $('remBanner').hidden = false;
+    if (!st.welcome_done) openWelcome();
+    startScreen(s.start_screen);
+    loadUpdate(); setTimeout(loadUpdate, 30000); setInterval(loadUpdate, 3600000);
+  }
+  // For screenshots and testing only (SWEEPWISE_SCREEN): open a given screen or step at start.
+  function startScreen(name) {
+    if (!name) return;
+    if (/^welcome[123]?$/.test(name)) { openWelcome(+(name.slice(7) || 1)); return; }
+    $('welcome').hidden = true;
+    if (name === 'keyguide') { show('settings'); setTimeout(function () { keyGuide('claude'); }, 800); return; }
+    if (name === 'supportcard') { show('work'); $('workTitle').textContent = 'Scan & Clean: finished'; $('supText').textContent = 'Sweepwise freed 4.2 GB today. If it helped, you can buy me a coffee.'; $('supportCard').hidden = false; return; }
+    if ($('v-' + name)) show(name);
+  }
+
+  // ---------- Sweepwise Brain ----------
+  function loadBrain() {
+    if (!$('brSug').innerHTML) $('brSug').innerHTML = skel(2);
+    api('/api/brain').then(function (d) {
+      var sug = d.suggestions || [];
+      $('navBrain').textContent = sug.length || ''; $('brSugCount').textContent = sug.length ? sug.length + ' new' : '';
+      $('brSug').innerHTML = sug.length ? sug.map(function (s) {
+        return '<div class="card sugg"><div><b data-i18n="tile.esc_s_label_charat_0_touppercase_s_label.title">' + esc(s.label.charAt(0).toUpperCase() + s.label.slice(1)) + '?</b><span data-i18n="tile.esc_s_label_charat_0_touppercase_s_label.desc">' + esc(s.because) + '</span></div><button class="btn primary sm" data-acc="' + esc(s.key) + '">Make it a rule</button><button class="btn sm" data-dis="' + esc(s.key) + '">Not now</button></div>';
+      }).join('') : '<div class="card empty" style="padding:20px">Nothing new yet. Sweepwise watches which AI suggestions you use, what you approve in the AI Organizer, and what you keep saying no to, then proposes rules here.</div>';
+      var rules = d.rules || [], cats = d.categories || [];
+      $('brRules').innerHTML = rules.length ? rules.map(function (r) {
+        var pickCat = r.kind === 'sort' ? '<select data-rcat="' + esc(r.id) + '" aria-label="Folder">' + cats.map(function (c) { return '<option' + (c === r.category ? ' selected' : '') + '>' + esc(c) + '</option>'; }).join('') + '</select>' : '<span class="tag">leave alone</span>';
+        return '<div class="rulerow"><div><b>' + esc(r.label.charAt(0).toUpperCase() + r.label.slice(1)) + '</b><span class="w">added ' + esc(when(r.created)) + '</span></div>' + pickCat + '<button class="btn sm" data-rdel="' + esc(r.id) + '">Delete</button></div>';
+      }).join('') : '<div class="empty" style="padding:20px">No rules yet. Rules you approve show up here and are used on every scan.</div>';
+      $('brFacts').innerHTML = (d.facts || []).map(function (f) { return '<div class="check"><i class="dot info"></i><div><span style="color:var(--text)">' + esc(f) + '</span></div></div>'; }).join('');
+      var hb = d.habits || {};
+      var hf = (hb.folders || []).map(function (f) { return esc(f.name) + ' (' + f.opens + ')'; }).join(', ');
+      var ha = (hb.apps || []).map(function (a) { return esc(a.name); }).join(', ');
+      $('habitsBody').innerHTML = (hf || ha) ? chk('info', 'Folders you open most', hf || 'Nothing yet') + chk('info', 'Apps you used recently', ha || 'Nothing yet') + chk('info', 'Files opened in the last 30 days', String(hb.files_opened_30d || 0)) : '<p class="s" style="margin:0">Nothing yet. Sweepwise learns this during each Scan &amp; Clean.</p>';
+      if (document.activeElement !== $('brNotes')) $('brNotes').value = d.notes || '';
+      var items = d.learned || [];
+      $('learnBody').innerHTML = items.length ? items.map(function (x) {
+        return '<div class="check"><i class="dot info"></i><div style="flex:1"><b data-i18n="tile.esc_x_title.title">' + esc(x.title) + '</b><span data-i18n="tile.esc_x_title.desc">' + esc(x.section.replace('_', ' ')) + ' · said no ' + x.count + ' time(s)' + (x.hidden ? ' · hidden' : ' · starts unticked') + '</span></div><button class="btn sm" data-forget="' + esc(x.key) + '">Forget</button></div>';
+      }).join('') + '<div class="links"><button class="btn sm" data-forget="*">Forget everything</button></div>' : '<p class="s" style="margin:0">Nothing yet. Leave a suggestion unticked when you approve, and Sweepwise will remember.</p>';
+      function bind(sel, fn) { Array.prototype.forEach.call(document.querySelectorAll(sel), fn); }
+      bind('[data-forget]', function (b) { b.addEventListener('click', function () { api('/api/learned/forget', { key: b.dataset.forget }).then(loadBrain); }); });
+      bind('[data-acc]', function (b) { b.addEventListener('click', function () { api('/api/rules/accept', { key: b.dataset.acc }).then(function () { toast('Rule added. Sweepwise uses it from the next scan.'); loadBrain(); }).catch(function (e) { toast(e.message); }); }); });
+      bind('[data-dis]', function (b) { b.addEventListener('click', function () { api('/api/rules/dismiss', { key: b.dataset.dis }).then(loadBrain); }); });
+      bind('[data-rdel]', function (b) { b.addEventListener('click', function () { api('/api/rules/delete', { id: b.dataset.rdel }).then(function () { toast('Rule deleted.'); loadBrain(); }); }); });
+      bind('[data-rcat]', function (s) { s.addEventListener('change', function () { api('/api/rules/update', { id: s.dataset.rcat, category: s.value }).then(function () { toast('Rule updated.'); loadBrain(); }).catch(function (e) { toast(e.message); }); }); });
+    }).catch(function (e) { $('brSug').innerHTML = '<div class="card empty">' + esc(e.message) + '</div>'; });
+  }
+  $('brSave').addEventListener('click', function () { api('/api/profile', { notes: $('brNotes').value }).then(function () { toast('Notes saved. The AI will see them next time.'); loadBrain(); }).catch(function (e) { toast(e.message); }); });
+
+  // ---------- chat ----------
+  var chatMsgs = [];
+  function addMsg(role, text, cls) { var d = document.createElement('div'); d.className = 'msg ' + (role === 'user' ? 'me' : 'bot') + (cls ? ' ' + cls : ''); d.textContent = text; $('chatBody').appendChild(d); $('chatBody').scrollTop = 1e9; return d; }
+  function openChat() { $('chat').classList.add('on'); $('chatFab').style.display = 'none'; setTimeout(function () { $('chatText').focus(); }, 250); }
+  function closeChat() { $('chat').classList.remove('on'); $('chatFab').style.display = ''; }
+  $('chatFab').addEventListener('click', openChat); $('chatClose').addEventListener('click', closeChat);
+  function doAction(a) {
+    var map = { quick_scan: function () { run('quick'); }, scan_clean: function () { run('scan_clean'); }, clean: function () { run('clean'); }, security_check: function () { run('security'); },
+      full_scan: function () { ask('full'); }, deep_clean: function () { ask('deep'); }, disk_map: function () { run('diskmap'); }, find_space: function () { run('finder', { roots: a.roots && a.roots.length ? a.roots : ['Desktop', 'Documents', 'Downloads', 'Pictures', 'Videos'] }); },
+      open_list: function () { show('list'); }, open_security: function () { show('security'); }, open_brain: function () { show('brain'); },
+      organize: function () {
+        show('organizer');
+        if (a.roots && a.roots.length) Array.prototype.forEach.call(document.querySelectorAll('[data-root]'), function (c) { c.classList.toggle('on', a.roots.indexOf(c.dataset.root) >= 0); });
+        if (a.request) $('orgAsk').value = a.request;
+        toast('Check the folders and press Make a plan.');
+      } };
+    if (map[a.action]) { if (window.innerWidth < 1300) closeChat(); map[a.action](); }
+  }
+  function sendChat(text) {
+    text = String(text || '').trim(); if (!text) return;
+    $('chatStarters').style.display = 'none';
+    chatMsgs.push({ role: 'user', content: text }); addMsg('user', text);
+    var wait = addMsg('bot', ''); wait.innerHTML = '<span class="typing"><i></i><i></i><i></i></span>';
+    $('chatText').value = ''; $('chatText').disabled = true;
+    api('/api/chat', { messages: chatMsgs }).then(function (r) {
+      var tries = 0;
+      (function poll() {
+        api('/api/chat/result?id=' + encodeURIComponent(r.id)).then(function (d) {
+          if (d.pending) { if (++tries < 120) { setTimeout(poll, 1000); return; } d = { ok: false, reply: 'Sweepwise took too long to answer. Try again.' }; }
+          wait.textContent = d.reply || ''; if (!d.ok) wait.classList.add('err'); else chatMsgs.push({ role: 'assistant', content: d.reply });
+          if (d.actions && d.actions.length) {
+            var acts = document.createElement('div'); acts.className = 'acts';
+            d.actions.forEach(function (a) { var b = document.createElement('button'); b.className = 'btn sm primary'; b.textContent = a.label || a.action; b.addEventListener('click', function () { doAction(a); }); acts.appendChild(b); });
+            wait.appendChild(acts);
+          }
+          $('chatBody').scrollTop = 1e9; $('chatText').disabled = false; $('chatText').focus();
+        }).catch(function () { setTimeout(poll, 1500); });
+      })();
+    }).catch(function (e) { wait.textContent = e.message; wait.classList.add('err'); $('chatText').disabled = false; });
+  }
+  $('chatForm').addEventListener('submit', function (e) { e.preventDefault(); sendChat($('chatText').value); });
+  Array.prototype.forEach.call(document.querySelectorAll('#chatStarters button'), function (b) { b.addEventListener('click', function () { sendChat(b.textContent); }); });
+
+  $('aiSave').addEventListener('click', function () {
+    var b = $('aiSave'); b.disabled = true; b.textContent = 'Checking the key...';
+    api('/api/ai/key', { key: $('aiKey').value }).then(function (r) { $('aiKey').value = ''; toast('AI helper is on (' + r.provider + ').' + (r.note ? ' ' + r.note : '')); loadSettings(); })
+      .catch(function (e) { toast(e.message); }).then(function () { b.disabled = false; b.textContent = 'Save and check key'; });
+  });
+  $('aiGuide').addEventListener('click', function () { keyGuide('claude'); });
+  $('aiRemove').addEventListener('click', function () { api('/api/ai/remove', {}).then(function () { toast('API key removed from this PC.'); loadSettings(); }); });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-open]'), function (b) {
+    b.addEventListener('click', function () { api('/api/open', { what: b.dataset.open }).then(function () { toast('Opened.'); }).catch(function (e) { toast(e.message); }); });
+  });
+
+  // ---------- Stage 6: motion helpers ----------
+  var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function countUp(el, to, dec, suffix) {
+    to = +to || 0; dec = dec || 0; suffix = suffix || '';
+    var from = parseFloat(el.dataset.v || '0'); el.dataset.v = to;
+    if (reduced || from === to) { el.textContent = to.toFixed(dec) + suffix; return; }
+    var t0 = performance.now(), dur = 700;
+    (function step(t) { var k = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - k, 3); el.textContent = (from + (to - from) * e).toFixed(dec) + suffix; if (k < 1) requestAnimationFrame(step); })(t0);
+  }
+  function skel(n) { var s = ''; for (var i = 0; i < (n || 3); i++) s += '<div class="skel"></div>'; return s; }
+  function celebrate() {
+    var b = $('burst'); b.innerHTML = '';
+    for (var i = 0; i < 18; i++) { var p = document.createElement('i'), a = i / 18 * Math.PI * 2, d = 38 + Math.random() * 30; p.style.setProperty('--dx', Math.cos(a) * d + 'px'); p.style.setProperty('--dy', Math.sin(a) * d + 'px'); p.style.animationDelay = (Math.random() * .12) + 's'; if (i % 3 === 0) p.style.background = '#a5f3fc'; b.appendChild(p); }
+    $('doneMark').style.display = 'flex';
+  }
+
+  // ---------- Stage 6: trends ----------
+  function smooth(pts) {
+    if (pts.length < 2) return pts.length ? 'M' + pts[0][0] + ',' + pts[0][1] : '';
+    var d = 'M' + pts[0][0] + ',' + pts[0][1];
+    for (var i = 0; i < pts.length - 1; i++) {
+      var p0 = pts[i - 1] || pts[i], p1 = pts[i], p2 = pts[i + 1], p3 = pts[i + 2] || p2;
+      d += ' C' + (p1[0] + (p2[0] - p0[0]) / 6).toFixed(1) + ',' + (p1[1] + (p2[1] - p0[1]) / 6).toFixed(1) + ' ' + (p2[0] - (p3[0] - p1[0]) / 6).toFixed(1) + ',' + (p2[1] - (p3[1] - p1[1]) / 6).toFixed(1) + ' ' + p2[0].toFixed(1) + ',' + p2[1].toFixed(1);
+    }
+    return d;
+  }
+  function lineChart(svg, data, color, fmt, lo, hi) {
+    var W = svg.clientWidth || 220, H = 86, pad = 6; svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+    if (data.length < 2) { svg.innerHTML = '<text x="0" y="50" fill="#8c9bb8" font-size="12">Builds up as Sweepwise runs.</text>'; return; }
+    var xs = data.map(function (d) { return d.x; }), ys = data.map(function (d) { return d.y; });
+    var x0 = Math.min.apply(null, xs), x1 = Math.max.apply(null, xs), y0 = lo != null ? lo : Math.min.apply(null, ys), y1 = hi != null ? hi : Math.max.apply(null, ys);
+    if (y1 === y0) { y1 += 1; y0 -= 1; }
+    var pts = data.map(function (d) { return [pad + (d.x - x0) / ((x1 - x0) || 1) * (W - pad * 2), H - pad - (d.y - y0) / (y1 - y0) * (H - pad * 2)]; });
+    var id = 'g' + svg.id, line = smooth(pts);
+    svg.innerHTML = '<defs><linearGradient id="' + id + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="' + color + '" stop-opacity=".35"/><stop offset="1" stop-color="' + color + '" stop-opacity="0"/></linearGradient></defs>' +
+      '<path d="' + line + ' L' + pts[pts.length - 1][0] + ',' + H + ' L' + pts[0][0] + ',' + H + ' Z" fill="url(#' + id + ')"/>' +
+      '<path d="' + line + '" fill="none" stroke="' + color + '" stroke-width="2.2" stroke-linecap="round"/>' +
+      pts.map(function (p, i) { return '<circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="' + (i === pts.length - 1 ? 3.5 : 2) + '" fill="' + color + '"><title>' + esc(new Date(data[i].x).toLocaleDateString() + ': ' + fmt(data[i].y)) + '</title></circle>'; }).join('');
+  }
+  function barChart(svg, bars, color, fmt) {
+    var W = svg.clientWidth || 220, H = 86, gap = 6; svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+    var max = Math.max.apply(null, bars.map(function (b) { return b.y; }).concat([0])) || 1, bw = (W - gap * (bars.length - 1)) / bars.length;
+    svg.innerHTML = bars.map(function (b, i) {
+      var h = Math.max(2, b.y / max * (H - 16));
+      return '<rect x="' + (i * (bw + gap)).toFixed(1) + '" y="' + (H - 12 - h).toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + h.toFixed(1) + '" rx="3" fill="' + (b.y ? color : '#1d2a47') + '"><title>' + esc(b.label + ': ' + fmt(b.y)) + '</title></rect>' +
+        '<text x="' + (i * (bw + gap) + bw / 2).toFixed(1) + '" y="' + H + '" fill="#8c9bb8" font-size="9" text-anchor="middle">' + esc(b.short) + '</text>';
+    }).join('');
+  }
+  function weeks(n) { var out = [], now = new Date(); now.setHours(0, 0, 0, 0); var monday = new Date(now); monday.setDate(now.getDate() - ((now.getDay() + 6) % 7)); for (var i = n - 1; i >= 0; i--) { var s = new Date(monday); s.setDate(monday.getDate() - 7 * i); out.push(s); } return out; }
+  function loadTrends() {
+    api('/api/trends').then(function (d) {
+      var pts = (d.points || []).map(function (p) { return { x: +new Date(p.t), y: p.score }; });
+      lineChart($('cScore'), pts, '#2dd4bf', function (v) { return Math.round(v) + ' / 100'; }, 0, 100);
+      if (pts.length) { countUp($('tScore'), pts[pts.length - 1].y); $('tScoreS').textContent = pts.length > 1 ? (pts[pts.length - 1].y - pts[0].y >= 0 ? 'up ' : 'down ') + Math.abs(pts[pts.length - 1].y - pts[0].y) + ' since ' + new Date(pts[0].x).toLocaleDateString() : 'tracking from today'; }
+      var free = (d.runs || []).filter(function (r) { return r.free_after; }).map(function (r) { return { x: +new Date(r.when), y: r.free_after / 1073741824 }; })
+        .concat((d.points || []).map(function (p) { return { x: +new Date(p.t), y: p.free_disk / 1073741824 }; })).sort(function (a, b) { return a.x - b.x; });
+      lineChart($('cFree'), free, '#60a5fa', function (v) { return v.toFixed(1) + ' GB'; });
+      if (free.length) { countUp($('tFree'), free[free.length - 1].y, 0, ' GB'); var ch = free[free.length - 1].y - free[0].y; $('tFreeS').textContent = (ch >= 0 ? '+' : '') + ch.toFixed(1) + ' GB since ' + new Date(free[0].x).toLocaleDateString(); }
+      var wk = weeks(8), runs = d.runs || [];
+      function inWeek(r, i) { var t = +new Date(r.when); return t >= +wk[i] && (i === wk.length - 1 || t < +wk[i + 1]); }
+      var freedBars = wk.map(function (w, i) { return { label: 'Week of ' + w.toLocaleDateString(), short: (w.getMonth() + 1) + '/' + w.getDate(), y: runs.filter(function (r) { return inWeek(r, i); }).reduce(function (s, r) { return s + (r.freed || 0); }, 0) }; });
+      barChart($('cFreed'), freedBars, '#2dd4bf', size);
+      var total = runs.reduce(function (s, r) { return s + (r.freed || 0); }, 0);
+      $('tFreed').textContent = size(total); $('tFreedS').textContent = 'across ' + runs.length + ' clean-up(s)';
+      var threatBars = wk.map(function (w, i) { return { label: 'Week of ' + w.toLocaleDateString(), short: (w.getMonth() + 1) + '/' + w.getDate(), y: runs.filter(function (r) { return inWeek(r, i) && r.scan === 'threats'; }).length }; });
+      barChart($('cThreat'), threatBars, '#f87171', function (v) { return v + ' scan(s) with threats'; });
+      var scans = runs.filter(function (r) { return r.scan === 'clean' || r.scan === 'threats'; }), bad = scans.filter(function (r) { return r.scan === 'threats'; }).length;
+      $('tThreat').textContent = bad; $('tThreat').className = 'v ' + (bad ? 'bad' : 'good'); $('tThreatS').textContent = bad ? bad + ' of ' + scans.length + ' scans found something' : 'none in ' + scans.length + ' scan(s)';
+    }).catch(function () {});
+  }
+
+  // ---------- Stage 6: disk map ----------
+  var dmTree = null, dmPath = [], dmSel = null, dmRoots = {};
+  var palette = ['#0d9488', '#2563eb', '#7c3aed', '#d97706', '#db2777', '#16a34a', '#0891b2', '#ea580c', '#4f46e5', '#65a30d'];
+  function squarify(items, x, y, w, h) {
+    var out = [], total = items.reduce(function (s, i) { return s + i.size; }, 0); if (!total) return out;
+    var scale = w * h / total, rest = items.slice(), row = [];
+    function worst(r, side) { var s = r.reduce(function (a, b) { return a + b.a; }, 0), mx = 0, mn = Infinity; r.forEach(function (i) { mx = Math.max(mx, i.a); mn = Math.min(mn, i.a); }); return Math.max(side * side * mx / (s * s), s * s / (side * side * mn)); }
+    function lay(r) {
+      var s = r.reduce(function (a, b) { return a + b.a; }, 0);
+      if (w >= h) { var cw = s / h, cy = y; r.forEach(function (i) { var ih = i.a / cw; out.push({ n: i.n, x: x, y: cy, w: cw, h: ih }); cy += ih; }); x += cw; w -= cw; }
+      else { var ch = s / w, cx = x; r.forEach(function (i) { var iw = i.a / ch; out.push({ n: i.n, x: cx, y: y, w: iw, h: ch }); cx += iw; }); y += ch; h -= ch; }
+    }
+    rest = rest.map(function (n) { return { n: n, a: n.size * scale }; }).filter(function (i) { return i.a > 0; });
+    while (rest.length) {
+      var side = Math.min(w, h), next = rest[0];
+      if (!row.length || worst(row.concat([next]), side) <= worst(row, side)) { row.push(next); rest.shift(); }
+      else { lay(row); row = []; }
+    }
+    if (row.length) lay(row);
+    return out;
+  }
+  function dmNode() { var n = dmTree; dmPath.forEach(function (i) { n = n.children[i]; }); return n; }
+  function rootLabelFor(p) { if (!p) return null; var best = null; for (var k in dmRoots) { var r = dmRoots[k]; if (p.toLowerCase() === r.toLowerCase() || p.toLowerCase().indexOf(r.toLowerCase() + '\\') === 0) best = k; } return best; }
+  function dmSide(n, parent) {
+    var pct = parent && parent.size ? Math.round(n.size / parent.size * 100) : 100, root = rootLabelFor(n.path);
+    var h = '<h3>' + esc(n.name) + '</h3><div class="big2">' + size(n.size) + '</div><p class="s">' + (n.files ? n.files.toLocaleString() + ' files · ' : '') + pct + '% of ' + esc(parent ? parent.name : 'the drive') + '</p>';
+    if (n.path) h += '<p class="s" style="word-break:break-all">' + esc(n.path) + '</p>';
+    h += '<div class="links">';
+    if (n.children && n.children.length) h += '<button class="btn sm primary" id="dmIn" data-i18n="button.look_inside">Look inside</button>';
+    if (n.path && n.name !== '(files here)') h += '<button class="btn sm" id="dmOpen" data-i18n="button.open_in_file_explorer">' + esc(t('button.open_in_file_explorer', 'Open in File Explorer')) + '</button><button class="btn sm" id="dmFind" data-i18n="button.find_duplicates_and_big_files_here">Find duplicates and big files here</button>';
+    if (root) h += '<button class="btn sm" id="dmOrg" data-i18n="button.tidy_it_with_the_ai_organizer">Tidy it with the AI Organizer</button>';
+    if (/AppData/i.test(n.path || '')) h += '<p class="s" style="margin-top:8px">AppData holds app settings and caches. Sweepwise\'s Clean and Deep Clean empty the safe parts; ask Sweepwise in the chat what the big folders are.</p>';
+    $('dmSide').innerHTML = h + '</div>';
+    if ($('dmIn')) $('dmIn').addEventListener('click', function () { dmPath.push(parentIndex(n)); dmSel = null; drawMap(); });
+    if ($('dmOpen')) $('dmOpen').addEventListener('click', function () { api('/api/folder', { path: n.path }).catch(function (e) { toast(e.message); }); });
+    if ($('dmFind')) $('dmFind').addEventListener('click', function () { run('finder', { folder: n.path }); });
+    if ($('dmOrg')) $('dmOrg').addEventListener('click', function () {
+      show('organizer'); Array.prototype.forEach.call(document.querySelectorAll('[data-root]'), function (c) { c.classList.toggle('on', c.dataset.root === root); });
+      var rel = n.path.slice(dmRoots[root].length).replace(/^\\/, ''); $('orgAsk').value = rel ? 'Tidy the folder ' + root + '/' + rel.replace(/\\/g, '/') : ''; toast('Press Make a plan.');
+    });
+  }
+  function parentIndex(n) { var p = dmNode(); return p.children.indexOf(n); }
+  function drawMap() {
+    var box = $('dmMap'), cur = dmNode(), W = box.clientWidth, H = box.clientHeight;
+    var crumbs = [dmTree].concat(dmPath.map(function (_, i) { var n = dmTree; for (var j = 0; j <= i; j++) n = n.children[dmPath[j]]; return n; }));
+    $('dmCrumbs').innerHTML = crumbs.map(function (n, i) { return i === crumbs.length - 1 ? '<b>' + esc(n.name) + '</b>' : '<button data-up="' + i + '">' + esc(n.name) + '</button><i>›</i>'; }).join('');
+    Array.prototype.forEach.call(document.querySelectorAll('[data-up]'), function (b) { b.addEventListener('click', function () { dmPath = dmPath.slice(0, +b.dataset.up); dmSel = null; drawMap(); }); });
+    var kids = (cur.children || []).slice().sort(function (a, b) { return b.size - a.size; });
+    var rects = squarify(kids, 4, 4, W - 8, H - 8);
+    box.innerHTML = rects.map(function (r, i) {
+      var n = r.n, grey = /^(Other|Windows, programs|System, programs)/.test(n.name) || n.name === '(files here)';
+      var col = grey ? '#475569' : palette[(cur.children.indexOf(n)) % palette.length];
+      var label = r.w > 70 && r.h > 34 ? '<b data-i18n="tile.esc_n_name.title">' + esc(n.name) + '</b><span data-i18n="tile.esc_n_name.desc">' + size(n.size) + '</span>' : '';
+      return '<div class="dm-box' + (n.children ? '' : ' flat') + (dmSel === n ? ' sel' : '') + '" data-i="' + cur.children.indexOf(n) + '" title="' + esc(n.name + ' · ' + size(n.size)) + '" style="left:' + (r.x + 2).toFixed(1) + 'px;top:' + (r.y + 2).toFixed(1) + 'px;width:' + Math.max(0, r.w - 4).toFixed(1) + 'px;height:' + Math.max(0, r.h - 4).toFixed(1) + 'px;background:linear-gradient(160deg,' + col + ',' + col + 'cc)">' + label + '</div>';
+    }).join('');
+    Array.prototype.forEach.call(box.querySelectorAll('.dm-box'), function (el) {
+      var n = cur.children[+el.dataset.i];
+      el.addEventListener('click', function () { dmSel = n; Array.prototype.forEach.call(box.querySelectorAll('.dm-box'), function (x) { x.classList.toggle('sel', x === el); }); dmSide(n, cur); });
+      el.addEventListener('dblclick', function () { if (n.children) { dmPath.push(+el.dataset.i); dmSel = null; drawMap(); } });
+    });
+    dmSide(dmSel || cur, dmSel ? cur : crumbs[crumbs.length - 2]);
+  }
+  function loadDiskMap() {
+    api('/api/status').then(function (s) { dmRoots = s.roots || {}; }).catch(function () {});
+    api('/api/diskmap').then(function (d) {
+      if (!d.tree) { $('dmMap').innerHTML = '<div class="empty" style="padding:60px">No map yet. Press Map my drive.</div>'; return; }
+      dmTree = d.tree; if (!dmPath.length) dmSel = null;
+      $('dmWhen').textContent = 'Mapped ' + when(d.made) + ' · ' + size(d.free) + ' free';
+      drawMap();
+    }).catch(function (e) { $('dmMap').innerHTML = '<div class="empty">' + esc(e.message) + '</div>'; });
+  }
+  $('dmRun').addEventListener('click', function () { run('diskmap'); });
+  window.addEventListener('resize', function () { if (current === 'diskmap' && dmTree) drawMap(); });
+
+  // ---------- Stage 7: Space Finder ----------
+  var fdRun = null;
+  Array.prototype.forEach.call(document.querySelectorAll('[data-froot]'), function (c) { c.addEventListener('click', function () { c.classList.toggle('on'); }); });
+  function fdRow(i, res) {
+    var r = res[i.id], done = r && r.ok;
+    var box = !done ? '<input type="checkbox" class="fpick" value="' + esc(i.id) + '"' + (i.checked ? ' checked' : '') + ' aria-label="Bin ' + esc(i.title) + '">' : '';
+    return '<div class="row' + (done ? ' done' : r ? ' failed' : '') + '"><div>' + box + '</div><div><span class="t">' + esc(i.title) + '</span><span class="w">' + esc(i.why) + (i.note ? ' <strong>' + esc(i.note) + '</strong>' : '') + '</span><span class="w" style="word-break:break-all">' + esc(short(i.path)) + '</span></div><div class="what">' + size(i.size) + ' to Recycle Bin</div><div class="res">' + (r ? (r.ok ? '✓ ' : '✗ ') + esc(r.message) : '') + '</div></div>';
+  }
+  function loadFinder() {
+    if (!$('fdBody').innerHTML) $('fdBody').innerHTML = skel(2);
+    api('/api/finder').then(function (d) {
+      fdRun = d.run;
+      if (!d.run) { $('fdBody').innerHTML = ''; $('fdActions').style.display = 'none'; return; }
+      var f = d.found || {}, res = d.results || {}, dup = f.duplicates || [], big = f.bigfiles || [];
+      var notes = []; if (f.private_skipped) notes.push(f.private_skipped + ' private-looking file(s) skipped'); if (f.locked_skipped) notes.push(f.locked_skipped + ' code project(s) skipped');
+      var h = '<div class="stats" style="grid-template-columns:repeat(3,1fr); margin-top:0"><div class="card stat"><div class="k">In exact copies</div><div class="v">' + size(f.duplicate_bytes) + '</div><div class="s">' + (f.duplicate_sets || 0) + ' set(s)</div></div>' +
+        '<div class="card stat"><div class="k">In big forgotten files</div><div class="v">' + size(f.big_bytes) + '</div><div class="s">' + big.length + ' file(s), nothing ticked</div></div>' +
+        '<div class="card stat"><div class="k">Files checked</div><div class="v">' + (f.scanned || 0).toLocaleString() + '</div><div class="s">' + esc(when(d.when)) + '</div></div></div>' +
+        (notes.length ? '<p class="sub" style="margin:10px 0 0">' + esc(notes.join('; ')) + '.</p>' : '');
+      h += '<div class="sect" style="margin-top:20px"><h3>Exact copies<small>' + dup.length + '</small></h3><p>The best-placed copy is kept (Documents, Pictures and Videos over Desktop over Downloads; the original over "(1)" copies). Sweepwise checks the kept copy is still there right before binning.</p>' +
+        (dup.length ? '<div class="card rows">' + dup.map(function (i) { return fdRow(i, res); }).join('') + '</div>' : '<div class="card empty" style="padding:18px">No duplicates found.</div>') + '</div>';
+      h += '<div class="sect"><h3>Big files not opened in 6 months<small>' + big.length + '</small></h3><p>Nothing is ticked. Tick only what you are sure about.</p>' +
+        (big.length ? '<div class="card rows">' + big.map(function (i) { return fdRow(i, res); }).join('') + '</div>' : '<div class="card empty" style="padding:18px">None found.</div>') + '</div>';
+      $('fdBody').innerHTML = h;
+      $('fdActions').style.display = dup.length || big.length ? 'flex' : 'none'; $('fdUndo').disabled = !d.undo_left;
+    }).catch(function (e) { $('fdBody').innerHTML = '<div class="card empty">' + esc(e.message) + '</div>'; });
+    api('/api/browsers').then(function (d) {
+      var b = d.browsers || [];
+      $('fdBrowsers').innerHTML = b.length ? b.map(function (x) {
+        return '<div class="row"><div></div><div><span class="t">' + esc(x.browser) + ' · ' + esc(x.profile) + '</span><span class="w">' + (x.open ? esc(x.browser) + ' is open; close it, then run Clean to empty this.' : 'Emptied the next time you run Clean.') + '</span></div><div class="what">' + size(x.bytes) + '</div><div class="res"></div></div>';
+      }).join('') + '<div class="row"><div></div><div><span class="w">Passwords, history, cookies, bookmarks and offline site data are never touched.</span></div><div class="what"><button class="btn sm primary" id="fdClean" data-i18n="button.run_clean_now">Run Clean now</button></div><div></div></div>' : '<div class="empty" style="padding:18px">No Chrome or Edge caches found.</div>';
+      if ($('fdClean')) $('fdClean').addEventListener('click', function () { run('clean'); });
+    }).catch(function () {});
+  }
+  $('fdGo').addEventListener('click', function () {
+    var roots = Array.prototype.map.call(document.querySelectorAll('[data-froot].on'), function (c) { return c.dataset.froot; });
+    if (!roots.length) { toast('Pick at least one folder.'); return; }
+    run('finder', { roots: roots });
+  });
+  $('fdApprove').addEventListener('click', function () {
+    var ids = Array.prototype.map.call(document.querySelectorAll('input.fpick:checked'), function (x) { return x.value; });
+    if (!ids.length) { $('fdStatus').textContent = 'Nothing is ticked.'; return; }
+    arm($('fdApprove'), 'Click again to bin ' + ids.length + ' file(s)', function () {
+      $('fdApprove').disabled = true; $('fdStatus').textContent = 'Working...';
+      api('/api/finder/approve', { run: fdRun, ids: ids }).then(function (d) {
+        var res = d.results || [], ok = res.filter(function (r) { return r.ok; }).length;
+        $('fdStatus').textContent = ok + ' of ' + res.length + ' sent to the ' + BIN + '. Undo brings them back.'; toast(ok + ' of ' + res.length + ' done.'); loadFinder();
+      }).catch(function (e) { $('fdStatus').textContent = e.message; }).then(function () { $('fdApprove').disabled = false; });
+    });
+  });
+  $('fdUndo').addEventListener('click', function () { undoRun(fdRun, $('fdUndo'), $('fdStatus')); });
+
+  $('habitsForget').addEventListener('click', function () { api('/api/habits/forget', {}).then(function () { toast('Habits forgotten. Sweepwise learns them again from scratch.'); loadBrain(); }).catch(function (e) { toast(e.message); }); });
+  // ---------- Speed Boost (answers 41, 47, 49) ----------
+  function loadBoost() {
+    api('/api/boost').then(function (b) {
+      var bf = b.before, now = b.now || {};
+      function row(label, a, c) { return '<tr><td>' + esc(label) + '</td><td class="num">' + a + '</td><td class="num">' + c + '</td></tr>'; }
+      function secs(v) { return v == null ? '<span style="color:var(--muted)">not measured</span>' : Math.round(v) + ' s'; }
+      var out = '<h3>Before and after</h3>';
+      if (!bf) {
+        out += '<p class="s" style="margin:0">Run Scan &amp; Clean once: Sweepwise measures your PC before it changes anything, so you can see the difference afterwards.</p>';
+      } else {
+        out += '<p class="s">Before: ' + esc(when(bf.when)) + '. Now: ' + esc(when(now.when)) + '.</p>' +
+          '<table><thead><tr><th></th><th class="num">Before</th><th class="num">Now</th></tr></thead><tbody>' +
+          row('Startup time', secs(bf.boot_seconds), secs(now.boot_seconds)) +
+          row('Apps that start with your PC', esc(bf.startup_apps), esc(now.startup_apps)) +
+          row('Free space', size(bf.free_disk), size(now.free_disk)) +
+          row('Memory in use', esc(bf.mem_used_gb) + ' GB', esc(now.mem_used_gb) + ' GB') +
+          row('Health score', bf.score == null ? '-' : esc(bf.score), now.score == null ? '-' : esc(now.score)) + '</tbody></table>';
+        var ch = b.changes || [];
+        out += ch.length ? ch.map(function (c) { return chk('', c, ''); }).join('') : '<p class="s" style="margin-top:10px">No big changes yet. Approve some speed-ups, restart your PC, then measure again.</p>';
+        if (!b.boot_known) out += '<p class="fine">' + (OS === 'linux' ? 'Startup time comes from systemd\'s own record, which this system did not provide.' : 'Startup time comes from Windows\' own record, which Sweepwise can read when it has admin permission (during Deep Clean or a restore point).') + '</p>';
+      }
+      $('boostReport').innerHTML = out;
+    }).catch(function (e) { $('boostReport').innerHTML = '<p class="s">' + esc(e.message) + '</p>'; });
+    api('/api/status').then(function (s) { swSet($('autoSwitch'), (s.settings || {}).auto_clean); }).catch(function () {});
+  }
+  $('boostFind').addEventListener('click', function () { run('scan_clean'); });
+  $('boostReview').addEventListener('click', function () { filter = 'boost'; show('list'); });
+  $('boostMeasure').addEventListener('click', function () { var b = $('boostMeasure'); b.disabled = true; api('/api/boost/measure', {}).then(function () { loadBoost(); toast('Measured.'); }).catch(function (e) { toast(e.message); }).then(function () { b.disabled = false; }); });
+  $('autoSwitch').addEventListener('click', function () {
+    var sw = $('autoSwitch'), v = !swOn(sw); sw.disabled = true;
+    api('/api/autoclean', { on: v }).then(function () { swSet(sw, v); toast(v ? 'Weekly auto-clean is on: Sundays at 5 pm, temporary files and caches only.' : 'Weekly auto-clean is off.'); })
+      .catch(function (e) { toast(e.message); }).then(function () { sw.disabled = false; });
+  });
+  // ---------- Email (answers 40, 53, 54) ----------
+  var mailRun = null, msTimer = null;
+  function loadEmail() {
+    api('/api/email').then(function (d) {
+      mailRun = d.run;
+      var sel = $('mailProvider');
+      if (!sel.options.length) {
+        sel.innerHTML = (d.providers || []).map(function (p) { return '<option value="' + esc(p.key) + '">' + esc(p.label) + '</option>'; }).join('');
+        mailProviderChanged();
+      }
+      sel.dataset.outlook = d.outlook_ready ? '1' : '';
+      var acc = d.accounts || [];
+      $('mailAccounts').innerHTML = acc.length ? acc.map(function (a) { return '<div class="check"><i class="dot"></i><div style="flex:1"><b>' + esc(a.email) + '</b><span>' + esc(a.provider) + '</span></div><button class="btn sm" data-mrem="' + esc(a.id) + '">Remove</button></div>'; }).join('') : '<p class="s" style="margin:0 0 6px">No accounts yet.</p>';
+      Array.prototype.forEach.call(document.querySelectorAll('[data-mrem]'), function (b) { b.addEventListener('click', function () { api('/api/email/remove', { id: b.dataset.mrem }).then(function () { toast('Account removed from Sweepwise. Delete its app password on your provider\'s page too if you like.'); loadEmail(); }); }); });
+      var L = d.lists || {};
+      if (L.keep || L.clean) $('mailAccounts').innerHTML += '<p class="fine">Your own lists: ' + (L.keep || 0) + ' always keep, ' + (L.clean || 0) + ' always clean (see Help).</p>';
+      $('mailScan').disabled = !acc.length;
+      $('mailAi').hidden = !(d.ai_on && d.run);
+      var items = (d.found && d.found.email) || [], res = d.results || {}, ai = d.ai || {};
+      if (!d.run) { $('mailList').innerHTML = ''; $('mailActions').style.display = 'none'; return; }
+      var shown = items.filter(function (i) { return !i.hidden || (res[i.id] && res[i.id].ok); });
+      $('mailList').innerHTML = '<h2>Old bulk email <span class="count">' + shown.length + ' sender(s) · ' + esc(when(d.when)) + '</span></h2>' + (shown.length ? '<div class="card rows">' + shown.map(function (i) {
+        var r = res[i.id], done = r && r.ok, u = res['unsub-' + i.id];
+        var box = !done ? '<input type="checkbox" class="mpick" value="' + esc(i.id) + '"' + (i.checked ? ' checked' : '') + ' aria-label="Move ' + esc(i.title) + ' to Trash">' : '';
+        var samples = (i.samples || []).map(function (x) { return '<br>' + esc(x.date) + ' · ' + esc(x.subject); }).join('');
+        var a = ai[i.id] ? '<span class="ai">AI: ' + (ai[i.id].verdict === 'junk' ? 'looks like marketing' : 'might matter, keep') + ' · ' + esc(ai[i.id].reason) + '</span>' : '';
+        var un = i.unsubscribe && !u ? '<button class="btn sm" data-unsub="' + esc(i.id) + '">Unsubscribe</button>' : u ? '<span class="w good">' + esc(u.message) + '</span>' : '';
+        return '<div class="row' + (done ? ' done' : r ? ' failed' : '') + '"><div>' + box + '</div><div><span class="t">' + esc(i.title) + '</span><span class="w">' + esc(i.sender) + ' · ' + esc(i.account_label) + (i.note ? ' <strong>' + esc(i.note) + '</strong>' : '') + samples + '</span>' + (i.learned ? '<span class="learned">' + esc(i.learned) + '</span>' : '') + a + '</div>' +
+          '<div class="what">' + esc(i.count) + ' email(s), ' + size(i.size) + ' to ' + esc(i.trash_name) + (un ? '<div style="margin-top:6px">' + un + '</div>' : '') + '</div><div class="res">' + (r ? (r.ok ? '&#10003; ' : '&#10007; ') + esc(r.message) : '') + '</div></div>';
+      }).join('') + '</div>' : '<div class="card empty">No old bulk email found. Your inbox looks tidy.</div>');
+      $('mailActions').style.display = shown.length ? 'flex' : 'none';
+      $('mailUndo').disabled = !d.undo_left;
+      Array.prototype.forEach.call(document.querySelectorAll('[data-unsub]'), function (b) {
+        b.addEventListener('click', function () { b.disabled = true; api('/api/email/unsubscribe', { run: mailRun, id: b.dataset.unsub }).then(function (r) { toast(r.message); loadEmail(); }).catch(function (e) { toast(e.message); b.disabled = false; }); });
+      });
+    }).catch(function (e) { $('mailList').innerHTML = '<div class="card empty">' + esc(e.message) + '</div>'; });
+  }
+  function mailProviderChanged() {
+    var p = $('mailProvider').value, ol = p === 'outlook';
+    $('mailOther').hidden = p !== 'other';
+    $('mailPass').hidden = ol; $('mailPassButtons').hidden = ol; $('mailOutlook').hidden = !ol;
+    $('mailEmail').placeholder = { gmail: 'you@gmail.com', yahoo: 'you@yahoo.com', icloud: 'you@icloud.com', outlook: 'you@outlook.com', other: 'you@example.com' }[p] || 'you@example.com';
+    $('mailGuide').hidden = p === 'other';
+    if (ol) { $('mailMs').disabled = !$('mailProvider').dataset.outlook; $('mailMsState').textContent = $('mailProvider').dataset.outlook ? '' : t('email.outlook.soon'); }
+  }
+  $('mailProvider').addEventListener('change', mailProviderChanged);
+  $('mailConnect').addEventListener('click', function () {
+    var b = $('mailConnect'); b.disabled = true; b.textContent = 'Checking...';
+    api('/api/email/connect', { provider: $('mailProvider').value, email: $('mailEmail').value, password: $('mailPass').value, host: $('mailHost').value, port: +$('mailPort').value || 0 })
+      .then(function (r) { $('mailPass').value = ''; toast('Connected ' + r.email + '.' + (r.note ? ' ' + r.note : '')); loadEmail(); })
+      .catch(function (e) { toast(e.message); }).then(function () { b.disabled = false; b.textContent = t('button.connect', 'Connect'); });
+  });
+  $('mailMs').addEventListener('click', function () {
+    var email = $('mailEmail').value;
+    if (!email) { toast('Type your Outlook or Hotmail address first.'); return; }
+    api('/api/email/outlook/start', {}).then(function (st) {
+      $('mailMsState').innerHTML = 'Microsoft\'s sign-in page opened. Type this code there: <b class="code" style="font-size:20px">' + esc(st.user_code) + '</b>';
+      api('/api/open', { what: 'ms_device' }).catch(function () {});
+      clearInterval(msTimer);
+      msTimer = setInterval(function () {
+        api('/api/email/outlook/poll', { email: email, device_code: st.device_code }).then(function (r) {
+          if (r.state === 'connected') { clearInterval(msTimer); $('mailMsState').textContent = 'Connected.'; toast('Connected ' + email + '.'); loadEmail(); }
+        }).catch(function (e) { clearInterval(msTimer); $('mailMsState').textContent = e.message; });
+      }, Math.max(5, st.interval || 5) * 1000);
+    }).catch(function (e) { toast(e.message); });
+  });
+  function mailGuide(which) {
+    var tabs = '<div class="tabs" role="tablist"><button type="button" role="tab" data-mg="gmail">Gmail</button><button type="button" role="tab" data-mg="yahoo">Yahoo</button><button type="button" role="tab" data-mg="icloud">iCloud</button></div>';
+    modal(t('guide.app.title', 'How to make an app password'), tabs + '<div id="mgBody"></div><p class="fine">' + esc(t('guide.app.note')) + '</p>', t('button.got_it', 'Got it'), function () { $('mailPass').focus(); });
+    function pick(p) {
+      Array.prototype.forEach.call(document.querySelectorAll('[data-mg]'), function (b) { b.setAttribute('aria-selected', String(b.dataset.mg === p)); });
+      var n = 1, items = '';
+      while (STR['guide.' + p + '.' + n]) { items += '<li>' + esc(t('guide.' + p + '.' + n)) + '</li>'; n++; }
+      $('mgBody').innerHTML = '<ol class="steps">' + items + '</ol><button type="button" class="btn sm" id="mgOpen">Open the page</button>';
+      $('mgOpen').addEventListener('click', function () { api('/api/open', { what: p + '_apppw' }).catch(function (e) { toast(e.message); }); });
+    }
+    Array.prototype.forEach.call(document.querySelectorAll('[data-mg]'), function (b) { b.addEventListener('click', function () { pick(b.dataset.mg); }); });
+    pick(['gmail', 'yahoo', 'icloud'].indexOf(which) >= 0 ? which : 'gmail');
+  }
+  $('mailGuide').addEventListener('click', function () { mailGuide($('mailProvider').value); });
+  $('mailScan').addEventListener('click', function () { run('email'); });
+  $('mailAi').addEventListener('click', function () { var b = $('mailAi'); b.disabled = true; api('/api/email/ai', { run: mailRun }).then(function () { toast('The AI looked at sender names and subject lines only.'); loadEmail(); }).catch(function (e) { toast(e.message); }).then(function () { b.disabled = false; }); });
+  $('mailApprove').addEventListener('click', function () {
+    var ids = Array.prototype.map.call(document.querySelectorAll('input.mpick:checked'), function (x) { return x.value; });
+    var unticked = Array.prototype.map.call(document.querySelectorAll('input.mpick:not(:checked)'), function (x) { return x.value; });
+    if (!ids.length) { $('mailStatus').textContent = 'Nothing is ticked.'; return; }
+    arm($('mailApprove'), 'Click again to move ' + ids.length + ' sender(s) to Trash', function () {
+      $('mailApprove').disabled = true; $('mailStatus').textContent = 'Moving to Trash...';
+      api('/api/email/approve', { run: mailRun, ids: ids, unticked: unticked }).then(function (d) {
+        var r = d.results || [], ok = r.filter(function (x) { return x.ok; }).length;
+        $('mailStatus').textContent = ok + ' of ' + r.length + ' done. Undo moves them back.'; loadEmail();
+      }).catch(function (e) { $('mailStatus').textContent = e.message; }).then(function () { $('mailApprove').disabled = false; });
+    });
+  });
+  $('mailUndo').addEventListener('click', function () { undoRun(mailRun, $('mailUndo'), $('mailStatus')); });
+  function brainBadge() { api('/api/brain').then(function (d) { $('navBrain').textContent = (d.suggestions || []).length || ''; }).catch(function () {}); }
+  loadStatus(); brainBadge();
+  setInterval(function () { if (current === 'home') loadStatus(); }, 15000);
+})();
+</script>
+</body></html>

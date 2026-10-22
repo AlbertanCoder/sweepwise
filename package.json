@@ -1,0 +1,16 @@
+{
+  "name": "sweepwise",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Sweepwise: free, open-source PC care for Windows, Mac and Linux, funded by the people who use it.",
+  "license": "GPL-3.0-or-later",
+  "author": "AlbertanCoder",
+  "scripts": {
+    "tauri": "tauri",
+    "icons": "tauri icon assets/logo-1024.png",
+    "build:exe": "tauri build --no-bundle"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2"
+  }
+}

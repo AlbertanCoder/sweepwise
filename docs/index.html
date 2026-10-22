@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sweepwise: free PC care that asks first</title>
+<meta name="description" content="Sweepwise clears junk, checks your protection and speeds up your computer, in plain English. Free for everyone, open source, and it collects nothing.">
+<link rel="icon" type="image/png" href="favicon.png">
+<style>
+:root { --bg:#0a1020; --card:#121c33; --card2:#16223d; --line:#22304f; --text:#e7eef9; --muted:#9aa8c3;
+  --teal:#2dd4bf; --teal2:#14b8a6; --onteal:#032421; --warn:#fbbf24; }
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { margin:0; background:var(--bg); color:var(--text); font:17px/1.6 "Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,Ubuntu,Cantarell,sans-serif; }
+a { color:var(--teal); }
+img { max-width:100%; height:auto; display:block; }
+.wrap { max-width:1120px; margin:0 auto; padding:0 20px; }
+.skip { position:absolute; left:-999px; top:8px; background:var(--teal); color:var(--onteal); padding:8px 14px; border-radius:8px; }
+.skip:focus { left:12px; z-index:10; }
+header { position:sticky; top:0; z-index:5; background:rgba(10,16,32,.86); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); }
+.bar { display:flex; align-items:center; gap:18px; min-height:64px; }
+.brand { display:flex; align-items:center; gap:10px; color:var(--text); text-decoration:none; font-weight:650; font-size:21px; margin-right:auto; }
+.brand img { width:34px; height:34px; }
+nav a { color:var(--muted); text-decoration:none; font-size:15px; }
+nav a:hover, nav a:focus-visible { color:var(--text); }
+nav { display:flex; gap:18px; flex-wrap:wrap; }
+.btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:13px 22px; border-radius:12px; font-weight:600; text-decoration:none; border:1px solid var(--line); color:var(--text); background:var(--card2); }
+.btn.primary { background:linear-gradient(180deg,var(--teal),var(--teal2)); color:var(--onteal); border:0; box-shadow:0 8px 28px rgba(45,212,191,.28); }
+.btn[aria-disabled="true"] { opacity:.75; cursor:default; }
+.btn small { font-weight:500; opacity:.85; }
+.hero { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.25fr); gap:42px; align-items:center; padding:64px 20px 40px; }
+.hero h1 { font-size:clamp(34px,5vw,54px); line-height:1.08; margin:0 0 16px; letter-spacing:-.5px; }
+.hero h1 span { color:var(--teal); }
+.lead { color:var(--muted); font-size:19px; margin:0 0 26px; }
+.ctas { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:14px; }
+.note { color:var(--muted); font-size:14px; margin:0; }
+.shot { border-radius:14px; border:1px solid var(--line); box-shadow:0 30px 80px rgba(0,0,0,.45), 0 0 0 1px rgba(45,212,191,.06); background:var(--card); }
+section { padding:56px 0; }
+h2 { font-size:clamp(26px,3.4vw,36px); margin:0 0 10px; letter-spacing:-.3px; }
+.kicker { color:var(--muted); margin:0 0 30px; max-width:720px; }
+.cards { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; }
+.card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:22px 22px 20px; }
+.card h3 { margin:6px 0 6px; font-size:19px; }
+.card p { margin:0; color:var(--muted); font-size:15.5px; }
+.num { display:inline-flex; width:34px; height:34px; border-radius:50%; align-items:center; justify-content:center; background:rgba(45,212,191,.14); color:var(--teal); font-weight:700; }
+.feature { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.3fr); gap:40px; align-items:center; padding:30px 0; }
+.feature.flip { grid-template-columns:minmax(0,1.3fr) minmax(0,1fr); }
+.feature.flip .text { order:2; }
+.feature h3 { font-size:24px; margin:0 0 10px; }
+.feature p { color:var(--muted); margin:0 0 12px; }
+.feature ul { margin:0; padding-left:20px; color:var(--muted); }
+.feature li { margin:4px 0; }
+.grid4 { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:16px; margin-top:26px; }
+.systems { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; }
+.tag { display:inline-block; font-size:13px; font-weight:600; border-radius:999px; padding:2px 10px; margin-top:8px; background:rgba(45,212,191,.14); color:var(--teal); }
+.tag.later { background:rgba(251,191,36,.14); color:var(--warn); }
+.privacy { background:radial-gradient(120% 140% at 0% 0%, rgba(45,212,191,.12), transparent 55%), var(--card); border:1px solid var(--line); border-radius:20px; padding:34px; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:30px; }
+.privacy ul { margin:0; padding-left:20px; color:var(--muted); }
+.privacy li { margin:6px 0; }
+.support { text-align:center; }
+.support .ctas { justify-content:center; margin:22px 0 10px; }
+details { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px 20px; margin:10px 0; }
+summary { cursor:pointer; font-weight:600; }
+details p { color:var(--muted); margin:10px 0 0; }
+footer { border-top:1px solid var(--line); padding:30px 0 40px; color:var(--muted); font-size:14px; }
+footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-between; }
+:focus-visible { outline:3px solid var(--teal); outline-offset:3px; border-radius:6px; }
+@media (max-width:900px) {
+  .hero, .feature, .feature.flip, .privacy { grid-template-columns:1fr; }
+  .feature.flip .text { order:0; }
+  .cards, .systems { grid-template-columns:1fr; }
+  .grid4 { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  nav { display:none; }
+  .hero { padding-top:36px; }
+}
+@media (max-width:520px) { .grid4 { grid-template-columns:1fr; } .privacy { padding:24px; } body { font-size:16px; } }
+@media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="#top"><img src="img/logo-256.png" alt="" width="34" height="34">Sweepwise</a>
+    <nav aria-label="Main">
+      <a href="#features">Features</a>
+      <a href="#privacy">Privacy</a>
+      <a href="#support">Support</a>
+      <a href="#faq">Questions</a>
+      <a href="https://github.com/AlbertanCoder/sweepwise">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+  <div class="wrap hero" id="top">
+    <div>
+      <h1>Free PC care that <span>asks first</span>.</h1>
+      <p class="lead">Sweepwise clears out junk, checks that your computer is protected and speeds it up with safe settings you can undo, all in plain English. Free for everyone, kept going by people who chip in.</p>
+      <div class="ctas">
+        <a class="btn primary" href="https://github.com/AlbertanCoder/sweepwise/releases" aria-disabled="true">Download for Windows <small>(coming soon)</small></a>
+        <a class="btn" href="https://github.com/AlbertanCoder/sweepwise">See the code</a>
+      </div>
+      <p class="note">Windows 10 and 11 in testing · Linux being built · Mac planned. No account, no ads, no paid version.</p>
+    </div>
+    <img class="shot" src="img/app-home.png" width="1822" height="1286" alt="Sweepwise's home screen: a health score of 85, the Scan and Clean button, and cards for free memory, free space, temperature, virus protection and last scan.">
+  </div>
+
+  <section aria-labelledby="promises">
+    <div class="wrap">
+      <h2 id="promises">Three promises</h2>
+      <p class="kicker">Cleaners have a bad name for deleting things people needed. Sweepwise is built the other way round.</p>
+      <div class="cards">
+        <div class="card"><span class="num">1</span><h3>Nothing personal changes without your OK</h3><p>Temporary files and caches are cleared straight away. Everything else waits on the Approve list until you tick it.</p></div>
+        <div class="card"><span class="num">2</span><h3>Everything can be undone</h3><p>Files only ever go to the Recycle Bin, and Sweepwise never empties it. History &amp; Undo puts things back in one click. (Uninstalling a program is the one exception.)</p></div>
+        <div class="card"><span class="num">3</span><h3>Nothing is collected</h3><p>No account, no tracking, no analytics, no crash reports. There are no Sweepwise servers at all.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="features" aria-labelledby="feat">
+    <div class="wrap">
+      <h2 id="feat">What it does</h2>
+      <p class="kicker">One button for the safe stuff, then clear suggestions you approve. Windows maintenance uses Microsoft's own tools only: no registry cleaners, no driver updaters, no tricks.</p>
+
+      <div class="feature">
+        <div class="text">
+          <h3>Scan &amp; Clean</h3>
+          <p>Clears temporary files and caches, runs a quick virus scan with Windows Security, and gives your computer a health score with the reasons behind it.</p>
+          <ul><li>The first time, it shows exactly what it would remove and waits.</li><li>Tidies your Desktop and Downloads into folders, with your OK.</li><li>Finds leftovers from AI tools, programs you no longer use, and folders removed programs left behind.</li></ul>
+        </div>
+        <img class="shot" src="img/app-welcome.png" width="1822" height="1286" alt="The welcome screen listing Sweepwise's three promises." loading="lazy">
+      </div>
+
+      <div class="feature flip">
+        <div class="text">
+          <h3>Speed Boost</h3>
+          <p>Makes a slow computer feel new again: fewer programs starting by themselves, lighter settings on older PCs, and up-to-date apps.</p>
+          <ul><li>A before-and-after report shows the difference.</li><li>Windows makes a restore point first, and every change has Undo.</li><li>An optional weekly auto-clean, off unless you turn it on.</li></ul>
+        </div>
+        <img class="shot" src="img/app-boost.png" width="1822" height="1286" alt="The Speed Boost screen with Find speed-ups, Review speed-ups and Measure now buttons, and the weekly auto-clean switch." loading="lazy">
+      </div>
+
+      <div class="feature">
+        <div class="text">
+          <h3>Email clean-up (optional)</h3>
+          <p>Connect Gmail, Yahoo or iCloud with an app password, a separate password just for Sweepwise. Outlook and Hotmail are coming.</p>
+          <ul><li>Old bulk mail goes to your email's own Trash, with Undo.</li><li>Unsubscribe from real senders in one click.</li><li>People you write to, banks, government and receipts are never suggested.</li></ul>
+        </div>
+        <img class="shot" src="img/app-email.png" width="1822" height="1286" alt="The Email screen with a provider list, a step-by-step app password guide and a Connect button." loading="lazy">
+      </div>
+
+      <div class="feature flip">
+        <div class="text">
+          <h3>AI helper, with your own key (optional)</h3>
+          <p>Add a Claude or OpenAI key for smarter suggestions, the AI Organizer and a chat that answers questions about your computer. A built-in guide shows how to get a key in a few minutes.</p>
+          <ul><li>Only names, sizes and dates are sent, never what is inside your files.</li><li>It learns what you use on this computer, and nowhere else.</li><li>Costs a few cents on your own account, never on Sweepwise.</li></ul>
+        </div>
+        <img class="shot" src="img/app-ai-guide.png" width="1822" height="1286" alt="The AI key guide with step-by-step instructions for getting a Claude or OpenAI key." loading="lazy">
+      </div>
+
+      <div class="grid4">
+        <div class="card"><h3>Security check</h3><p>Protection, odd startup items, risky browser extensions, hijacked search or proxy settings and built-in safety switches.</p></div>
+        <div class="card"><h3>Deep Clean</h3><p>Windows' own Disk Cleanup for system files, with optional repair checks. Never empties your Recycle Bin.</p></div>
+        <div class="card"><h3>Disk map &amp; Space Finder</h3><p>See what fills your drive, and find exact duplicates and big forgotten files.</p></div>
+        <div class="card"><h3>History &amp; Undo</h3><p>Every change is written down before it happens, so one click puts it back.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="sys">
+    <div class="wrap">
+      <h2 id="sys">Which computers</h2>
+      <p class="kicker">Each system gets the same care the way it is done there: Windows Security on Windows, ClamAV on Linux and Mac.</p>
+      <div class="systems">
+        <div class="card"><h3>Windows 10 and 11</h3><p>Microsoft Store and GitHub.</p><span class="tag">In testing</span></div>
+        <div class="card"><h3>Linux</h3><p>Ubuntu, Linux Mint, Debian, Fedora and Arch: .deb and AppImage.</p><span class="tag later">Being built</span></div>
+        <div class="card"><h3>macOS</h3><p>The three newest versions.</p><span class="tag later">Planned</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="privacy" aria-labelledby="priv">
+    <div class="wrap">
+      <div class="privacy">
+        <div>
+          <h2 id="priv">We collect nothing</h2>
+          <p class="kicker" style="margin-bottom:0">Your files, scans and choices stay on your computer. Sweepwise is open source, so anyone can check.</p>
+        </div>
+        <ul>
+          <li>Once a day it asks GitHub for the newest version (you can switch this off).</li>
+          <li>Your AI key and email app passwords are kept encrypted on your computer and only ever sent to their own service.</li>
+          <li>Nothing else leaves your computer unless you press a button that says so.</li>
+          <li><a href="https://github.com/AlbertanCoder/sweepwise/blob/main/PRIVACY.md">Read the full privacy page</a></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="support" class="support" aria-labelledby="sup">
+    <div class="wrap">
+      <h2 id="sup">Kept going by people who chip in</h2>
+      <p class="kicker" style="margin:0 auto">Supporting is optional and unlocks nothing: every feature is already free. One time or every month, any amount.</p>
+      <div class="ctas">
+        <a class="btn primary" href="https://ko-fi.com/albertancoder">Buy me a coffee on Ko-fi</a>
+        <a class="btn" href="https://github.com/sponsors/AlbertanCoder">GitHub Sponsors</a>
+      </div>
+      <p class="note">US$3 buys a coffee; monthly support starts at $2. This isn't a charity, so support isn't tax-deductible.</p>
+    </div>
+  </section>
+
+  <section id="faq" aria-labelledby="qs">
+    <div class="wrap">
+      <h2 id="qs">Questions</h2>
+      <details><summary>Is it really free?</summary><p>Yes: every feature, for everyone, with no ads and no paid version. It's kept going by people who choose to support it, and supporting unlocks nothing extra.</p></details>
+      <details><summary>Can it delete something I need?</summary><p>Safe cleaning only touches temporary files and caches in a fixed list of places. Anything personal waits on the Approve list for your tick, files only go to the Recycle Bin, and History &amp; Undo brings them back.</p></details>
+      <details><summary>Does it replace my antivirus?</summary><p>No. On Windows, Windows Security does the virus protection; Sweepwise checks it is switched on, runs its scans and looks for things that should not be there. On Linux it uses ClamAV, which it can install with one click.</p></details>
+      <details><summary>Why does Windows warn me when I install it?</summary><p>The download from GitHub isn't signed with a paid certificate yet, so Windows shows "Windows protected your PC". Click More info, then Run anyway. The Microsoft Store version has no warning.</p></details>
+      <details><summary>Do I need an AI key?</summary><p>No. Everything works without one. A Claude or OpenAI key adds smarter suggestions, the AI Organizer and chat, and costs a few cents on your own account.</p></details>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Sweepwise is free software under the GNU GPL, version 3. It comes with no warranty. Made by AlbertanCoder.</span>
+    <span><a href="https://github.com/AlbertanCoder/sweepwise">Code</a> · <a href="https://github.com/AlbertanCoder/sweepwise/discussions">Discussions</a> · <a href="https://github.com/AlbertanCoder/sweepwise/blob/main/PRIVACY.md">Privacy</a></span>
+  </div>
+</footer>
+</body>
+</html>
