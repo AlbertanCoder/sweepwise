@@ -418,10 +418,28 @@ pub fn approve_list(cfg: &Config, run: &str, ids: &[String], unticked: &[String]
 
 // ---------- undo ----------
 struct Bin {
+    #[cfg(not(target_os = "macos"))]
     items: Option<Vec<trash::TrashItem>>,
 }
 
 impl Bin {
+    fn new() -> Bin {
+        Bin {
+            #[cfg(not(target_os = "macos"))]
+            items: None,
+        }
+    }
+
+    /// Mac: the trash library cannot list or restore the Trash yet (Stage P6 adds it); Finder's Put Back still works.
+    #[cfg(target_os = "macos")]
+    fn restore(&mut self, p: &Path, _when: Option<i64>) -> Result<(), String> {
+        if fs::symlink_metadata(p).is_ok() {
+            return Err("something new is already at the original spot".into());
+        }
+        Err("on a Mac, open the Trash, find it, and choose Put Back".into())
+    }
+
+    #[cfg(not(target_os = "macos"))]
     fn restore(&mut self, p: &Path, when: Option<i64>) -> Result<(), String> {
         if fs::symlink_metadata(p).is_ok() {
             return Err("something new is already at the original spot".into());
@@ -551,7 +569,7 @@ pub fn undo_run(cfg: &Config, run: &str) -> Result<Value, String> {
         Some(Value::Array(a)) => a,
         _ => return Ok(json!({ "ok": true, "results": [{ "ok": false, "message": "nothing to undo for this run" }] })),
     };
-    let mut bin = Bin { items: None };
+    let mut bin = Bin::new();
     let mut results = Vec::new();
     for e in list.iter_mut().rev() {
         if e.get("undone").and_then(|v| v.as_bool()).unwrap_or(false) {

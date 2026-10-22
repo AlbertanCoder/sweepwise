@@ -18,6 +18,7 @@ use std::sync::{Arc, OnceLock};
 
 // ---------- 1. protection ----------
 fn protection(cfg: &Config) -> Vec<Value> {
+    #[cfg_attr(not(any(windows, target_os = "linux")), allow(unused_mut))]
     let mut items = Vec::new();
     if cfg.test {
         return items;
@@ -189,6 +190,7 @@ fn scheduled_tasks() -> Vec<(String, String, String)> {
 
 fn autoruns(cfg: &Config) -> Vec<Value> {
     let mut sig = Sig(HashMap::new());
+    #[cfg_attr(not(any(windows, target_os = "linux")), allow(unused_mut))]
     let mut found = Vec::new();
     #[cfg(windows)]
     {
@@ -548,6 +550,7 @@ fn item(name: &str, level: &str, detail: &str, fix: &str) -> Value {
 }
 
 fn posture(cfg: &Config) -> Vec<Value> {
+    #[cfg_attr(not(any(windows, target_os = "linux")), allow(unused_mut))]
     let mut v = Vec::new();
     if cfg.test {
         return v;

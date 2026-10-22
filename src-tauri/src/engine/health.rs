@@ -389,7 +389,8 @@ mod tests {
     #[test]
     fn this_pc_has_a_thermometer_and_windows_security() {
         let cfg = Config::from_env();
-        if cfg!(windows) {
+        // GitHub's build machines are virtual: no thermometer to read, so this only checks real PCs.
+        if cfg!(windows) && std::env::var_os("CI").is_none() {
             let t = temperature(&cfg).expect("temperature readable without admin");
             assert!(t > 10.0 && t < 120.0, "{}", t);
             assert!(defender(&cfg).realtime.is_some(), "Windows Security status readable");

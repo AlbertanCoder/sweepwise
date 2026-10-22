@@ -20,6 +20,7 @@ pub fn recent_opened(cfg: &Config) -> Vec<(PathBuf, SystemTime)> {
     #[cfg(target_os = "linux")]
     return super::linux::recent_files(cfg);
     #[allow(unreachable_code)]
+    #[cfg_attr(not(windows), allow(unused_mut))]
     let mut out = Vec::new();
     let Ok(rd) = std::fs::read_dir(recent_dir(cfg)) else { return out };
     for e in rd.flatten() {

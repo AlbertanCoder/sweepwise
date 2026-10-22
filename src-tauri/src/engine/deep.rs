@@ -235,6 +235,8 @@ pub fn helper(log: &Path, repair: bool, windows_old: bool) -> i32 {
     if !safe_log(log) {
         return 2;
     }
+    #[cfg(not(any(windows, target_os = "linux")))]
+    let _ = (repair, windows_old);
     let say = |t: &str| {
         use std::io::Write;
         if let Ok(mut f) = std::fs::OpenOptions::new().append(true).open(log) {
