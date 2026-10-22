@@ -29,9 +29,7 @@ fi
 say "running the tests"
 (cd src-tauri && CARGO_BUILD_JOBS=2 cargo test -j 2 -- --test-threads=1) > "$OUT/test.log" 2>&1
 TEST_EXIT=$?
-read -r PASSED FAILED < <(awk '/^test result:/ { for (i = 2; i <= NF; i++) { if ($i == "passed;") p += $(i-1); if ($i == "failed;") f += $(i-1) } } END { print p+0, f+0 }' "$OUT/test.log")
-if [ "$TEST_EXIT" -ne 0 ] && [ "$FAILED" -eq 0 ]; then FAILED=1; fi
-say "tests: $PASSED passed, $FAILED failed"
+say "tests finished (exit $TEST_EXIT)"
 
 # 4. The two Linux packages: .deb (Ubuntu, Mint, Debian) and AppImage (most others).
 say "building the .deb and AppImage"
@@ -51,42 +49,5 @@ if [ "$BUILD_EXIT" -eq 0 ]; then
     [ -n "$RPM" ] && cp "$RPM" "$OUT/"
 fi
 
-# 5. The built program's own self-test, with a throwaway data folder.
-DATA=$(mktemp -d)
-SELF=$(SWEEPWISE_DATA="$DATA" ./src-tauri/target/release/sweepwise --self-test 2>/dev/null | tail -1)
-rm -rf "$DATA"
-
-# 6. Results.
-python3 - "$OUT/RESULT.json" "$PASSED" "$FAILED" "$TEST_EXIT" "$BUILD_EXIT" "${DEB:-}" "${APPIMAGE:-}" "$SELF" "$RPM" <<'PY'
-import datetime, json, os, sys
-out, passed, failed, test_exit, build_exit, deb, appimage, self_line, rpm = sys.argv[1:10]
-try:
-    st = json.loads(self_line)
-except Exception:
-    st = {}
-distro = ''
-try:
-    for line in open('/etc/os-release', encoding='utf-8'):
-        if line.startswith('PRETTY_NAME='):
-            distro = line.split('=', 1)[1].strip().strip('"')
-except OSError:
-    pass
-r = {
-    'platform': st.get('platform', 'unknown'),
-    'self_test_ok': bool(st.get('ok')),
-    'version': st.get('version'),
-    'features': st.get('features', []),
-    'tests_passed': int(passed),
-    'tests_failed': int(failed),
-    'test_exit': int(test_exit),
-    'build_exit': int(build_exit),
-    'deb': os.path.basename(deb) if deb else None,
-    'appimage': os.path.basename(appimage) if appimage else None,
-    'rpm': os.path.basename(rpm) if rpm else None,
-    'distro': distro,
-    'when': datetime.datetime.now().isoformat(timespec='seconds'),
-}
-with open(out, 'w', encoding='utf-8') as f:
-    json.dump(r, f, indent=1)
-print(json.dumps({k: v for k, v in r.items() if k != 'features'}))
-PY
+# 5. Results: the tests, the built program's own self-test and the packages (same writer as the GitHub checks).
+python3 "$SRC/tools/linux_result.py" "$OUT/test.log" "$OUT" "$WORK/src-tauri/target/release/sweepwise" "$TEST_EXIT" "$BUILD_EXIT"
