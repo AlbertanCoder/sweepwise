@@ -30,9 +30,12 @@ jobs:
           - name: Linux
             os: ubuntu-22.04
             bundles: deb,appimage
+          # One universal app for Apple Silicon and Intel Macs.
           - name: macOS
             os: macos-latest
             bundles: app,dmg
+            target: universal-apple-darwin
+            rust_targets: aarch64-apple-darwin,x86_64-apple-darwin
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -49,6 +52,8 @@ jobs:
           cache: npm
 
       - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.rust_targets }}
 
       - uses: Swatinem/rust-cache@v2
         with:
@@ -70,7 +75,7 @@ jobs:
         run: cargo run --example tour | tee tour.json
 
       - name: Build
-        run: npx tauri build --bundles ${{ matrix.bundles }}
+        run: npx tauri build --bundles ${{ matrix.bundles }} ${{ matrix.target && format('--target {0}', matrix.target) || '' }}
 
       # Linux: the packages plus RESULT.json (tests, the built program's self-test), same as tools/linux_check.sh.
       - name: Linux results
@@ -93,8 +98,8 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           mkdir -p tools/mac
-          cp src-tauri/target/release/bundle/dmg/*.dmg tools/mac/
-          python3 tools/mac_result.py src-tauri/test.log src-tauri/tour.json tools/mac src-tauri/target/release/sweepwise
+          cp src-tauri/target/universal-apple-darwin/release/bundle/dmg/*.dmg tools/mac/
+          python3 tools/mac_result.py src-tauri/test.log src-tauri/tour.json tools/mac src-tauri/target/universal-apple-darwin/release/sweepwise
 
       - uses: actions/upload-artifact@v4
         if: runner.os == 'macOS'
