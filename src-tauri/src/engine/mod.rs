@@ -91,12 +91,44 @@ pub struct Config {
     pub outlook_client: Option<String>,
 }
 
+/// Windows: Sweepwise's own records live in a folder named after the app's id. The installer puts the program itself
+/// in AppData\Local\Sweepwise, so records and program files never mix.
+pub const WINDOWS_DATA_DIR: &str = "com.albertancoder.sweepwise";
+
+/// Moves records from the old folder (AppData\Local\Sweepwise) to the new one, once: only while the new folder has no
+/// settings yet. Program files (.exe, .dll) stay where the installer put them. Nothing is deleted.
+pub fn move_old_records(old: &Path, new: &Path) -> usize {
+    if new.join("settings.json").exists() {
+        return 0;
+    }
+    let Ok(rd) = std::fs::read_dir(old) else { return 0 };
+    let entries: Vec<std::fs::DirEntry> = rd
+        .flatten()
+        .filter(|e| {
+            let n = e.file_name().to_string_lossy().to_lowercase();
+            !(n.ends_with(".exe") || n.ends_with(".dll"))
+        })
+        .collect();
+    if entries.is_empty() || std::fs::create_dir_all(new).is_err() {
+        return 0;
+    }
+    entries.into_iter().filter(|e| !new.join(e.file_name()).exists() && std::fs::rename(e.path(), new.join(e.file_name())).is_ok()).count()
+}
+
 impl Config {
     pub fn from_env() -> Config {
         let home = dirs::home_dir().unwrap_or_else(|| PathBuf::from("."));
         let local = dirs::data_local_dir().unwrap_or_else(|| home.join("AppData").join("Local"));
         let roaming = dirs::data_dir().unwrap_or_else(|| home.join("AppData").join("Roaming"));
-        let data_dir = std::env::var_os("SWEEPWISE_DATA").map(PathBuf::from).unwrap_or_else(|| local.join("Sweepwise"));
+        let data_dir = match std::env::var_os("SWEEPWISE_DATA") {
+            Some(d) => PathBuf::from(d),
+            None if cfg!(windows) => {
+                let new = local.join(WINDOWS_DATA_DIR);
+                move_old_records(&local.join("Sweepwise"), &new);
+                new
+            }
+            None => local.join("Sweepwise"),
+        };
         let config = if cfg!(windows) { roaming.clone() } else { dirs::config_dir().unwrap_or_else(|| home.join(".config")) };
         let cache = if cfg!(windows) { local.clone() } else { dirs::cache_dir().unwrap_or_else(|| home.join(".cache")) };
         let f = |d: Option<PathBuf>, name: &str| d.unwrap_or_else(|| home.join(name));
@@ -559,6 +591,24 @@ fn open_place(cfg: &Config, what: &str) -> Result<Value, String> {
 mod tests {
     use super::*;
     use testutil::engine as test_engine;
+
+    #[test]
+    fn old_records_move_once_and_program_files_stay() {
+        let base = std::env::temp_dir().join(format!("sw_move_{}", std::process::id()));
+        let (old, new) = (base.join("Sweepwise"), base.join(WINDOWS_DATA_DIR));
+        std::fs::create_dir_all(old.join("runs").join("20261022_100000")).unwrap();
+        std::fs::write(old.join("settings.json"), b"{\"reminder\": true}").unwrap();
+        std::fs::write(old.join("email-keep.txt"), b"bank.example").unwrap();
+        std::fs::write(old.join("sweepwise.exe"), b"MZ").unwrap();
+        std::fs::write(old.join("uninstall.exe"), b"MZ").unwrap();
+        std::fs::create_dir_all(new.join("EBWebView")).unwrap();
+        assert_eq!(move_old_records(&old, &new), 3, "settings, the email list and the runs folder");
+        assert!(new.join("settings.json").is_file() && new.join("runs").join("20261022_100000").is_dir() && new.join("email-keep.txt").is_file());
+        assert!(old.join("sweepwise.exe").is_file() && old.join("uninstall.exe").is_file(), "program files stay with the installer");
+        std::fs::write(old.join("settings.json"), b"{}").unwrap();
+        assert_eq!(move_old_records(&old, &new), 0, "only once");
+        let _ = std::fs::remove_dir_all(&base);
+    }
 
     #[test]
     fn routes_answer_or_explain() {

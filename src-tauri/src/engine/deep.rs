@@ -255,7 +255,7 @@ pub fn safe_log(log: &Path) -> bool {
         n.len() > 16 && super::runs::valid_id(&n[..15]) && [".deep.log", ".restore.log", ".mrt.log"].iter().any(|k| &n[15..] == *k)
     });
     let parent_ok = log.parent().map_or(false, |p| {
-        p.file_name().map_or(false, |n| n.eq_ignore_ascii_case("jobs")) && p.parent().and_then(|q| q.file_name()).map_or(false, |n| n.to_string_lossy().to_lowercase().starts_with("sweepwise"))
+        p.file_name().map_or(false, |n| n.eq_ignore_ascii_case("jobs")) && p.parent().and_then(|q| q.file_name()).map_or(false, |n| n.to_string_lossy().to_lowercase().contains("sweepwise"))
     });
     let not_link = std::fs::symlink_metadata(log).map(|m| m.is_file() && !super::util::is_link(&m)).unwrap_or(false);
     name_ok && parent_ok && not_link
@@ -462,6 +462,11 @@ mod tests {
         std::fs::write(&r, b"").unwrap();
         assert!(safe_log(&r));
         assert!(!safe_log(&dir.join("20261021_120000.evil.log")));
+        // The Windows records folder is named after the app's id.
+        let win = dir.parent().unwrap().parent().unwrap().join(super::super::WINDOWS_DATA_DIR).join("jobs");
+        std::fs::create_dir_all(&win).unwrap();
+        std::fs::write(win.join("20261022_120000.deep.log"), b"").unwrap();
+        assert!(safe_log(&win.join("20261022_120000.deep.log")));
         let _ = std::fs::remove_dir_all(dir.parent().unwrap().parent().unwrap());
     }
 }
