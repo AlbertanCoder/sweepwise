@@ -88,8 +88,10 @@ pub fn command_target(cmd: &str) -> String {
     c.split_whitespace().next().unwrap_or("").to_string()
 }
 
+#[cfg_attr(not(any(windows, target_os = "linux")), allow(dead_code))]
 struct Sig(HashMap<String, Option<bool>>);
 impl Sig {
+    #[cfg_attr(not(any(windows, target_os = "linux")), allow(dead_code))]
     fn signed(&mut self, p: &str) -> Option<bool> {
         if let Some(v) = self.0.get(p) {
             return *v;
@@ -104,6 +106,7 @@ impl Sig {
 }
 
 /// Why a startup command looks suspicious; empty when it looks normal.
+#[cfg_attr(not(any(windows, target_os = "linux")), allow(dead_code))]
 fn reasons(cmd: &str, target: &str, sig: &mut Sig) -> Vec<String> {
     static RES: OnceLock<Vec<(Regex, &'static str)>> = OnceLock::new();
     let res = RES.get_or_init(|| {
@@ -545,6 +548,7 @@ fn hijacks(cfg: &Config) -> Vec<Value> {
 
 // ---------- 3c. Windows' own safety switches and privacy (PUBLIC_SPEC 55: what paid suites call "vulnerability
 // assessment"). Read-only: each item says what it means and where to change it. level: good / warn / info.
+#[cfg_attr(not(any(windows, target_os = "linux")), allow(dead_code))]
 fn item(name: &str, level: &str, detail: &str, fix: &str) -> Value {
     json!({ "name": name, "level": level, "detail": detail, "fix": fix })
 }

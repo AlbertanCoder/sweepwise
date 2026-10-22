@@ -57,6 +57,7 @@ fn allowed_place(cfg: &Config, p: &Path) -> bool {
 }
 
 /// Runs `f` on a brand-new thread: the Recycle Bin needs its own Windows (COM) setup, kept apart from WMI.
+#[cfg_attr(target_os = "macos", allow(dead_code))]
 fn fresh_thread<T: Send + 'static>(f: impl FnOnce() -> Result<T, String> + Send + 'static) -> Result<T, String> {
     std::thread::spawn(f).join().map_err(|_| "the Recycle Bin could not be reached".to_string())?
 }
@@ -92,9 +93,9 @@ fn finder(script: &str, args: &[&str]) -> Result<String, String> {
 
 #[cfg(target_os = "macos")]
 const FINDER_BIN: &str = "on run argv
-    set target to POSIX file (item 1 of argv) as alias
+    set theItem to POSIX file (item 1 of argv) as alias
     tell application \"Finder\"
-        set binned to delete target
+        set binned to delete theItem
         return name of binned
     end tell
 end run";

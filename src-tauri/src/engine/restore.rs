@@ -88,6 +88,7 @@ fn setting(cfg: &Config, key: &str) -> Value {
     util::read_json(&cfg.settings_file()).and_then(|s| s.get(key).cloned()).unwrap_or(Value::Null)
 }
 
+#[cfg_attr(not(any(windows, target_os = "linux")), allow(dead_code))]
 fn set_setting(cfg: &Config, key: &str, v: Value) {
     let mut s = util::read_json(&cfg.settings_file()).unwrap_or_else(|| json!({}));
     s[key] = v;
