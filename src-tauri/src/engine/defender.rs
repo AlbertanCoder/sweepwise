@@ -13,6 +13,25 @@ fn mpcmd() -> PathBuf {
     PathBuf::from(std::env::var("ProgramFiles").unwrap_or_else(|_| "C:\\Program Files".into())).join("Windows Defender").join("MpCmdRun.exe")
 }
 
+/// ClamAV's command line for a quick or full scan (Mac). Quick: the places harmful files usually land.
+#[cfg(target_os = "macos")]
+pub fn clam_args(cfg: &Config, full: bool) -> Vec<String> {
+    let mut a: Vec<String> = vec!["-r".into(), "--infected".into(), "--no-summary".into()];
+    if full {
+        for d in ["^/System", "^/dev", "^/private/var/vm", "^/Volumes"] {
+            a.push(format!("--exclude-dir={}", d));
+        }
+        a.push("/".into());
+    } else {
+        for p in [cfg.folders.downloads.clone(), cfg.folders.desktop.clone(), cfg.home.join("Library").join("LaunchAgents"), std::path::PathBuf::from("/Library/LaunchAgents"), std::path::PathBuf::from("/tmp")] {
+            if p.exists() {
+                a.push(p.to_string_lossy().to_string());
+            }
+        }
+    }
+    a
+}
+
 /// ClamAV's command line for a quick or full scan (Linux). Quick: the places harmful files usually land.
 #[cfg(target_os = "linux")]
 pub fn clam_args(cfg: &Config, full: bool) -> Vec<String> {
@@ -39,13 +58,14 @@ pub fn clam_args(cfg: &Config, full: bool) -> Vec<String> {
 /// Starts the scanner (or the pretend one in tests). None = no scanner available.
 #[allow(unreachable_code)]
 fn start_scanner(cfg: &Config, args: &[&str]) -> Option<Child> {
-    #[cfg(target_os = "linux")]
+    #[cfg(any(target_os = "linux", target_os = "macos"))]
     {
-        if cfg.test || !super::linux::clam_installed() || args.first() != Some(&"-Scan") {
+        let scanner = super::os::clamscan();
+        if cfg.test || scanner.is_none() || args.first() != Some(&"-Scan") {
             return None;
         }
         let full = args.get(2) == Some(&"2");
-        return std::process::Command::new("clamscan").args(clam_args(cfg, full)).stdout(std::process::Stdio::piped()).stderr(std::process::Stdio::null()).spawn().ok();
+        return std::process::Command::new(scanner?).args(clam_args(cfg, full)).stdout(std::process::Stdio::piped()).stderr(std::process::Stdio::null()).spawn().ok();
     }
     if let Some(fake) = &cfg.scanner {
         return util::command("cmd.exe").arg("/c").arg(fake).args(args).spawn().ok();
@@ -101,13 +121,13 @@ pub fn threats_since(cfg: &Config, since: chrono::DateTime<chrono::Local>) -> Ve
 }
 
 /// ClamAV's answer (exit 0 clean, 1 found, 2 error) in plain words, and the time of the scan noted.
-#[cfg(target_os = "linux")]
+#[cfg(any(target_os = "linux", target_os = "macos"))]
 fn clam_result(cfg: &Config, child: Child) -> (String, String) {
     let out = child.wait_with_output();
     let _ = util::write_json(&cfg.data_dir.join("clamav.json"), &serde_json::json!({ "last_scan": util::iso(util::now()) }));
     match out {
         Ok(o) => {
-            let found = super::linux::clam_found(&String::from_utf8_lossy(&o.stdout));
+            let found = super::os::clam_found(&String::from_utf8_lossy(&o.stdout));
             match o.status.code() {
                 Some(0) => ("clean".into(), "No threats found.".into()),
                 Some(1) => ("threats".into(), format!("ClamAV found {} harmful file(s): {}. Nothing was deleted; check them, then move them to the Trash or ask for help.", found.len(), found.iter().take(5).cloned().collect::<Vec<_>>().join("; "))),
@@ -121,14 +141,19 @@ fn clam_result(cfg: &Config, child: Child) -> (String, String) {
 
 /// Quick virus scan (1-2 minutes). Returns ("clean"|"threats"|"failed"|"not run", plain description).
 pub fn quick_scan(cfg: &Config, _j: &Job) -> (String, String) {
-    #[cfg(target_os = "linux")]
+    #[cfg(any(target_os = "linux", target_os = "macos"))]
     {
         if cfg.test {
             return ("not run".into(), "Skipped (practice mode).".into());
         }
+        let missing = if cfg!(target_os = "macos") {
+            "XProtect, built into macOS, already checks apps when they open. For scans of your files, install ClamAV on the Security page."
+        } else {
+            "Virus scanning on Linux uses ClamAV. Install it with one click on the Security page."
+        };
         return match start_scanner(cfg, &["-Scan", "-ScanType", "1"]) {
             Some(child) => clam_result(cfg, child),
-            None => ("not run".into(), "Virus scanning on Linux uses ClamAV. Install it with one click on the Security page.".into()),
+            None => ("not run".into(), missing.into()),
         };
     }
     #[allow(unreachable_code)]
@@ -184,6 +209,23 @@ pub fn clamav_install_job(eng: &Arc<Engine>, j: &Job) -> i32 {
             }
         };
     }
+    #[cfg(target_os = "macos")]
+    {
+        if super::mac::clam_installed() {
+            j.say("ClamAV is already installed.");
+            return 0;
+        }
+        return match super::mac::clam_install(&|m| j.say(m)) {
+            Ok(()) => {
+                j.say("ClamAV is installed with its virus list; Quick Scan and Full Scan now use it.");
+                0
+            }
+            Err(e) => {
+                j.say(e);
+                1
+            }
+        };
+    }
     #[allow(unreachable_code)]
     {
         j.say("On Windows, Windows Security already does virus scanning.");
@@ -192,6 +234,23 @@ pub fn clamav_install_job(eng: &Arc<Engine>, j: &Job) -> i32 {
 }
 
 pub fn definitions_job(eng: &Arc<Engine>, j: &Job) -> i32 {
+    #[cfg(target_os = "macos")]
+    {
+        j.step(1, 1, "updating ClamAV's virus list...");
+        if eng.cfg.test {
+            return 0;
+        }
+        return match super::mac::clam_update() {
+            Ok(()) => {
+                j.say("Virus list is up to date.");
+                0
+            }
+            Err(e) => {
+                j.say(e);
+                1
+            }
+        };
+    }
     #[cfg(target_os = "linux")]
     {
         j.step(1, 1, "updating ClamAV's virus list...");
@@ -273,7 +332,7 @@ pub fn full_job(eng: &Arc<Engine>, j: &Job) -> i32 {
         j.say("Windows Security scanner not found.");
         return 1;
     };
-    #[cfg(target_os = "linux")]
+    #[cfg(any(target_os = "linux", target_os = "macos"))]
     let stdout = child.stdout.take();
     let report = if cfg.test { Duration::from_secs(1) } else { Duration::from_secs(60) };
     let mut next = Instant::now() + report;
@@ -298,7 +357,7 @@ pub fn full_job(eng: &Arc<Engine>, j: &Job) -> i32 {
         }
         std::thread::sleep(Duration::from_millis(500));
     };
-    #[cfg(target_os = "linux")]
+    #[cfg(any(target_os = "linux", target_os = "macos"))]
     let (result, detail) = {
         use std::io::Read;
         let mut text = String::new();
@@ -306,7 +365,7 @@ pub fn full_job(eng: &Arc<Engine>, j: &Job) -> i32 {
             let _ = s.read_to_string(&mut text);
         }
         let _ = util::write_json(&cfg.data_dir.join("clamav.json"), &serde_json::json!({ "last_scan": util::iso(util::now()) }));
-        let found = super::linux::clam_found(&text);
+        let found = super::os::clam_found(&text);
         let _ = start;
         match code {
             Some(0) => ("clean".to_string(), "No threats found.".to_string()),
@@ -315,7 +374,7 @@ pub fn full_job(eng: &Arc<Engine>, j: &Job) -> i32 {
             None => ("failed".to_string(), "The scan was stopped.".to_string()),
         }
     };
-    #[cfg(not(target_os = "linux"))]
+    #[cfg(not(any(target_os = "linux", target_os = "macos")))]
     let (result, detail) = describe(code, &threats_since(cfg, start));
     j.say(format!("{} The full scan took {} minutes.", detail, began.elapsed().as_secs() / 60));
     if result == "failed" {

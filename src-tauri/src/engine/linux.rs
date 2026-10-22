@@ -45,6 +45,10 @@ pub fn clam_installed() -> bool {
     have("clamscan")
 }
 
+pub fn clamscan() -> Option<PathBuf> {
+    have("clamscan").then(|| PathBuf::from("clamscan"))
+}
+
 /// Days since ClamAV's virus list was last updated.
 pub fn clam_defs_age_days() -> Option<u32> {
     let dir = Path::new("/var/lib/clamav");

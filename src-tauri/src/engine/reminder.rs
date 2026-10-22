@@ -25,10 +25,10 @@ pub fn is_on(eng: &Engine) -> bool {
 
 /// POST /api/reminder {on}
 pub fn set(eng: &Engine, on: bool) -> Result<Value, String> {
-    #[cfg(target_os = "linux")]
+    #[cfg(any(target_os = "linux", target_os = "macos"))]
     {
-        let exe = super::linux::self_exe()?;
-        super::linux::timer(&eng.cfg, "sweepwise-reminder", "Sun 18:00", &exe, "--reminder", on)?;
+        let exe = super::os::self_exe()?;
+        super::os::timer(&eng.cfg, "sweepwise-reminder", "Sun 18:00", &exe, "--reminder", on)?;
     }
     if !eng.cfg.test && cfg!(windows) {
         let args = if on {

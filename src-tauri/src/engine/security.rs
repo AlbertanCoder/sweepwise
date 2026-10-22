@@ -18,7 +18,7 @@ use std::sync::{Arc, OnceLock};
 
 // ---------- 1. protection ----------
 fn protection(cfg: &Config) -> Vec<Value> {
-    #[cfg_attr(not(any(windows, target_os = "linux")), allow(unused_mut))]
+    #[cfg_attr(not(any(windows, target_os = "linux", target_os = "macos")), allow(unused_mut))]
     let mut items = Vec::new();
     if cfg.test {
         return items;
@@ -68,6 +68,31 @@ fn protection(cfg: &Config) -> Vec<Value> {
             None => items.push(json!({ "name": "Firewall", "ok": false, "detail": "No firewall is set up. Many Linux systems use ufw; \"sudo ufw enable\" in a terminal turns it on." })),
         }
     }
+    #[cfg(target_os = "macos")]
+    {
+        match super::mac::xprotect() {
+            Some((ver, age)) => items.push(json!({ "name": "XProtect (built-in malware protection)", "ok": age <= 60,
+                "detail": if age <= 60 { format!("On, definitions {} from {} day(s) ago.", if ver.is_empty() { "updated".to_string() } else { format!("version {}", ver) }, age) } else { format!("Its definitions are {} days old. Check Software Update so macOS can update them.", age) }, "fix": if age <= 60 { "" } else { "software_updates" } })),
+            None => items.push(json!({ "name": "XProtect (built-in malware protection)", "ok": true, "detail": "Built into macOS; it checks apps when they open." })),
+        }
+        match super::mac::gatekeeper() {
+            Some(on) => items.push(json!({ "name": "Gatekeeper", "ok": on, "detail": if on { "On: apps from unknown developers need your OK before they open." } else { "Off: any app can open without macOS checking it. Turn it back on in Privacy & Security." }, "fix": if on { "" } else { "mac_privacy" } })),
+            None => {}
+        }
+        match super::mac::firewall() {
+            Some(on) => items.push(json!({ "name": "Firewall", "ok": on, "detail": if on { "On." } else { "Off. Turn it on in System Settings > Network > Firewall." }, "fix": if on { "" } else { "mac_firewall" } })),
+            None => {}
+        }
+        let clam = super::mac::clam_installed();
+        items.push(json!({ "name": "Virus scanner (ClamAV, optional)", "ok": true, "optional": !clam, "fix": if clam { "" } else { "clamav_install" },
+            "detail": if clam { "Installed: Quick Scan and Full Scan use it." } else { "Not installed. XProtect already checks apps when they open; install ClamAV (free, through Homebrew) to scan your files on demand." } }));
+        if clam {
+            if let Some(age) = super::mac::clam_defs_age_days() {
+                items.push(json!({ "name": "Virus definitions", "ok": age <= 3, "fix": "update_definitions",
+                    "detail": if age <= 3 { format!("Up to date ({} day(s) old).", age) } else { format!("{} days old. Update them so new viruses are recognised.", age) } }));
+            }
+        }
+    }
     items
 }
 
@@ -88,10 +113,10 @@ pub fn command_target(cmd: &str) -> String {
     c.split_whitespace().next().unwrap_or("").to_string()
 }
 
-#[cfg_attr(not(any(windows, target_os = "linux")), allow(dead_code))]
+#[cfg_attr(not(any(windows, target_os = "linux", target_os = "macos")), allow(dead_code))]
 struct Sig(HashMap<String, Option<bool>>);
 impl Sig {
-    #[cfg_attr(not(any(windows, target_os = "linux")), allow(dead_code))]
+    #[cfg_attr(not(any(windows, target_os = "linux", target_os = "macos")), allow(dead_code))]
     fn signed(&mut self, p: &str) -> Option<bool> {
         if let Some(v) = self.0.get(p) {
             return *v;
@@ -106,7 +131,7 @@ impl Sig {
 }
 
 /// Why a startup command looks suspicious; empty when it looks normal.
-#[cfg_attr(not(any(windows, target_os = "linux")), allow(dead_code))]
+#[cfg_attr(not(any(windows, target_os = "linux", target_os = "macos")), allow(dead_code))]
 fn reasons(cmd: &str, target: &str, sig: &mut Sig) -> Vec<String> {
     static RES: OnceLock<Vec<(Regex, &'static str)>> = OnceLock::new();
     let res = RES.get_or_init(|| {
@@ -193,7 +218,7 @@ fn scheduled_tasks() -> Vec<(String, String, String)> {
 
 fn autoruns(cfg: &Config) -> Vec<Value> {
     let mut sig = Sig(HashMap::new());
-    #[cfg_attr(not(any(windows, target_os = "linux")), allow(unused_mut))]
+    #[cfg_attr(not(any(windows, target_os = "linux", target_os = "macos")), allow(unused_mut))]
     let mut found = Vec::new();
     #[cfg(windows)]
     {
@@ -276,6 +301,19 @@ fn autoruns(cfg: &Config) -> Vec<Value> {
                 if !why.is_empty() {
                     found.push(json!({ "kind": "Background service", "name": n, "where": "~/.config/systemd/user", "command": exec, "reasons": why }));
                 }
+            }
+        }
+    }
+    #[cfg(target_os = "macos")]
+    {
+        for a in super::mac::launch_agents(cfg).into_iter().filter(|a| a.enabled) {
+            let mut why = reasons(&a.program, &a.program, &mut sig);
+            let lower = a.program.to_lowercase();
+            if lower.ends_with(".sh") || lower.ends_with(".py") || lower.ends_with("/bash") || lower.ends_with("/sh") {
+                why.push("a script that starts when you sign in".into());
+            }
+            if !why.is_empty() {
+                found.push(json!({ "kind": "Starts when you sign in", "name": a.label, "where": if a.system { "/Library/LaunchAgents" } else { "~/Library/LaunchAgents" }, "command": a.program, "reasons": why }));
             }
         }
     }
@@ -504,6 +542,13 @@ fn hijacks(cfg: &Config) -> Vec<Value> {
             }
         }
     }
+    #[cfg(target_os = "macos")]
+    if !cfg.test {
+        let (on, server, pac) = super::mac::proxy();
+        if let Some(f) = proxy_finding(on, &server, &pac) {
+            out.push(f);
+        }
+    }
     #[cfg(target_os = "linux")]
     if !cfg.test {
         let (on, server, pac) = super::linux::proxy();
@@ -548,13 +593,13 @@ fn hijacks(cfg: &Config) -> Vec<Value> {
 
 // ---------- 3c. Windows' own safety switches and privacy (PUBLIC_SPEC 55: what paid suites call "vulnerability
 // assessment"). Read-only: each item says what it means and where to change it. level: good / warn / info.
-#[cfg_attr(not(any(windows, target_os = "linux")), allow(dead_code))]
+#[cfg_attr(not(any(windows, target_os = "linux", target_os = "macos")), allow(dead_code))]
 fn item(name: &str, level: &str, detail: &str, fix: &str) -> Value {
     json!({ "name": name, "level": level, "detail": detail, "fix": fix })
 }
 
 fn posture(cfg: &Config) -> Vec<Value> {
-    #[cfg_attr(not(any(windows, target_os = "linux")), allow(unused_mut))]
+    #[cfg_attr(not(any(windows, target_os = "linux", target_os = "macos")), allow(unused_mut))]
     let mut v = Vec::new();
     if cfg.test {
         return v;
@@ -640,6 +685,34 @@ fn posture(cfg: &Config) -> Vec<Value> {
         }
         if super::linux::reboot_required() {
             v.push(item("Restart needed", "warn", "Updates were installed that finish when you restart.", ""));
+        }
+    }
+    #[cfg(target_os = "macos")]
+    {
+        match super::mac::filevault() {
+            Some(true) => v.push(item("FileVault disk encryption", "good", "On: if this Mac is lost or stolen, your files can't be read.", "")),
+            Some(false) => v.push(item("FileVault disk encryption", "warn", "Off: anyone with this Mac can read your files. Turn on FileVault in Privacy & Security.", "mac_filevault")),
+            None => {}
+        }
+        match super::mac::sip() {
+            Some(true) => v.push(item("System Integrity Protection", "good", "On: macOS's own files are protected from changes.", "")),
+            Some(false) => v.push(item("System Integrity Protection", "warn", "Off: malware could change macOS itself. It is turned back on from macOS Recovery.", "")),
+            None => {}
+        }
+        match super::mac::auto_updates() {
+            Some(true) => v.push(item("Automatic security updates", "good", "On: security fixes install by themselves.", "")),
+            Some(false) => v.push(item("Automatic security updates", "warn", "Off: turn on automatic updates in Software Update so security fixes install by themselves.", "software_updates")),
+            None => {}
+        }
+        match super::mac::listening(22) {
+            Some(true) => v.push(item("Remote Login", "warn", "On: other computers can log in to this Mac if they know a password. If you don't use it, turn it off in Sharing.", "mac_sharing")),
+            Some(false) => v.push(item("Remote Login", "good", "Off: nobody can log in remotely.", "")),
+            None => {}
+        }
+        match super::mac::listening(5900) {
+            Some(true) => v.push(item("Screen Sharing", "warn", "On: other computers can see and control this screen. If you don't use it, turn it off in Sharing.", "mac_sharing")),
+            Some(false) => v.push(item("Screen Sharing", "good", "Off.", "")),
+            None => {}
         }
     }
     v
@@ -842,7 +915,16 @@ fn updates(cfg: &Config) -> Value {
             "days_since": log.map(|t| util::days_since(t) as i64), "pending": pending, "ok": !reboot && pending.map_or(true, |n| n == 0),
         })
     }
-    #[cfg(not(any(windows, target_os = "linux")))]
+    #[cfg(target_os = "macos")]
+    {
+        let pending = if cfg.test { Some(0) } else { super::mac::pending_updates() };
+        let last = super::mac::last_install();
+        json!({
+            "restart_pending": false, "last_update": last.map(|t| util::iso(util::to_local(t))), "last_title": Value::Null,
+            "days_since": last.map(|t| util::days_since(t) as i64), "pending": pending, "ok": pending.map_or(true, |n| n == 0),
+        })
+    }
+    #[cfg(not(any(windows, target_os = "linux", target_os = "macos")))]
     json!({ "restart_pending": false, "last_update": Value::Null, "last_title": Value::Null, "days_since": Value::Null, "ok": true })
 }
 

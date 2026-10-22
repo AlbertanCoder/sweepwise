@@ -84,12 +84,12 @@ pub fn defender(cfg: &Config) -> Defender {
     if cfg.test {
         return Defender::default();
     }
-    #[cfg(target_os = "linux")]
+    #[cfg(any(target_os = "linux", target_os = "macos"))]
     {
-        let installed = super::linux::clam_installed();
+        let installed = super::os::clam_installed();
         let last = util::read_json(&cfg.data_dir.join("clamav.json")).and_then(|v| v["last_scan"].as_str().and_then(|s| chrono::NaiveDateTime::parse_from_str(s, "%Y-%m-%dT%H:%M:%S").ok())).and_then(|n| n.and_local_timezone(chrono::Local).single());
         // ClamAV scans when asked; there is no real-time switch to check.
-        return Defender { realtime: None, tamper: None, antivirus: Some(installed), signature_age: if installed { super::linux::clam_defs_age_days() } else { None }, last_scan: last };
+        return Defender { realtime: None, tamper: None, antivirus: Some(installed), signature_age: if installed { super::os::clam_defs_age_days() } else { None }, last_scan: last };
     }
     #[cfg(windows)]
     {

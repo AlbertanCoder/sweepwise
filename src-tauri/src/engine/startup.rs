@@ -144,7 +144,44 @@ pub fn proposals(cfg: &Config) -> Vec<Value> {
     items
 }
 
-#[cfg(not(any(windows, target_os = "linux")))]
+/// Mac: what starts when the person signs in (launch agents). Turning one off uses launchctl, just for this user.
+#[cfg(target_os = "macos")]
+pub fn proposals(cfg: &Config) -> Vec<Value> {
+    use regex::Regex;
+    use serde_json::json;
+    // Updaters for browsers and Office, security, backup, input and hardware helpers: keep. Chat, game, music: off.
+    let keep_re = Regex::new(r"(?i)apple|keystone|google\.(keystone|softwareupdate)|microsoft\.(update|autoupdate)|security|antivirus|malwarebytes|sophos|norton|avast|bitdefender|littlesnitch|lulu|1password|bitwarden|lastpass|backblaze|backup|timemachine|vpn|sweepwise|albertancoder|wacom|logitech|razer|elgato|displaylink|karabiner|bluetooth|printer|epson|canon|brother").unwrap();
+    let script_re = Regex::new(r"(?i)\.(sh|py|pl)$|/(ba|z)?sh$").unwrap();
+    let off_re = Regex::new(r"(?i)discord|telegram|zoom|steam|spotify|skype|slack|teams|whatsapp|viber|epicgames|battle\.?net|blizzard|riot").unwrap();
+    let mut items = Vec::new();
+    for (n, a) in super::mac::launch_agents(cfg).into_iter().enumerate() {
+        let name = a.program.split(".app/").next().filter(|_| a.program.contains(".app/")).and_then(|p| p.rsplit('/').next()).map(|s| s.to_string()).unwrap_or_else(|| a.label.clone());
+        let text = format!("{} {}", a.label, a.program);
+        let (verdict, why) = if keep_re.is_match(&text) {
+            ("keep", "an updater, security, backup or hardware helper; keep it")
+        } else if script_re.is_match(&a.program) {
+            ("your call", "a script someone set up on purpose; check what it does before turning it off")
+        } else if off_re.is_match(&text) {
+            ("turn off", "chat, game or music app; it still works when you open it yourself")
+        } else {
+            ("your call", "not sure; leave it unless you know you do not need it when you sign in")
+        };
+        let mut item = json!({
+            "id": format!("s{}", n + 1), "section": "startup", "title": name, "path": a.path, "command": a.program, "publisher": "",
+            "hive": if a.system { "system" } else { "user" }, "kind": "launchagent", "approved_key": a.label, "action": "disable_startup", "verdict": verdict, "why": why,
+            "checked": verdict == "turn off", "can_do": true, "note": if a.system { "starts for every account; Sweepwise turns it off just for you" } else { "" },
+        });
+        if !a.enabled {
+            item["can_do"] = json!(false);
+            item["checked"] = json!(false);
+            item["note"] = json!("already turned off");
+        }
+        items.push(item);
+    }
+    items
+}
+
+#[cfg(not(any(windows, target_os = "linux", target_os = "macos")))]
 pub fn proposals(_cfg: &Config) -> Vec<Value> {
     Vec::new()
 }

@@ -21,6 +21,13 @@ pub mod jobs;
 pub mod leftovers;
 #[cfg(target_os = "linux")]
 pub mod linux;
+#[cfg(target_os = "macos")]
+pub mod mac;
+/// Linux or Mac: the calls both make the same way (timers, recent files, ClamAV, the admin helper).
+#[cfg(target_os = "linux")]
+pub use self::linux as os;
+#[cfg(target_os = "macos")]
+pub use self::mac as os;
 pub mod mail;
 pub mod organize;
 pub mod outlook;
@@ -497,6 +504,10 @@ fn open_place(cfg: &Config, what: &str) -> Result<Value, String> {
         "ms_device" => "https://microsoft.com/devicelogin".into(),
         "windows_features" => "optionalfeatures.exe".into(),
         "software_updates" => "software_updates".into(),
+        "mac_firewall" => "x-apple.systempreferences:com.apple.preference.security?Firewall".into(),
+        "mac_filevault" => "x-apple.systempreferences:com.apple.preference.security?FileVault".into(),
+        "mac_sharing" => "x-apple.systempreferences:com.apple.preferences.sharing".into(),
+        "mac_privacy" => "x-apple.systempreferences:com.apple.preference.security?General".into(),
         "data_folder" => {
             let _ = std::fs::create_dir_all(&cfg.data_dir);
             cfg.data_dir.to_string_lossy().to_string()
@@ -506,8 +517,12 @@ fn open_place(cfg: &Config, what: &str) -> Result<Value, String> {
     if !cfg.test && !cfg!(windows) {
         // Linux and Mac: web pages and folders open with the system's own opener; Windows settings don't exist.
         let opener = if cfg!(target_os = "macos") { "open" } else { "xdg-open" };
-        if target.starts_with("https://") || what == "review" || what == "data_folder" {
+        if target.starts_with("https://") || what == "review" || what == "data_folder" || (cfg!(target_os = "macos") && target.starts_with("x-apple.systempreferences:")) {
             let _ = std::process::Command::new(opener).arg(&target).spawn();
+        } else if cfg!(target_os = "macos") && (what == "software_updates" || what == "windows_update") {
+            let _ = std::process::Command::new("open").arg("x-apple.systempreferences:com.apple.preferences.softwareupdate").spawn();
+        } else if cfg!(target_os = "macos") && what == "chrome_extensions" {
+            let _ = std::process::Command::new("open").args(["-a", "Google Chrome", &target]).spawn();
         } else if what == "software_updates" || what == "windows_update" {
             let _ = std::process::Command::new("gnome-software").arg("--mode=updates").spawn().or_else(|_| std::process::Command::new("update-manager").spawn());
         } else if what == "chrome_extensions" {

@@ -56,6 +56,13 @@ const WINDOWS_OLD: &str = "Previous Installations";
 /// `sweepwise --deep-plan [--repair] [--windows-old]`: what Deep Clean would do on this PC (changes nothing, needs no admin).
 #[allow(unreachable_code)]
 pub fn plan(repair: bool, windows_old: bool) -> Value {
+    #[cfg(target_os = "macos")]
+    {
+        let _ = windows_old;
+        let then: Vec<&str> = if repair { vec!["check the startup disk (read-only)"] } else { vec![] };
+        return json!({ "ok": true, "restore_point": true, "would_clean": ["System log archives older than two weeks", "Crash and diagnostic reports older than two weeks"],
+            "never": ["your files", "the Trash", "installed apps"], "then": then, "recycle_bin_emptied": false });
+    }
     #[cfg(target_os = "linux")]
     {
         let _ = windows_old;
@@ -143,6 +150,30 @@ pub fn job(eng: &Arc<Engine>, j: &Job, repair: bool, windows_old: bool) -> i32 {
             }
         };
     }
+    #[cfg(target_os = "macos")]
+    {
+        let _ = windows_old;
+        let log = cfg.jobs_dir().join(format!("{}.deep.log", j.id));
+        if std::fs::write(&log, b"").is_err() {
+            j.say("Could not prepare the progress file.");
+            return 1;
+        }
+        let Ok(exe) = super::mac::self_exe() else { return 1 };
+        j.say("macOS will ask for your password so Deep Clean can clear system files.");
+        let exe_s = exe.to_string_lossy().to_string();
+        let log_s = log.to_string_lossy().to_string();
+        let mut args: Vec<&str> = vec![exe_s.as_str(), "--deep-clean", "--log", log_s.as_str()];
+        if repair {
+            args.push("--repair");
+        }
+        return match std::process::Command::new("/usr/bin/osascript").arg("-e").arg(super::mac::admin_script(&args)).spawn() {
+            Ok(mut child) => follow_child(j, &mut child, &log),
+            Err(_) => {
+                j.say("macOS's password box did not open, so Deep Clean can't run.");
+                1
+            }
+        };
+    }
     #[allow(unreachable_code)]
     {
         j.say("Deep Clean is only available on Windows for now.");
@@ -150,8 +181,8 @@ pub fn job(eng: &Arc<Engine>, j: &Job, repair: bool, windows_old: bool) -> i32 {
     }
 }
 
-/// Linux: shows the admin helper's progress file live until its last line; returns its exit code.
-#[cfg(target_os = "linux")]
+/// Linux and Mac: shows the admin helper's progress file live until its last line; returns its exit code.
+#[cfg(any(target_os = "linux", target_os = "macos"))]
 pub fn follow_child(j: &Job, child: &mut std::process::Child, log: &Path) -> i32 {
     let started = std::time::Instant::now();
     let mut shown = 0usize;
@@ -235,7 +266,7 @@ pub fn helper(log: &Path, repair: bool, windows_old: bool) -> i32 {
     if !safe_log(log) {
         return 2;
     }
-    #[cfg(not(any(windows, target_os = "linux")))]
+    #[cfg(not(any(windows, target_os = "linux", target_os = "macos")))]
     let _ = (repair, windows_old);
     let say = |t: &str| {
         use std::io::Write;
@@ -360,6 +391,20 @@ pub fn helper(log: &Path, repair: bool, windows_old: bool) -> i32 {
             say(if ok { "Snapshot: Timeshift snapshot made." } else { "Snapshot: Timeshift could not make a snapshot; continuing." });
         }
         super::linux::deep_steps(repair, &|m| say(&m));
+        let (free_after, _) = super::health::system_disk();
+        say(&format!("Deep Clean finished. Freed {}.", super::util::fmt_size(free_after.saturating_sub(free_before))));
+        return finish(0);
+    }
+    #[cfg(target_os = "macos")]
+    {
+        let _ = windows_old;
+        if !super::mac::is_root() {
+            say("Deep Clean needs admin rights. Type your password when macOS asks.");
+            return finish(5);
+        }
+        let (free_before, _) = super::health::system_disk();
+        say(&format!("Snapshot: {}", super::mac::tm_snapshot("Deep Clean").unwrap_or_default()));
+        super::mac::deep_steps(repair, &|m| say(&m));
         let (free_after, _) = super::health::system_disk();
         say(&format!("Deep Clean finished. Freed {}.", super::util::fmt_size(free_after.saturating_sub(free_before))));
         return finish(0);

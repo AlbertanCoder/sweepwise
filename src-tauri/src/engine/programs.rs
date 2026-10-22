@@ -192,7 +192,36 @@ pub fn proposals(cfg: &Config, _now: DateTime<Local>) -> Vec<Value> {
     items
 }
 
-#[cfg(not(any(windows, target_os = "linux")))]
+/// Mac: apps not opened for six months (macOS's own record). They go to the Trash, so Undo or Put Back brings them
+/// back. Apps macOS has no record for are left out rather than guessed.
+#[cfg(target_os = "macos")]
+pub fn proposals(cfg: &Config, _now: DateTime<Local>) -> Vec<Value> {
+    use serde_json::json;
+    let mut items = Vec::new();
+    if cfg.test {
+        return items;
+    }
+    for a in super::mac::apps(cfg) {
+        if !super::mac::removable_app(cfg, &a.path, &a.bundle_id) {
+            continue;
+        }
+        let Some(last) = a.last_used else { continue };
+        let days = super::util::days_since(last);
+        if days < 180.0 {
+            continue;
+        }
+        let size = super::util::folder_stat(&a.path).bytes;
+        items.push(json!({ "section": "uninstall", "title": a.name, "publisher": "", "path": a.path, "size": size, "uninstall": format!("mac-app:{}", a.path.display()), "action": "uninstall",
+            "why": format!("not opened for {} days. It goes to the Trash, so Undo or Finder's Put Back brings it back.", days as i64), "last_used": super::util::day(last), "checked": false, "can_do": true, "note": "" }));
+    }
+    items.sort_by(|a, b| b["size"].as_u64().cmp(&a["size"].as_u64()));
+    for (n, i) in items.iter_mut().enumerate() {
+        i["id"] = json!(format!("u{}", n + 1));
+    }
+    items
+}
+
+#[cfg(not(any(windows, target_os = "linux", target_os = "macos")))]
 pub fn proposals(_cfg: &Config, _now: DateTime<Local>) -> Vec<Value> {
     Vec::new()
 }

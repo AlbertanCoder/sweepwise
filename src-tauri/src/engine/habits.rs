@@ -17,8 +17,8 @@ fn recent_dir(cfg: &Config) -> PathBuf {
 
 /// Files and folders opened recently: (what was opened, when), from Windows' Recent items.
 pub fn recent_opened(cfg: &Config) -> Vec<(PathBuf, SystemTime)> {
-    #[cfg(target_os = "linux")]
-    return super::linux::recent_files(cfg);
+    #[cfg(any(target_os = "linux", target_os = "macos"))]
+    return super::os::recent_files(cfg);
     #[allow(unreachable_code)]
     #[cfg_attr(not(windows), allow(unused_mut))]
     let mut out = Vec::new();
@@ -99,9 +99,9 @@ fn apps_used(cfg: &Config) -> Vec<Value> {
         v.sort_by(|a, b| b.1.cmp(&a.1));
         return v.into_iter().take(12).map(|(n, w)| json!({ "name": n, "last": w.format("%Y-%m-%d").to_string() })).collect();
     }
-    #[cfg(target_os = "linux")]
+    #[cfg(any(target_os = "linux", target_os = "macos"))]
     {
-        return super::linux::recent_apps(cfg).into_iter().filter(|(_, w)| util::days_since(*w) <= 30.0).take(12).map(|(n, w)| json!({ "name": n, "last": util::day(w) })).collect();
+        return super::os::recent_apps(cfg).into_iter().filter(|(_, w)| util::days_since(*w) <= 30.0).take(12).map(|(n, w)| json!({ "name": n, "last": util::day(w) })).collect();
     }
     #[allow(unreachable_code)]
     {

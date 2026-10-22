@@ -88,7 +88,7 @@ fn setting(cfg: &Config, key: &str) -> Value {
     util::read_json(&cfg.settings_file()).and_then(|s| s.get(key).cloned()).unwrap_or(Value::Null)
 }
 
-#[cfg_attr(not(any(windows, target_os = "linux")), allow(dead_code))]
+#[cfg_attr(not(any(windows, target_os = "linux", target_os = "macos")), allow(dead_code))]
 fn set_setting(cfg: &Config, key: &str, v: Value) {
     let mut s = util::read_json(&cfg.settings_file()).unwrap_or_else(|| json!({}));
     s[key] = v;
@@ -114,7 +114,16 @@ pub fn ensure(cfg: &Config, why: &str) -> Result<String, String> {
         }
         return r;
     }
-    #[cfg(not(any(windows, target_os = "linux")))]
+    #[cfg(target_os = "macos")]
+    {
+        // Mac: a Time Machine local snapshot when macOS allows one.
+        let r = super::mac::tm_snapshot(why);
+        if r.is_ok() {
+            set_setting(cfg, "restore_last", json!(util::iso(util::now())));
+        }
+        return r;
+    }
+    #[cfg(not(any(windows, target_os = "linux", target_os = "macos")))]
     {
         let _ = why;
         return Err("Restore points are a Windows feature.".into());

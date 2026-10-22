@@ -235,7 +235,14 @@ fn disable_startup(cfg: &Config, item: &Value, run_dir: &Path) -> Result<String,
     add_undo(run_dir, undo)?;
     Ok("will no longer start when you sign in".into())
 }
-#[cfg(not(any(windows, target_os = "linux")))]
+#[cfg(target_os = "macos")]
+fn disable_startup(cfg: &Config, item: &Value, run_dir: &Path) -> Result<String, String> {
+    let mut undo = super::mac::disable_agent(cfg, s(item, "approved_key"))?;
+    undo["title"] = json!(s(item, "title"));
+    add_undo(run_dir, undo)?;
+    Ok("will no longer start when you sign in".into())
+}
+#[cfg(not(any(windows, target_os = "linux", target_os = "macos")))]
 fn disable_startup(_cfg: &Config, _item: &Value, _run_dir: &Path) -> Result<String, String> {
     Err("not available on this system yet".into())
 }
@@ -296,7 +303,18 @@ fn uninstall(_cfg: &Config, item: &Value, run_dir: &Path) -> Result<String, Stri
         None => Err("the removal did not start".into()),
     }
 }
-#[cfg(not(any(windows, target_os = "linux")))]
+/// Mac: the app goes to the Trash through Finder, so Undo (or Finder's Put Back) brings it back.
+#[cfg(target_os = "macos")]
+fn uninstall(cfg: &Config, item: &Value, run_dir: &Path) -> Result<String, String> {
+    let path = PathBuf::from(s(item, "uninstall").strip_prefix("mac-app:").ok_or("not allowed from here")?);
+    if !super::mac::removable_app(cfg, &path, &super::mac::bundle_id(&path)) {
+        return Err("not allowed from here".into());
+    }
+    let binned = finder(FINDER_BIN, &[&path.to_string_lossy()])?;
+    add_undo(run_dir, json!({ "type": "recycle", "path": path, "title": s(item, "title"), "when": chrono::Utc::now().timestamp(), "binned": binned }))?;
+    Ok("moved to the Trash; Undo brings it back".into())
+}
+#[cfg(not(any(windows, target_os = "linux", target_os = "macos")))]
 fn uninstall(_cfg: &Config, _item: &Value, _run_dir: &Path) -> Result<String, String> {
     Err("not available on this system yet".into())
 }
@@ -598,6 +616,14 @@ fn undo_one(cfg: &Config, e: &Value, bin: &mut Bin) -> Result<String, String> {
             #[cfg(target_os = "linux")]
             {
                 return super::linux::undo_autostart(cfg, e);
+            }
+            #[allow(unreachable_code)]
+            Err("not available on this system".into())
+        }
+        "launchagent" => {
+            #[cfg(target_os = "macos")]
+            {
+                return super::mac::undo_agent(cfg, e);
             }
             #[allow(unreachable_code)]
             Err("not available on this system".into())

@@ -229,6 +229,24 @@ fn linux_names() -> (HashSet<String>, HashSet<String>) {
     (full, words)
 }
 
+#[cfg(target_os = "macos")]
+fn mac_names(cfg: &Config) -> (HashSet<String>, HashSet<String>) {
+    let mut full = HashSet::new();
+    let mut words = HashSet::new();
+    for n in super::mac::installed_names(cfg) {
+        let nn = norm(&n);
+        if nn.len() >= 3 {
+            full.insert(nn);
+        }
+        for w in n.split(|c: char| !c.is_ascii_alphanumeric()) {
+            if w.len() >= 4 {
+                words.insert(w.to_lowercase());
+            }
+        }
+    }
+    (full, words)
+}
+
 /// Does a folder name match anything installed? (Generous on purpose: a wrong "match" only means no suggestion.)
 pub fn matches_installed(name: &str, full: &HashSet<String>, words: &HashSet<String>) -> bool {
     let n = norm(name);
@@ -247,9 +265,17 @@ pub fn program_leftovers(cfg: &Config) -> Vec<Value> {
     let (full, words) = installed_names(cfg);
     #[cfg(target_os = "linux")]
     let (full, words): (HashSet<String>, HashSet<String>) = if cfg.test { (HashSet::new(), HashSet::new()) } else { linux_names() };
-    #[cfg(not(any(windows, target_os = "linux")))]
+    #[cfg(target_os = "macos")]
+    let (full, words): (HashSet<String>, HashSet<String>) = if cfg.test { (HashSet::new(), HashSet::new()) } else { mac_names(cfg) };
+    #[cfg(not(any(windows, target_os = "linux", target_os = "macos")))]
     let (full, words): (HashSet<String>, HashSet<String>) = (HashSet::new(), HashSet::new());
-    let mut roots: Vec<(&str, PathBuf)> = if cfg!(windows) { vec![("AppData\\Roaming", cfg.roaming.clone()), ("AppData\\Local", cfg.local.clone())] } else { vec![("~/.config", cfg.config.clone()), ("~/.local/share", cfg.local.clone())] };
+    let mut roots: Vec<(&str, PathBuf)> = if cfg!(windows) {
+        vec![("AppData\\Roaming", cfg.roaming.clone()), ("AppData\\Local", cfg.local.clone())]
+    } else if cfg!(target_os = "macos") {
+        vec![("~/Library/Application Support", cfg.config.clone()), ("~/Library/Caches", cfg.cache.clone())]
+    } else {
+        vec![("~/.config", cfg.config.clone()), ("~/.local/share", cfg.local.clone())]
+    };
     if !cfg.test && cfg!(windows) {
         roots.push(("ProgramData", PathBuf::from(std::env::var("ProgramData").unwrap_or_else(|_| "C:\\ProgramData".into()))));
     }
@@ -273,6 +299,11 @@ pub fn program_leftovers(cfg: &Config) -> Vec<Value> {
             }
             let name = e.file_name().to_string_lossy().to_string();
             if name.starts_with('.') || name.starts_with('{') || KEEP.contains(&norm(&name).as_str()) || matches_installed(&name, &full, &words) {
+                continue;
+            }
+            // Mac: only folders named after an app's id (com.maker.app), never Apple's; plain names like "MobileSync"
+            // (iPhone backups) or a game's saves are left alone.
+            if cfg!(target_os = "macos") && (name.matches('.').count() < 2 || name.starts_with("com.apple.") || name.starts_with("group.")) {
                 continue;
             }
             if running.iter().any(|r| util::under(r, &path)) {
@@ -402,8 +433,14 @@ mod tests {
     #[test]
     fn leftovers_are_old_unmatched_and_unticked() {
         let (cfg, root) = testutil::cfg("speed_left");
-        let (home, label) = if cfg!(windows) { (cfg.roaming.clone(), "AppData\\Roaming\\") } else { (cfg.config.clone(), "~/.config/") };
-        let old = home.join("OldGameLauncher");
+        let (home, label, old_name) = if cfg!(windows) {
+            (cfg.roaming.clone(), "AppData\\Roaming\\", "OldGameLauncher")
+        } else if cfg!(target_os = "macos") {
+            (cfg.config.clone(), "~/Library/Application Support/", "com.oldgame.launcher")
+        } else {
+            (cfg.config.clone(), "~/.config/", "OldGameLauncher")
+        };
+        let old = home.join(old_name);
         let fresh = home.join("BusyThing");
         let sys = cfg.local.join("Microsoft");
         for d in [&old, &fresh, &sys] {
@@ -416,7 +453,7 @@ mod tests {
         }
         let items = program_leftovers(&cfg);
         let titles: Vec<&str> = items.iter().map(|i| i["title"].as_str().unwrap()).collect();
-        assert_eq!(titles, vec![format!("{}OldGameLauncher", label)]);
+        assert_eq!(titles, vec![format!("{}{}", label, old_name)]);
         assert_eq!(items[0]["checked"], false);
         assert_eq!(items[0]["action"], "recycle");
         testutil::clean(&root);

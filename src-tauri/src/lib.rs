@@ -83,7 +83,9 @@ pub const FEATURES: &[&str] = &[
 pub const PLATFORM_FEATURES: &[&str] = &["windows-old", "malware-tools", "camera-mic-privacy"];
 #[cfg(target_os = "linux")]
 pub const PLATFORM_FEATURES: &[&str] = &["linux-clean", "clamav", "linux-security-checks", "linux-autostart", "linux-deep-clean", "linux-updates", "linux-timers", "timeshift-snapshot"];
-#[cfg(not(any(windows, target_os = "linux")))]
+#[cfg(target_os = "macos")]
+pub const PLATFORM_FEATURES: &[&str] = &["mac-clean", "xprotect", "gatekeeper", "filevault", "mac-firewall", "clamav", "launch-agents", "mac-apps", "mac-updates", "time-machine-snapshot", "mac-keychain", "mac-deep-clean", "mac-timers"];
+#[cfg(not(any(windows, target_os = "linux", target_os = "macos")))]
 pub const PLATFORM_FEATURES: &[&str] = &[];
 
 /// Prints the engine status as one line of JSON (for automatic checks and support).

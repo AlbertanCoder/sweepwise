@@ -53,7 +53,25 @@ fn keychain(create: bool) -> Option<[u8; 32]> {
     (unhex32(std::str::from_utf8(&item.get_secret().ok()?).ok()?)? == k).then_some(k)
 }
 
-#[cfg(not(target_os = "linux"))]
+/// Mac: the login keychain, which the Mac password protects.
+#[cfg(target_os = "macos")]
+fn keychain(create: bool) -> Option<[u8; 32]> {
+    use security_framework::passwords::{get_generic_password, set_generic_password};
+    const SERVICE: &str = "Sweepwise";
+    const ACCOUNT: &str = "secrets-key";
+    if let Ok(v) = get_generic_password(SERVICE, ACCOUNT) {
+        return unhex32(std::str::from_utf8(&v).ok()?);
+    }
+    if !create {
+        return None;
+    }
+    let k: [u8; 32] = random().ok()?;
+    set_generic_password(SERVICE, ACCOUNT, ai::hex(&k).as_bytes()).ok()?;
+    let back = get_generic_password(SERVICE, ACCOUNT).ok()?;
+    (unhex32(std::str::from_utf8(&back).ok()?)? == k).then_some(k)
+}
+
+#[cfg(not(any(target_os = "linux", target_os = "macos")))]
 fn keychain(_create: bool) -> Option<[u8; 32]> {
     None
 }

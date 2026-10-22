@@ -37,6 +37,10 @@ ring = "0.17"
 [target.'cfg(target_os = "linux")'.dependencies]
 secret-service = { version = "5.2", features = ["rt-async-io-crypto-rust"] }
 
+# Mac: the sealing key lives in the login keychain.
+[target.'cfg(target_os = "macos")'.dependencies]
+security-framework = "3"
+
 [target.'cfg(windows)'.dependencies]
 winreg = "0.56"
 wmi = "0.18"

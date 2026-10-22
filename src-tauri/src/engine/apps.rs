@@ -86,6 +86,25 @@ fn run_with_limit(mut c: std::process::Command, limit: Duration) -> Option<(i32,
 
 /// The Approve list's "App updates" items (nothing ticked).
 pub fn proposals(cfg: &Config) -> Vec<Value> {
+    #[cfg(target_os = "macos")]
+    {
+        // Mac: apps and tools installed with Homebrew.
+        let mut items = Vec::new();
+        if cfg.test {
+            return items;
+        }
+        for (name, have, new, cask) in super::mac::brew_outdated() {
+            if !valid_id(&name) {
+                continue;
+            }
+            items.push(json!({ "section": "updates", "title": name, "package": format!("{}:{}", if cask { "brew-cask" } else { "brew" }, name), "version": have, "available": new,
+                "action": "app_update", "why": format!("version {} is out (you have {})", new, have), "checked": false, "can_do": true, "note": if cask { "close the app first if it is open" } else { "" } }));
+        }
+        for (n, i) in items.iter_mut().enumerate() {
+            i["id"] = json!(format!("w{}", n + 1));
+        }
+        return items;
+    }
     #[cfg(target_os = "linux")]
     {
         // Linux: the system's own updater (apt) and Flatpak.
@@ -143,6 +162,18 @@ pub fn apt_upgrade(names: &[String]) -> Result<String, String> {
 /// Updates one app with winget (quietly, using the app's own installer). Cannot be undone automatically.
 #[allow(unreachable_code)]
 pub fn upgrade(package: &str) -> Result<String, String> {
+    #[cfg(target_os = "macos")]
+    {
+        for (prefix, cask) in [("brew-cask:", true), ("brew:", false)] {
+            if let Some(name) = package.strip_prefix(prefix) {
+                if !valid_id(name) {
+                    return Err("not an app Sweepwise can update".into());
+                }
+                return super::mac::brew_upgrade(name, cask);
+            }
+        }
+        return Err("not an app Sweepwise can update".into());
+    }
     #[cfg(target_os = "linux")]
     {
         if let Some(name) = package.strip_prefix("apt:") {

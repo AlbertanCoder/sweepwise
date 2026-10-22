@@ -23,10 +23,10 @@ pub fn is_on(eng: &Engine) -> bool {
 
 /// POST /api/autoclean {on}
 pub fn set(eng: &Engine, on: bool) -> Result<Value, String> {
-    #[cfg(target_os = "linux")]
+    #[cfg(any(target_os = "linux", target_os = "macos"))]
     {
-        let exe = super::linux::self_exe()?;
-        super::linux::timer(&eng.cfg, "sweepwise-autoclean", "Sun 17:00", &exe, "--auto-clean", on)?;
+        let exe = super::os::self_exe()?;
+        super::os::timer(&eng.cfg, "sweepwise-autoclean", "Sun 17:00", &exe, "--auto-clean", on)?;
     }
     if !eng.cfg.test && cfg!(windows) {
         let args = if on {

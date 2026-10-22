@@ -8,3 +8,4 @@ tools/.ui_check.js
 tools/screens/
 tools/linux/
 tools/capture-*.png
+tools/mac/
