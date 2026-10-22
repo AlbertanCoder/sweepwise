@@ -321,6 +321,7 @@ impl Engine {
         let s = |k: &str| body.get(k).and_then(|v| v.as_str()).unwrap_or("").to_string();
         match p {
             "/api/status" => Ok(health::status(self)),
+            "/api/temp" => Ok(json!({ "temp_c": self.temperature() })),
             "/api/job" => Ok(match self.current_job() {
                 Some(j) => j.state(self.temperature()),
                 None => json!({ "running": false, "mode": Value::Null }),

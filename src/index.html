@@ -46,6 +46,24 @@ h1 { font-size:26px; margin:0 0 4px; font-weight:650; } h2 { font-size:18px; mar
 .stats { display:grid; grid-template-columns:repeat(5, 1fr); gap:12px; margin-top:16px; }
 .stat { padding:14px 16px; } .stat .k { color:var(--muted); font-size:13px; } .stat .v { font-size:20px; font-weight:650; margin-top:2px; } .stat .s { color:var(--muted); font-size:12px; }
 .good { color:var(--good); } .warn { color:var(--warn); } .bad { color:var(--bad); }
+/* compact home: one health card, one vitals row, a live temperature graph */
+.hero2 { display:grid; grid-template-columns:150px 1fr; gap:26px; padding:22px 26px; align-items:center;
+  background:radial-gradient(120% 140% at 0% 0%, rgba(45,212,191,.10), transparent 55%), var(--card); }
+.ring.sm { width:150px; height:150px; } .ring.sm .num b { font-size:42px; } .ring.sm .num span { font-size:12px; margin-top:4px; }
+.hero2 h2 { margin:0 0 10px; font-size:22px; }
+.attn-row { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 18px; min-height:32px; }
+.attn { display:inline-flex; align-items:center; gap:8px; max-width:100%; background:var(--card2); border:1px solid var(--line); border-radius:999px; padding:6px 12px; font-size:13px; color:var(--text); }
+button.attn:hover { border-color:var(--teal2); }
+.attn i { width:8px; height:8px; border-radius:50%; background:var(--warn); flex:0 0 8px; } .attn.ok i { background:var(--good); } .attn.bad i { background:var(--bad); }
+.attn span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:440px; }
+.attn.more { color:var(--muted); }
+.hero-actions { display:flex; flex-wrap:wrap; align-items:center; gap:10px; }
+.hero-actions .big { padding:13px 30px; font-size:17px; }
+.vitals { display:grid; grid-template-columns:2fr 1fr; gap:12px; margin-top:14px; }
+.vit { display:grid; grid-template-columns:repeat(4, 1fr); padding:16px 4px; }
+.vit .m { padding:0 16px; border-left:1px solid var(--line); display:flex; flex-direction:column; gap:2px; min-width:0; } .vit .m:first-child { border-left:0; }
+.vit .k, .temp .k { color:var(--muted); font-size:13px; } .vit b, .temp b { font-size:19px; font-weight:650; } .vit .s, .temp .s { color:var(--muted); font-size:12px; }
+.temp { padding:14px 16px 10px; } .temp .th { display:flex; align-items:baseline; gap:10px; } .temp svg { display:block; width:100%; height:54px; margin-top:6px; overflow:visible; }
 /* tiles */
 .tiles { display:grid; grid-template-columns:repeat(4, 1fr); gap:14px; }
 .tile { position:relative; text-align:left; background:var(--card); border:1px solid var(--line); border-radius:16px; padding:18px; min-height:132px; transition:border-color .12s, transform .12s, background .12s; }
@@ -175,7 +193,8 @@ details.hid { margin:6px 0 0; } details.hid summary { color:var(--muted); font-s
 .burst i { position:absolute; width:6px; height:6px; border-radius:50%; background:var(--teal); opacity:0; animation:fly .9s ease-out forwards; }
 @keyframes fly { 0% { transform:translate(0,0) scale(1); opacity:1; } 100% { transform:translate(var(--dx), var(--dy)) scale(.3); opacity:0; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; } }
-@media (max-width:1100px) { .trends { grid-template-columns:repeat(2, 1fr); } .dmwrap { grid-template-columns:1fr; } }
+@media (max-width:1100px) { .trends { grid-template-columns:repeat(2, 1fr); } .dmwrap { grid-template-columns:1fr; } .vitals { grid-template-columns:1fr; } }
+@media (max-width:900px) { .vit { grid-template-columns:repeat(2, 1fr); row-gap:14px; } .vit .m:nth-child(3) { border-left:0; } .hero2 { grid-template-columns:1fr; justify-items:start; } }
 @media (max-width:1100px) { .tiles { grid-template-columns:repeat(3, 1fr); } .secgrid, .setgrid { grid-template-columns:1fr; } }
 @media (max-width:900px) { .stats { grid-template-columns:repeat(2, 1fr); } .tiles { grid-template-columns:repeat(2, 1fr); } .hero { grid-template-columns:1fr; } .row { grid-template-columns:34px 1fr; } .row .what, .row .res { grid-column:2; } }
 /* public polish: light theme, welcome, help, support, banners, switches, keyboard use */
@@ -255,44 +274,35 @@ main:focus { outline:none; }
   <section class="view on" id="v-home">
     <h1 data-i18n="h1.your_pc">Your PC</h1><p class="sub" id="homeSub" data-i18n="sub.homeSub">Checking...</p>
     <div class="banner" id="remBanner" hidden><div><b data-i18n="rem.title">It's been a week since your last clean-up</b><span data-i18n="rem.desc">Want Sweepwise to run Scan &amp; Clean now? Nothing personal changes without your OK.</span></div><button class="btn sm primary" id="remGo" data-i18n="button.scan_clean">Scan &amp; Clean</button><button class="btn sm" id="remHide" data-i18n="button.not_now">Not now</button></div>
-    <div class="card hero">
-      <div class="ring"><svg width="200" height="200" viewBox="0 0 200 200"><circle cx="100" cy="100" r="86" fill="none" stroke="#1d2a47" stroke-width="14"/>
+    <div class="card hero2">
+      <div class="ring sm"><svg width="150" height="150" viewBox="0 0 200 200"><circle cx="100" cy="100" r="86" fill="none" stroke="#1d2a47" stroke-width="14"/>
         <circle id="ringArc" cx="100" cy="100" r="86" fill="none" stroke="url(#rg)" stroke-width="14" stroke-linecap="round" stroke-dasharray="540.4" stroke-dashoffset="540.4" style="transition:stroke-dashoffset 1s"/>
         <defs><linearGradient id="rg"><stop offset="0" stop-color="#14b8a6"/><stop offset="1" stop-color="#5eead4"/></linearGradient></defs></svg>
         <div class="num"><b id="score">--</b><span>health score</span></div></div>
-      <div>
+      <div class="hero-main">
         <h2 id="scoreWord">Checking your PC</h2>
-        <ul class="reasons" id="reasons"></ul>
-        <button class="big" id="bigBtn" data-i18n="button.scan_clean">Scan &amp; Clean</button><span class="hint">Cleans junk, scans for viruses, then lists suggestions for your OK.</span>
+        <div class="attn-row" id="attn"></div>
+        <div class="hero-actions">
+          <button class="big" id="bigBtn" data-i18n="button.scan_clean" title="Cleans junk, scans for viruses, then lists suggestions for your OK.">Scan &amp; Clean</button>
+          <button class="btn" data-run="quick" data-i18n="tile.quick_scan.title">Quick Scan</button>
+          <button class="btn" data-ask="full" data-i18n="tile.full_scan.title">Full Scan</button>
+          <button class="btn" data-run="clean" data-i18n="tile.clean.title">Clean</button>
+          <button class="btn" data-ask="deep" data-i18n="tile.deep_clean.title">Deep Clean</button>
+        </div>
       </div>
     </div>
-    <div class="stats">
-      <div class="card stat"><div class="k">Free memory</div><div class="v" id="sRam">--</div><div class="s" id="sRam2"></div></div>
-      <div class="card stat"><div class="k">Free space</div><div class="v" id="sDisk">--</div><div class="s" id="sDisk2"></div></div>
-      <div class="card stat"><div class="k">Temperature</div><div class="v" id="sTemp">--</div><div class="s" id="sTemp2"></div></div>
-      <div class="card stat"><div class="k">Virus protection</div><div class="v" id="sProt">--</div><div class="s" id="sProt2"></div></div>
-      <div class="card stat"><div class="k">Last scan</div><div class="v" id="sScan">--</div><div class="s" id="sScan2"></div></div>
-    </div>
-    <h2 data-i18n="h2.trends">Trends</h2>
-    <div class="trends">
-      <div class="card trend"><div class="k">Health score</div><div class="v" id="tScore">--</div><div class="s" id="tScoreS"></div><svg id="cScore" aria-label="Health score over time"></svg></div>
-      <div class="card trend"><div class="k">Free space on C:</div><div class="v" id="tFree">--</div><div class="s" id="tFreeS"></div><svg id="cFree" aria-label="Free space over time"></svg></div>
-      <div class="card trend"><div class="k">Space freed by Sweepwise</div><div class="v" id="tFreed">--</div><div class="s" id="tFreedS"></div><svg id="cFreed" aria-label="Space freed per week"></svg></div>
-      <div class="card trend"><div class="k">Threats found</div><div class="v" id="tThreat">--</div><div class="s" id="tThreatS"></div><svg id="cThreat" aria-label="Threats found per week"></svg></div>
-    </div>
-    <h2 data-i18n="h2.tools">Tools</h2>
-    <div class="tiles">
-      <button class="tile" data-run="quick"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg></div><b data-i18n="tile.quick_scan.title">Quick Scan</b><span data-i18n="tile.quick_scan.desc">Windows Security checks the places viruses usually hide. 1-2 minutes.</span></button>
-      <button class="tile" data-ask="full"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.4 8.6-8 10-4.6-1.4-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></svg></div><b data-i18n="tile.full_scan.title">Full Scan</b><span data-i18n="tile.full_scan.desc">Every file on your PC. Starts only when your PC is cool.</span></button>
-      <button class="tile" data-run="clean"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21l6-6M14 4l6 6-8 8-6-6z"/><path d="M5 19l-2 2"/></svg></div><b data-i18n="tile.clean.title">Clean</b><span data-i18n="tile.clean.desc">Clears temp files and caches now, then lists the rest for your OK.</span></button>
-      <button class="tile admin" data-ask="deep"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M10 11v6M14 11v6M5 7l1 13h12l1-13M9 7V4h6v3"/></svg></div><b data-i18n="tile.deep_clean.title">Deep Clean</b><span data-i18n="tile.deep_clean.desc">Windows' own system cleanup and repair. Asks for admin.</span></button>
-      <button class="tile" data-goto="security"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.4 8.6-8 10-4.6-1.4-8-5-8-10V6z"/><path d="M12 8v4M12 16h.01"/></svg></div><b data-i18n="tile.security.title">Security</b><span data-i18n="tile.security.desc">Protection, odd startup items, risky Chrome extensions, updates.</span><em class="count" id="cSecurity"></em></button>
-      <button class="tile" data-goto="startup"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.9 4.9l2.8 2.8M16.3 16.3l2.8 2.8M2 12h4M18 12h4M4.9 19.1l2.8-2.8M16.3 7.7l2.8-2.8"/></svg></div><b data-i18n="tile.optimize.title">Optimize</b><span data-i18n="tile.optimize.desc">Programs that start with Windows and slow it down.</span><em class="count" id="cStartup"></em></button>
-      <button class="tile" data-goto="organize"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div><b data-i18n="tile.organize.title">Organize</b><span data-i18n="tile.organize.desc">Loose files sorted into folders, old AI leftovers to the Recycle Bin.</span><em class="count" id="cOrganize"></em></button>
-      <button class="tile" data-goto="uninstall"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M15 17.5h6"/></svg></div><b data-i18n="tile.programs.title">Programs</b><span data-i18n="tile.programs.desc">Programs you have not opened in 6 months.</span><em class="count" id="cPrograms"></em></button>
-      <button class="tile" data-goto="organizer"><div class="ic" style="background:rgba(165,243,252,.12); color:#a5f3fc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.8 4.2L18 9l-4.2 1.8L12 15l-1.8-4.2L6 9l4.2-1.8z"/><path d="M19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9z"/></svg></div><b data-i18n="tile.ai_organizer.title">AI Organizer</b><span data-i18n="tile.ai_organizer.desc">Your AI helper plans a tidy-up of your folders. Every step waits for your OK.</span></button>
-      <button class="tile" data-goto="diskmap"><div class="ic" style="background:rgba(139,92,246,.14); color:#c4b5fd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="10" height="11" rx="1"/><rect x="15" y="3" width="6" height="6" rx="1"/><rect x="15" y="11" width="6" height="10" rx="1"/><rect x="3" y="16" width="10" height="5" rx="1"/></svg></div><b data-i18n="tile.disk_map.title">Disk map</b><span data-i18n="tile.disk_map.desc">See what fills your drive and click into any folder.</span></button>
-      <button class="tile" data-goto="finder"><div class="ic" style="background:rgba(96,165,250,.14); color:#93c5fd"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="9" height="12" rx="1.5"/><rect x="8" y="8" width="9" height="12" rx="1.5"/><circle cx="18" cy="6" r="3"/><path d="M20.2 8.2L22 10"/></svg></div><b data-i18n="tile.space_finder.title">Space Finder</b><span data-i18n="tile.space_finder.desc">Exact duplicate files and big files you forgot about.</span></button>
+    <div class="vitals">
+      <div class="card vit">
+        <div class="m"><span class="k">Free memory</span><b id="sRam">--</b><span class="s" id="sRam2"></span></div>
+        <div class="m"><span class="k">Free space</span><b id="sDisk">--</b><span class="s" id="sDisk2"></span></div>
+        <div class="m"><span class="k">Virus protection</span><b id="sProt">--</b><span class="s" id="sProt2"></span></div>
+        <div class="m"><span class="k">Last scan</span><b id="sScan">--</b><span class="s" id="sScan2"></span></div>
+      </div>
+      <div class="card temp">
+        <div class="th"><span class="k">Temperature</span><b id="sTemp">--</b><span class="s" id="sTemp2"></span></div>
+        <svg id="cTemp" role="img" aria-label="Temperature over the last 10 minutes"></svg>
+        <div class="s" id="sTemp3">Live, last 10 minutes</div>
+      </div>
     </div>
   </section>
 
@@ -318,6 +328,14 @@ main:focus { outline:none; }
 
   <section class="view" id="v-history">
     <h1 data-i18n="h1.history_undo">History &amp; Undo</h1><p class="sub">Every Sweepwise run. Undo puts back what was moved, binned, trashed or turned off in that run.</p>
+    <h2 data-i18n="h2.trends" style="margin-top:6px">Trends</h2>
+    <div class="trends">
+      <div class="card trend"><div class="k">Health score</div><div class="v" id="tScore">--</div><div class="s" id="tScoreS"></div><svg id="cScore" aria-label="Health score over time"></svg></div>
+      <div class="card trend"><div class="k">Free space on C:</div><div class="v" id="tFree">--</div><div class="s" id="tFreeS"></div><svg id="cFree" aria-label="Free space over time"></svg></div>
+      <div class="card trend"><div class="k">Space freed by Sweepwise</div><div class="v" id="tFreed">--</div><div class="s" id="tFreedS"></div><svg id="cFreed" aria-label="Space freed per week"></svg></div>
+      <div class="card trend"><div class="k">Threats found</div><div class="v" id="tThreat">--</div><div class="s" id="tThreatS"></div><svg id="cThreat" aria-label="Threats found per week"></svg></div>
+    </div>
+    <h2 style="margin-top:24px">Runs</h2>
     <div class="card" id="histBody"></div>
     <p id="histStatus" style="margin-top:14px"></p>
   </section>
@@ -540,7 +558,7 @@ main:focus { outline:none; }
     });
     if (v === 'home') loadStatus();
     if (v === 'list') loadList();
-    if (v === 'history') loadHistory();
+    if (v === 'history') { loadHistory(); loadTrends(); }
     if (v === 'security') loadSecurity();
     if (v === 'organizer') loadOrganizer();
     if (v === 'brain') loadBrain();
@@ -590,35 +608,75 @@ main:focus { outline:none; }
     api('/api/status').then(function (s) {
       firstStatus(s);
       var sc = s.score; countUp($('score'), sc); dmRoots = s.roots || dmRoots;
-      if (!loadStatus.t || Date.now() - loadStatus.t > 300000) { loadStatus.t = Date.now(); loadTrends(); }
       $('ringArc').style.strokeDashoffset = 540.4 * (1 - sc / 100);
       $('scoreWord').textContent = sc >= 85 ? 'Your PC is in great shape' : sc >= 65 ? 'Your PC is doing OK' : 'Your PC needs attention';
-      $('reasons').innerHTML = s.reasons.length ? s.reasons.map(function (r) { return '<li>' + esc(r) + '</li>'; }).join('') : '<li class="ok">Nothing needs your attention.</li>';
+      attention(s);
       $('homeSub').textContent = s.last_run ? 'Last clean-up ' + ago(s.last_run.when) + (s.last_run.freed ? ', freed ' + size(s.last_run.freed) : '') + '.' : 'Sweepwise has not run yet.';
-      $('sRam').textContent = s.free_ram_gb + ' GB'; $('sRam').className = 'v ' + (s.free_ram_gb < 1.5 ? 'warn' : ''); $('sRam2').textContent = 'of ' + Math.round(s.total_ram_gb) + ' GB';
+      $('sRam').textContent = s.free_ram_gb + ' GB'; $('sRam').className = s.free_ram_gb < 1.5 ? 'warn' : ''; $('sRam2').textContent = 'of ' + Math.round(s.total_ram_gb) + ' GB';
       $('sDisk').textContent = size(s.free_disk); $('sDisk2').textContent = 'of ' + size(s.total_disk) + ' on C:';
-      $('sTemp').textContent = s.temp_c == null ? 'n/a' : s.temp_c + '°C'; $('sTemp').className = 'v ' + (s.temp_c >= 85 ? 'bad' : s.temp_c >= 75 ? 'warn' : 'good');
-      $('sTemp2').textContent = s.temp_c >= 85 ? 'hot: let it cool' : s.temp_c >= 75 ? 'warm' : 'cool';
-      $('sProt').textContent = s.realtime === false ? 'Off' : s.realtime ? 'On' : 'n/a'; $('sProt').className = 'v ' + (s.realtime === false ? 'bad' : 'good');
+      tempSample(s.temp_c);
+      $('sProt').textContent = s.realtime === false ? 'Off' : s.realtime ? 'On' : 'n/a'; $('sProt').className = s.realtime === false ? 'bad' : 'good';
       $('sProt2').textContent = s.definitions_age == null ? '' : 'definitions ' + (s.definitions_age === 0 ? 'up to date' : s.definitions_age + ' day(s) old');
       $('sScan').textContent = ago(s.last_scan); $('sScan2').textContent = s.last_run && s.last_run.scan === 'threats' ? 'threat found' : s.last_scan ? 'no threats' : '';
       $('navCount').textContent = s.pending || '';
       lastTemp = s.temp_c;
       var sp = s.security ? s.security.problems : '';
-      $('navSec').textContent = sp || ''; $('cSecurity').textContent = s.security ? (sp ? sp + ' to check' : 'all good') : 'not run';
+      $('navSec').textContent = sp || '';
       setBusy(s.job_running);
       if (s.job_running && current === 'home') { show('work'); pollJob(); }
     }).catch(function (e) { $('homeSub').textContent = 'Could not reach the Sweepwise engine: ' + e.message; });
-    loadCounts();
   }
+  // What needs the person: short pills that open the right page (at most 3, the rest one click away).
+  function attention(s) {
+    var where = function (r) {
+      if (/waiting for your OK/i.test(r)) return 'list';
+      if (/not cleaned yet|No clean-up|is hot/i.test(r)) return null;
+      if (/drive is getting full/i.test(r)) return 'finder';
+      if (/memory is low/i.test(r)) return '';
+      return 'security';
+    };
+    var items = (s.reasons || []).map(function (r) { return { text: r, go: where(r) }; }).filter(function (i) { return i.go !== null; });
+    var pill = function (i) {
+      var bad = /off|threat|harmful/i.test(i.text) && !/Sweepwise/.test(i.text);
+      return i.go ? '<button class="attn' + (bad ? ' bad' : '') + '" data-attn="' + i.go + '" title="' + esc(i.text) + '"><i></i><span>' + esc(i.text) + '</span> &#8250;</button>'
+        : '<span class="attn" title="' + esc(i.text) + '"><i></i><span>' + esc(i.text) + '</span></span>';
+    };
+    var open = attention.open;
+    var shown = open ? items : items.slice(0, 3);
+    var html = items.length ? shown.map(pill).join('') : '<span class="attn ok"><i></i><span>Nothing needs your attention.</span></span>';
+    if (!open && items.length > 3) html += '<button class="attn more" id="attnMore">+' + (items.length - 3) + ' more</button>';
+    $('attn').innerHTML = html;
+    Array.prototype.forEach.call(document.querySelectorAll('[data-attn]'), function (b) { b.addEventListener('click', function () { show(b.dataset.attn); }); });
+    if ($('attnMore')) $('attnMore').addEventListener('click', function () { attention.open = true; attention(s); });
+  }
+  // Live temperature: a reading every 5 seconds while Home is open, the last 10 minutes drawn as a line.
+  var temps = [];
+  function tempSample(c) {
+    $('sTemp').textContent = c == null ? 'n/a' : c + '°C'; $('sTemp').className = c >= 85 ? 'bad' : c >= 75 ? 'warn' : c == null ? '' : 'good';
+    $('sTemp2').textContent = c == null ? 'no sensor' : c >= 85 ? 'hot: let it cool' : c >= 75 ? 'warm' : 'cool';
+    if (c == null) { $('cTemp').innerHTML = ''; $('sTemp3').textContent = 'This computer does not report its temperature.'; return; }
+    var now = Date.now();
+    temps.push({ x: now, y: c });
+    temps = temps.filter(function (p) { return now - p.x <= 600000; });
+    drawTemp();
+  }
+  function drawTemp() {
+    var svg = $('cTemp'), W = svg.clientWidth || 260, H = 54, pad = 4;
+    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+    if (temps.length < 2) { svg.innerHTML = ''; $('sTemp3').textContent = 'Live, last 10 minutes (building up)'; return; }
+    var ys = temps.map(function (p) { return p.y; }), lo = Math.min.apply(null, ys), hi = Math.max.apply(null, ys);
+    var y0 = Math.max(0, lo - 4), y1 = hi + 4, x0 = temps[0].x, x1 = Math.max(temps[temps.length - 1].x, x0 + 1);
+    var pts = temps.map(function (p) { return [pad + (p.x - x0) / (x1 - x0) * (W - pad * 2), H - pad - (p.y - y0) / (y1 - y0) * (H - pad * 2)]; });
+    var last = temps[temps.length - 1].y, col = last >= 85 ? 'var(--bad)' : last >= 75 ? 'var(--warn)' : 'var(--teal)';
+    var line = pts.map(function (p, i) { return (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1); }).join(' ');
+    var area = line + ' L' + pts[pts.length - 1][0].toFixed(1) + ' ' + (H - pad) + ' L' + pts[0][0].toFixed(1) + ' ' + (H - pad) + ' Z';
+    var end = pts[pts.length - 1];
+    svg.innerHTML = '<path d="' + area + '" fill="' + col + '" opacity=".12"/><path d="' + line + '" fill="none" stroke="' + col + '" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>' +
+      '<circle cx="' + end[0].toFixed(1) + '" cy="' + end[1].toFixed(1) + '" r="3.5" fill="' + col + '"/>';
+    $('sTemp3').textContent = 'Live, last 10 minutes · low ' + lo + '°C, high ' + hi + '°C';
+  }
+  setInterval(function () { if (current === 'home' && !document.hidden) api('/api/temp').then(function (d) { tempSample(d.temp_c); }).catch(function () {}); }, 5000);
   function setBusy(b) { $('bigBtn').disabled = b; Array.prototype.forEach.call(document.querySelectorAll('[data-run]'), function (x) { x.disabled = b; }); }
-  function loadCounts() {
-    api('/api/list').then(function (d) {
-      var p = d.proposals || {}, done = d.results || {};
-      function n(keys) { var c = 0; keys.forEach(function (k) { (p[k] || []).forEach(function (i) { if (i.can_do && !(done[i.id] && done[i.id].ok)) c++; }); }); return c || ''; }
-      $('cStartup').textContent = n(['startup']); $('cOrganize').textContent = n(['files', 'ai_leftovers']); $('cPrograms').textContent = n(['uninstall']);
-    }).catch(function () {});
-  }
 
   // ---------- jobs ----------
   var lastTemp = null;
