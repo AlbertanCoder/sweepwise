@@ -2,7 +2,9 @@
 // Gate (every file, checked when planning AND again right before removal):
 //   inside one of the listed cache folders; that folder is not the home folder or a drive root; not inside a
 //   protected folder (AI tools' working folders, which go on the Approve list instead); a real file, not a link,
-//   and not inside a linked folder; unchanged for 24 hours; path not too long. Each removal is logged first.
+//   and not inside a linked folder; not created or changed in the last 24 hours (on Windows a file copied or
+//   unpacked today keeps its old "changed" date, so the newer of the two counts); path not too long. Each removal
+//   is logged first.
 use super::util::{self, is_link};
 use super::Config;
 use serde_json::{json, Value};
@@ -228,8 +230,14 @@ pub fn check(path: &Path, roots: &[PathBuf], excludes: &[PathBuf], home: &Path, 
         }
         d = dir.parent();
     }
-    if m.modified().map_or(true, |t| t > cutoff) {
-        return Some("changed in the last 24 hours");
+    // An installer that unpacks into Temp keeps each file's old date; the creation time shows it arrived today.
+    let created = if cfg!(windows) { m.created().ok() } else { None };
+    let newest = match (m.modified().ok(), created) {
+        (Some(a), Some(b)) => Some(a.max(b)),
+        (a, b) => a.or(b),
+    };
+    if newest.map_or(true, |t| t > cutoff) {
+        return Some("created or changed in the last 24 hours");
     }
     None
 }
@@ -356,9 +364,29 @@ mod tests {
     use std::time::Duration;
 
     fn age(p: &Path, days: u64) {
-        let t = SystemTime::now() - Duration::from_secs(days * 86400);
-        let f = fs::File::options().write(true).open(p).unwrap();
-        f.set_modified(t).unwrap();
+        crate::engine::testutil::make_old(p, days);
+    }
+
+    #[cfg(windows)]
+    #[test]
+    fn files_copied_in_today_stay_even_with_an_old_date() {
+        let (cfg, root) = fixture("copied");
+        let temp = cfg.local.join("Temp");
+        fs::create_dir_all(&temp).unwrap();
+        // Unpacked a minute ago by an installer that is still running: an old "changed" date, but it arrived today.
+        let unpacked = temp.join("setup_payload.dll");
+        fs::write(&unpacked, b"x").unwrap();
+        fs::File::options().write(true).open(&unpacked).unwrap().set_modified(SystemTime::now() - Duration::from_secs(30 * 86400)).unwrap();
+        let leftover = temp.join("old_leftover.tmp");
+        fs::write(&leftover, b"x").unwrap();
+        age(&leftover, 30);
+        let roots = vec![temp.clone()];
+        let cutoff = SystemTime::now() - Duration::from_secs(24 * 3600);
+        assert_eq!(check(&unpacked, &roots, &[], &cfg.home, cutoff, &mut HashMap::new()), Some("created or changed in the last 24 hours"));
+        assert_eq!(check(&leftover, &roots, &[], &cfg.home, cutoff, &mut HashMap::new()), None, "old both ways: it can go");
+        let names: Vec<String> = plan(&cfg, &targets(&cfg)).allowed.iter().map(|(f, _)| f.file_name().unwrap().to_string_lossy().to_string()).collect();
+        assert!(names.contains(&"old_leftover.tmp".to_string()) && !names.contains(&"setup_payload.dll".to_string()), "{:?}", names);
+        let _ = fs::remove_dir_all(root);
     }
 
     fn fixture(name: &str) -> (Config, PathBuf) {

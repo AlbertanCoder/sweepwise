@@ -95,7 +95,7 @@ mod tests {
         std::fs::create_dir_all(&temp).unwrap();
         let f = temp.join("old.tmp");
         std::fs::write(&f, b"junk").unwrap();
-        std::fs::File::options().write(true).open(&f).unwrap().set_modified(std::time::SystemTime::now() - std::time::Duration::from_secs(3 * 86400)).unwrap();
+        crate::engine::testutil::make_old(&f, 3);
         set(&eng, true).unwrap();
         eng.set_setting("first_clean_done", json!(true));
         let r = run(&eng);

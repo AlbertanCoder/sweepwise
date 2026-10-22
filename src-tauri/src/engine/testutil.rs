@@ -237,6 +237,20 @@ impl FakeImap {
 }
 
 /// Removes the test's folder and its registry branch.
+/// Makes a test file look `days` old: its changed date and, on Windows, its creation date (Sweepwise's cleaning
+/// checks both there).
+pub fn make_old(p: &Path, days: u64) {
+    let t = std::time::SystemTime::now() - std::time::Duration::from_secs(days * 86400);
+    let f = std::fs::File::options().write(true).open(p).unwrap();
+    #[cfg(windows)]
+    {
+        use std::os::windows::fs::FileTimesExt;
+        f.set_times(std::fs::FileTimes::new().set_modified(t).set_created(t)).unwrap();
+    }
+    #[cfg(not(windows))]
+    f.set_modified(t).unwrap();
+}
+
 pub fn clean(root: &Path) {
     #[cfg(windows)]
     if let Some(n) = root.file_name() {
