@@ -124,7 +124,10 @@ impl Config {
             Some(d) => PathBuf::from(d),
             None if cfg!(windows) => {
                 let new = local.join(WINDOWS_DATA_DIR);
-                move_old_records(&local.join("Sweepwise"), &new);
+                // Tests that read this computer's real settings never move the person's records.
+                if !cfg!(test) {
+                    move_old_records(&local.join("Sweepwise"), &new);
+                }
                 new
             }
             None => local.join("Sweepwise"),
