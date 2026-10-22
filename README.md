@@ -1,6 +1,6 @@
 # Sweepwise
 
-Free, open-source PC care for Windows and Linux (Mac planned), funded by the people who use it.
+Free, open-source PC care for Windows, Linux and Mac, funded by the people who use it.
 
 Sweepwise clears out junk, checks that your computer is protected, speeds it up with safe, reversible settings and
 suggests tidy-ups, in plain English. Every feature is free for everyone. There are no ads, no paid version and no
@@ -50,8 +50,8 @@ Windows maintenance uses Microsoft's own tools only: no registry cleaners, no dr
 | System | Status |
 | --- | --- |
 | Windows 10 and 11 | In testing |
-| Linux: Ubuntu, Linux Mint, Debian, Fedora, Arch | Being built (.deb and AppImage) |
-| macOS (the three newest versions) | Planned |
+| Linux: Ubuntu, Linux Mint, Debian, Fedora, Arch | In testing (.deb and AppImage) |
+| macOS (Apple Silicon; Intel to follow) | In testing (DMG) |
 
 ## Support Sweepwise
 

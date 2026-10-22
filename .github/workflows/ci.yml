@@ -3,7 +3,10 @@ name: ci
 on:
   push:
     branches: [main]
+    # Words-only changes (README, website, guides) don't need a 17-minute build.
+    paths-ignore: ['**.md', 'docs/**']
   pull_request:
+    paths-ignore: ['**.md', 'docs/**']
   workflow_dispatch:
 
 permissions:
