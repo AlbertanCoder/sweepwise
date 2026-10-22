@@ -6,7 +6,9 @@ two whenever Sweepwise reminds you, for two to three weeks.
 ## Before you start
 
 - You need Windows 10 or 11. (Linux and Mac testers will be asked separately later.)
-- Sweepwise never deletes anything for good: files only go to the Recycle Bin, and History & Undo puts things back.
+- Sweepwise never deletes your own files for good: they only go to the Recycle Bin, and History & Undo puts them
+  back. Temporary files and caches (junk that Windows and your apps rebuild) are deleted for good, after Sweepwise
+  shows you the list the first time.
   Even so, this is a test version, so it's a good idea to have a backup of anything precious, as always.
 - Nothing about you or your computer is sent to anyone. See [PRIVACY.md](../PRIVACY.md).
 
