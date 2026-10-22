@@ -75,7 +75,44 @@ fn check_bin_fits(_p: &Path, _size: u64) -> Result<(), String> {
     Ok(()) // the Linux trash always moves files; it never deletes them
 }
 
-fn recycle(cfg: &Config, p: &Path) -> Result<String, String> {
+/// Mac: Finder bins the item (so Finder's Put Back works too) and says what it is called in the Trash.
+#[cfg(target_os = "macos")]
+fn finder(script: &str, args: &[&str]) -> Result<String, String> {
+    let out = std::process::Command::new("osascript").arg("-e").arg(script).args(args).output().map_err(|e| format!("Finder could not be reached ({})", e))?;
+    if out.status.success() {
+        Ok(String::from_utf8_lossy(&out.stdout).trim().to_string())
+    } else {
+        let why = String::from_utf8_lossy(&out.stderr).trim().to_string();
+        if why.contains("-1743") || why.to_lowercase().contains("not authorized") {
+            return Err("macOS asked whether Sweepwise may use Finder; allow it in System Settings > Privacy & Security > Automation".into());
+        }
+        Err(format!("Finder said: {}", why))
+    }
+}
+
+#[cfg(target_os = "macos")]
+const FINDER_BIN: &str = "on run argv
+    set target to POSIX file (item 1 of argv) as alias
+    tell application \"Finder\"
+        set binned to delete target
+        return name of binned
+    end tell
+end run";
+
+#[cfg(target_os = "macos")]
+const FINDER_PUT_BACK: &str = "on run argv
+    set itemName to item 1 of argv
+    set destination to POSIX file (item 2 of argv) as alias
+    tell application \"Finder\"
+        set found to (every item of trash whose name is itemName)
+        if (count of found) is 0 then error \"not in the Trash\"
+        set moved to move (item 1 of found) to destination
+        return name of moved
+    end tell
+end run";
+
+/// Sends a file or folder to the Recycle Bin (Trash). Returns the message and, on a Mac, its name in the Trash.
+fn recycle(cfg: &Config, p: &Path) -> Result<(String, Option<String>), String> {
     if !allowed_place(cfg, p) {
         return Err("outside your own folders, so it was left alone".into());
     }
@@ -85,12 +122,18 @@ fn recycle(cfg: &Config, p: &Path) -> Result<String, String> {
     }
     let size = if m.is_dir() { util::folder_stat(p).bytes } else { m.len() };
     check_bin_fits(p, size)?;
-    let owned = p.to_path_buf();
-    fresh_thread(move || trash::delete(&owned).map_err(|e| format!("the Recycle Bin refused it ({})", e)))?;
+    #[cfg(target_os = "macos")]
+    let binned = Some(finder(FINDER_BIN, &[&p.to_string_lossy()])?);
+    #[cfg(not(target_os = "macos"))]
+    let binned = {
+        let owned = p.to_path_buf();
+        fresh_thread(move || trash::delete(&owned).map_err(|e| format!("the Recycle Bin refused it ({})", e)))?;
+        None
+    };
     if fs::symlink_metadata(p).is_ok() {
         return Err("still there after sending to the Recycle Bin".into());
     }
-    Ok("sent to the Recycle Bin".into())
+    Ok(("sent to the Recycle Bin".into(), binned))
 }
 
 /// Moves a file or folder. Across drives a file is copied, checked, and only then removed from where it was.
@@ -293,8 +336,8 @@ fn one(cfg: &Config, item: &Value, run_dir: &Path) -> Result<String, String> {
     match s(item, "action") {
         "move" => move_item(cfg, item, run_dir),
         "recycle" => {
-            let msg = recycle(cfg, &path)?;
-            add_undo(run_dir, json!({ "type": "recycle", "path": path, "title": s(item, "title"), "when": chrono::Utc::now().timestamp() }))?;
+            let (msg, binned) = recycle(cfg, &path)?;
+            add_undo(run_dir, json!({ "type": "recycle", "path": path, "title": s(item, "title"), "when": chrono::Utc::now().timestamp(), "binned": binned }))?;
             Ok(msg)
         }
         "mkdir" => mkdir(cfg, item, run_dir),
@@ -430,17 +473,28 @@ impl Bin {
         }
     }
 
-    /// Mac: the trash library cannot list or restore the Trash yet (Stage P6 adds it); Finder's Put Back still works.
+    /// Mac: Finder moves the item back out of the Trash by the name it had there, then it gets its own name back.
     #[cfg(target_os = "macos")]
-    fn restore(&mut self, p: &Path, _when: Option<i64>) -> Result<(), String> {
+    fn restore(&mut self, p: &Path, _when: Option<i64>, binned: Option<&str>) -> Result<(), String> {
         if fs::symlink_metadata(p).is_ok() {
             return Err("something new is already at the original spot".into());
         }
-        Err("on a Mac, open the Trash, find it, and choose Put Back".into())
+        let name = binned.filter(|n| !n.is_empty()).ok_or("on a Mac, open the Trash, find it, and choose Put Back")?;
+        let parent = p.parent().ok_or("no folder to put it back in")?;
+        fs::create_dir_all(parent).map_err(|e| format!("could not make the folder ({})", e))?;
+        let back = finder(FINDER_PUT_BACK, &[name, &parent.to_string_lossy()])?;
+        let landed = parent.join(&back);
+        if landed != p {
+            fs::rename(&landed, p).map_err(|e| format!("put back as {} but could not rename it ({})", back, e))?;
+        }
+        if fs::symlink_metadata(p).is_err() {
+            return Err("restore did not finish".into());
+        }
+        Ok(())
     }
 
     #[cfg(not(target_os = "macos"))]
-    fn restore(&mut self, p: &Path, when: Option<i64>) -> Result<(), String> {
+    fn restore(&mut self, p: &Path, when: Option<i64>, _binned: Option<&str>) -> Result<(), String> {
         if fs::symlink_metadata(p).is_ok() {
             return Err("something new is already at the original spot".into());
         }
@@ -496,7 +550,7 @@ fn undo_one(cfg: &Config, e: &Value, bin: &mut Bin) -> Result<String, String> {
             Ok("moved back".into())
         }
         "recycle" => {
-            bin.restore(&p("path"), e.get("when").and_then(|v| v.as_i64()))?;
+            bin.restore(&p("path"), e.get("when").and_then(|v| v.as_i64()), e.get("binned").and_then(|v| v.as_str()))?;
             Ok("restored from the Recycle Bin".into())
         }
         "startup_folder" => {
