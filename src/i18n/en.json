@@ -277,5 +277,22 @@
  "about.promise.4@linux": "System maintenance uses your system's own tools only (apt, Flatpak, journalctl, ClamAV): no tricks.",
  "sub.boost@linux": "Make your computer feel new again with your system's own tools: fewer programs starting when you sign in, less junk, lighter settings on slow computers and up-to-date apps. Every change waits for your OK, and Timeshift makes a snapshot first when it is installed.",
  "help.14.q": "Can I tell Sweepwise which email senders to always keep or always clean?",
- "help.14.a": "Yes. In Sweepwise's own records folder (About & privacy > Open Sweepwise's own records), make a text file called email-keep.txt and/or email-clean.txt with one email address or domain per line. Senders on the keep list are never suggested. Senders on the clean list are always suggested and ticked, except people you write to, banks and government, which are never suggested."
+ "help.14.a": "Yes. In Sweepwise's own records folder (About & privacy > Open Sweepwise's own records), make a text file called email-keep.txt and/or email-clean.txt with one email address or domain per line. Senders on the keep list are never suggested. Senders on the clean list are always suggested and ticked, except people you write to, banks and government, which are never suggested.",
+ "button.open_in_file_explorer@mac": "Show in Finder",
+ "sub.secSub@mac": "XProtect and Gatekeeper, built into macOS, do the malware protection. Sweepwise checks they are on, checks FileVault, the firewall and sharing, and looks for things that should not be there. ClamAV can be added to scan your files. This check only reads; it changes nothing.",
+ "tile.clean_check_and_repair_windows.title@mac": "Clean + check the startup disk",
+ "tile.clean_check_and_repair_windows.desc@mac": "Also runs Disk Utility's read-only check of your startup disk. Adds a few minutes.",
+ "tile.clean_system_files.desc@mac": "System log archives and crash reports older than two weeks. A few minutes. Never empties your Trash or touches Downloads.",
+ "tile.deep_clean.desc@mac": "Old system files only an admin can clear. Asks for your password.",
+ "tile.optimize.desc@mac": "Programs that start when you sign in and slow your Mac down.",
+ "tile.quick_scan.desc@mac": "ClamAV checks Downloads, Desktop and the other places harmful files usually land. XProtect already checks apps when they open.",
+ "help.1.a@mac": "It clears caches that macOS and your apps make and never tidy up, runs a quick virus scan if ClamAV is installed, and checks your Mac's health and protection. Then it lists anything else it suggests (files to tidy, old AI leftovers, startup programs, apps you don't use) and waits for your OK. The very first time, it shows what it would remove and waits for you to press Clean now.",
+ "help.5.a@mac": "A full virus scan with ClamAV works your Mac hard and can take an hour or more. Sweepwise waits until it is under 70 degrees C with enough free memory, so it doesn't overheat.",
+ "help.6.a@mac": "It clears system log archives and crash reports older than two weeks, with admin rights (macOS asks for your password). Time Machine makes a snapshot first when it can. It never empties your Trash and never touches Downloads.",
+ "help.9.a@mac": "Sorted files go to folders in Documents (Finance, Career, Notes and so on), Pictures, Movies and Music. Files Sweepwise wasn't sure about go to Documents/_Review, and private-looking files to the hidden Documents/_Private. History & Undo shows every move.",
+ "help.10.q@mac": "Why does my Mac say Sweepwise cannot be opened?",
+ "help.10.a@mac": "Until Apple has checked (notarized) Sweepwise, macOS asks before opening it the first time. Open System Settings > Privacy & Security, scroll down and click Open Anyway. You only need to do this once.",
+ "help.12.a@mac": "Drag Sweepwise from Applications to the Trash. Its own records live in a folder you can open from this page; delete that folder too if you want every trace gone.",
+ "about.promise.4@mac": "Mac maintenance uses macOS's own tools only (launchctl, Spotlight, Time Machine, Software Update), plus Homebrew and ClamAV when you ask: no tricks.",
+ "sub.boost@mac": "Make your Mac feel new again: fewer apps starting when you sign in, less junk, unused apps moved to the Trash and up-to-date apps. Every change waits for your OK, and Time Machine makes a snapshot first when it can."
 }

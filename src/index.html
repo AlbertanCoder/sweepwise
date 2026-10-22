@@ -629,8 +629,8 @@ main:focus { outline:none; }
   function deepModal(wo) {
     var pick = 'deep';
     var old = wo.offer ? '<label class="opt" style="cursor:pointer"><input type="checkbox" id="dcOld" style="margin-top:4px; width:18px; height:18px; accent-color:var(--teal)"><div><b>Also remove the old copy of Windows (Windows.old)</b><span>Left from an upgrade ' + esc(wo.days) + ' days ago. It frees a lot of space, but going back to your previous version of Windows will no longer be possible.</span></div></label>' : '';
-    var L = OS === 'linux';
-    modal('Deep Clean', (L ? '<p>Clears system files that need admin rights, so your system will ask for your password. If Timeshift is installed, it makes a snapshot first.</p>' : '<p>Uses Microsoft\'s own tools with admin rights. Windows will show an "Allow changes?" box: click <b>Yes</b>. Windows makes a restore point first.</p>') +
+    var L = OS !== 'windows';
+    modal('Deep Clean', (OS === 'mac' ? '<p>Clears old system files with admin rights, so macOS will ask for your password. Time Machine makes a snapshot first when it can.</p>' : L ? '<p>Clears system files that need admin rights, so your system will ask for your password. If Timeshift is installed, it makes a snapshot first.</p>' : '<p>Uses Microsoft\'s own tools with admin rights. Windows will show an "Allow changes?" box: click <b>Yes</b>. Windows makes a restore point first.</p>') +
       '<div class="opts"><button class="opt sel" data-m="deep"><div><b>Clean system files</b><span>' + (L ? esc(t('tile.clean_system_files.desc')) : 'Old Windows Update leftovers, error reports, setup logs, caches, and a quick drive optimize. 5-15 minutes. Never empties your Recycle Bin or touches Downloads.') + '</span></div></button>' +
       '<button class="opt" data-m="deep_repair"><div><b>' + (L ? esc(t('tile.clean_check_and_repair_windows.title')) : 'Clean + check and repair Windows') + '</b><span>' + (L ? esc(t('tile.clean_check_and_repair_windows.desc')) : 'Also runs Microsoft\'s DISM and SFC repair checks. Adds 20-30 minutes and makes your PC work harder.') + '</span></div></button>' + old + '</div>',
       'Start Deep Clean', function () { var w = $('dcOld'); run(pick, { windows_old: !!(w && w.checked) }); });
@@ -642,7 +642,7 @@ main:focus { outline:none; }
     (function () {
       if (kind === 'full') {
         var t = lastTemp == null ? '' : ' Right now it is <b>' + lastTemp + '°C</b>' + (lastTemp > 70 ? ', so Sweepwise will wait for it to cool first.' : ', so it can start straight away.');
-        modal('Full Scan', (OS === 'linux' ? '<p>ClamAV checks every file on your computer. It can take an hour or more, and you can keep working.</p>' +
+        modal('Full Scan', (OS !== 'windows' ? '<p>ClamAV checks every file on your computer. It can take an hour or more, and you can keep working.</p>' +
           '<p>Sweepwise only starts it when your computer is under 70°C with enough free memory.' + t + '</p>' : '<p>Windows Security checks every file on your PC. It usually takes 30-90 minutes and you can keep working.</p>' +
           '<p>Windows will not let a scan be paused once it starts, so Sweepwise only starts it when your PC is under 70°C with enough free memory.' + t + '</p>') +
           '<p>Tip: set your laptop on a hard surface or a stand while it runs.</p>', 'Start Full Scan', function () { run('full'); });
@@ -716,8 +716,16 @@ main:focus { outline:none; }
     startup: ['Programs that start with Windows', 'Turning one off only stops it opening by itself. Some need admin; switch those off in Task Manager.'],
     uninstall: ['Programs not used in 6 months', 'Nothing is ticked. Each program\'s own uninstaller opens. Uninstalls cannot be undone.']
   };
-  if (OS === 'linux') {
+  if (OS === 'mac') {
+    info.speed[1] = 'Proven settings that make a computer faster. Each can be switched back with Undo, and Time Machine makes a snapshot first when it can.';
+    info.updates[1] = 'Newer versions of apps you installed with Homebrew. Nothing is ticked. Close an app before updating it. Updates cannot be undone automatically.';
+    info.startup = ['Programs that start when you sign in', 'Turning one off only stops it opening by itself, just for you. Undo turns it back on.'];
+    info.uninstall = ['Apps not opened in 6 months', 'Nothing is ticked. Apps go to the Trash, so Undo or Finder\'s Put Back brings them back.'];
+  }
+  if (OS !== 'windows') {
     info.files[1] = 'Loose files on your Desktop and in Downloads, sorted into folders. Moves start unticked; only clear junk is ticked. Private-looking files go to a hidden Documents/_Private folder, unclear ones to Documents/_Review.';
+  }
+  if (OS === 'linux') {
     info.speed[1] = 'Proven settings that make a computer faster. Each can be switched back with Undo, and Timeshift makes a snapshot first when it is installed.';
     info.updates[1] = 'Newer versions of your apps from your system\'s own updater and Flatpak. Nothing is ticked. Your system asks for your password. Updates cannot be undone automatically.';
     info.startup = ['Programs that start when you sign in', 'Turning one off only stops it opening by itself, just for you. Undo turns it back on.'];
@@ -915,19 +923,19 @@ main:focus { outline:none; }
       if (!r) { $('secWhen').textContent = 'Not checked yet'; $('secBody').innerHTML = '<div class="card empty" style="grid-column:1/-1">Press Run Security check. It takes a few seconds and changes nothing.</div>'; return; }
       $('secWhen').textContent = 'Last checked ' + when(r.checked);
       var prot = (r.protection || []), bad = prot.filter(function (x) { return !x.ok; }).length;
-      var html = '<div class="card seccard"><h3>Protection <span class="tag ' + (bad ? 'bad' : 'good') + '">' + (bad ? bad + ' problem(s)' : 'all on') + '</span></h3><p class="s">' + (OS === 'linux' ? 'Virus scanner, virus definitions, firewall.' : 'Antivirus, real-time and tamper protection, virus definitions, firewall.') + '</p>' +
-        prot.map(function (x) { return chk(x.ok ? '' : 'bad', x.name, esc(x.detail), x.fix === 'update_definitions' && !x.ok ? '<div class="links"><button class="btn sm" data-run2="definitions">Update definitions now</button></div>' : x.fix === 'clamav_install' && !x.ok ? '<div class="links"><button class="btn sm primary" data-run2="clamav_install">Install ClamAV</button></div>' : ''); }).join('') + '</div>';
+      var html = '<div class="card seccard"><h3>Protection <span class="tag ' + (bad ? 'bad' : 'good') + '">' + (bad ? bad + ' problem(s)' : 'all on') + '</span></h3><p class="s">' + (OS === 'mac' ? 'XProtect, Gatekeeper, the firewall and the optional virus scanner.' : OS === 'linux' ? 'Virus scanner, virus definitions, firewall.' : 'Antivirus, real-time and tamper protection, virus definitions, firewall.') + '</p>' +
+        prot.map(function (x) { return chk(x.ok ? '' : 'bad', x.name, esc(x.detail), x.fix === 'update_definitions' && !x.ok ? '<div class="links"><button class="btn sm" data-run2="definitions">Update definitions now</button></div>' : x.fix === 'clamav_install' && (!x.ok || x.optional) ? '<div class="links"><button class="btn sm primary" data-run2="clamav_install">Install ClamAV</button></div>' : x.fix && !x.ok ? '<div class="links">' + openBtn(x.fix, 'Open settings') + '</div>' : ''); }).join('') + '</div>';
       var u = r.updates || {};
       var uLevel = u.restart_pending ? 'warn' : u.ok ? '' : 'warn';
-      html += '<div class="card seccard"><h3>' + (OS === 'linux' ? 'System updates' : 'Windows Update') + ' <span class="tag ' + (uLevel ? 'warn' : 'good') + '">' + (u.restart_pending ? 'restart needed' : u.ok ? 'up to date' : 'check it') + '</span></h3><p class="s">Updates fix the security holes viruses use.</p>' +
-        chk(u.restart_pending ? 'warn' : '', u.restart_pending ? 'A restart is needed' : 'No restart needed', u.restart_pending ? (OS === 'linux' ? 'Updates were installed that finish when you restart.' : 'Windows installed updates that finish when you restart.') : 'Nothing is waiting on a restart.') +
-        (OS === 'linux' && u.pending != null ? chk(u.pending ? 'warn' : '', 'Updates waiting', u.pending ? u.pending + ' update(s) are ready to install.' : 'Everything is up to date.') : '') +
+      html += '<div class="card seccard"><h3>' + (OS !== 'windows' ? 'System updates' : 'Windows Update') + ' <span class="tag ' + (uLevel ? 'warn' : 'good') + '">' + (u.restart_pending ? 'restart needed' : u.ok ? 'up to date' : 'check it') + '</span></h3><p class="s">Updates fix the security holes viruses use.</p>' +
+        chk(u.restart_pending ? 'warn' : '', u.restart_pending ? 'A restart is needed' : 'No restart needed', u.restart_pending ? (OS !== 'windows' ? 'Updates were installed that finish when you restart.' : 'Windows installed updates that finish when you restart.') : 'Nothing is waiting on a restart.') +
+        (OS !== 'windows' && u.pending != null ? chk(u.pending ? 'warn' : '', 'Updates waiting', u.pending ? u.pending + ' update(s) are ready to install.' : 'Everything is up to date.') : '') +
         chk(u.ok ? '' : 'warn', 'Last update installed', u.last_update ? esc(when(u.last_update)) + ' (' + u.days_since + ' days ago)<br>' + esc(u.last_title || '') : 'Unknown') +
-        '<div class="links">' + (OS === 'linux' ? openBtn('software_updates', 'Open Software Updater') : openBtn('windows_update', 'Open Windows Update')) + '</div></div>';
+        '<div class="links">' + (OS === 'mac' ? openBtn('software_updates', 'Open Software Update') : OS === 'linux' ? openBtn('software_updates', 'Open Software Updater') : openBtn('windows_update', 'Open Windows Update')) + '</div></div>';
       var auto = r.autoruns || [];
-      html += '<div class="card seccard"><h3>' + (OS === 'linux' ? 'Programs that start by themselves' : 'Startup items and scheduled tasks') + ' <span class="tag ' + (auto.length ? 'warn' : 'good') + '">' + (auto.length ? auto.length + ' to look at' : 'nothing odd') + '</span></h3><p class="s">Programs that run by themselves from unusual places, hidden scripts, unsigned programs, or entries pointing at deleted programs. Sweepwise only lists them.</p>' +
+      html += '<div class="card seccard"><h3>' + (OS !== 'windows' ? 'Programs that start by themselves' : 'Startup items and scheduled tasks') + ' <span class="tag ' + (auto.length ? 'warn' : 'good') + '">' + (auto.length ? auto.length + ' to look at' : 'nothing odd') + '</span></h3><p class="s">Programs that run by themselves from unusual places, hidden scripts, unsigned programs, or entries pointing at deleted programs. Sweepwise only lists them.</p>' +
         (auto.length ? auto.map(function (a) { return chk('warn', a.name + ' · ' + a.kind, esc((a.reasons || []).join('; ')) + '<br><span style="font-family:Consolas,monospace;font-size:12px">' + esc(String(a.command).slice(0, 160)) + '</span>'); }).join('') : chk('', 'Nothing suspicious', 'Every startup item and task looks normal.')) +
-        (OS === 'linux' ? '' : '<div class="links">' + openBtn('startup_apps', 'Open Startup apps') + openBtn('task_scheduler', 'Open Task Scheduler') + '</div>') + '</div>';
+        (OS !== 'windows' ? '' : '<div class="links">' + openBtn('startup_apps', 'Open Startup apps') + openBtn('task_scheduler', 'Open Task Scheduler') + '</div>') + '</div>';
       var ext = (r.extensions || []).filter(function (e) { return e.level !== 'ok'; }).sort(function (a, b) { return (a.level === 'check' ? 0 : 1) - (b.level === 'check' ? 0 : 1); });
       var nCheck = ext.filter(function (e) { return e.level === 'check'; }).length;
       html += '<div class="card seccard"><h3>Browser extensions <span class="tag ' + (nCheck ? 'warn' : 'good') + '">' + (nCheck ? nCheck + ' worth a look' : 'nothing risky') + '</span></h3><p class="s">Extensions can see what you do online. Yellow ones deserve a real look; blue ones are powerful but normal for their kind. Remove any you do not use.</p>' +
@@ -936,7 +944,7 @@ main:focus { outline:none; }
       var post = r.posture || [];
       if (post.length) {
         var pw = post.filter(function (p) { return p.level === 'warn'; }).length;
-        html += '<div class="card seccard"><h3>' + (OS === 'linux' ? 'Safety switches' : 'Windows safety switches') + ' <span class="tag ' + (pw ? 'warn' : 'good') + '">' + (pw ? pw + ' to look at' : 'all good') + '</span></h3><p class="s">Built-in protections that paid security suites check too.</p>' +
+        html += '<div class="card seccard"><h3>' + (OS !== 'windows' ? 'Safety switches' : 'Windows safety switches') + ' <span class="tag ' + (pw ? 'warn' : 'good') + '">' + (pw ? pw + ' to look at' : 'all good') + '</span></h3><p class="s">Built-in protections that paid security suites check too.</p>' +
           post.map(function (p) { return chk(p.level === 'good' ? '' : p.level === 'warn' ? 'warn' : 'info', p.name, esc(p.detail), p.fix && p.level !== 'good' ? '<div class="links">' + openBtn(p.fix, 'Open settings') + '</div>' : ''); }).join('') + '</div>';
       }
       var hij = r.hijack || [], hc = hij.filter(function (h) { return h.level === 'check'; }).length;
@@ -1390,7 +1398,7 @@ main:focus { outline:none; }
           row('Health score', bf.score == null ? '-' : esc(bf.score), now.score == null ? '-' : esc(now.score)) + '</tbody></table>';
         var ch = b.changes || [];
         out += ch.length ? ch.map(function (c) { return chk('', c, ''); }).join('') : '<p class="s" style="margin-top:10px">No big changes yet. Approve some speed-ups, restart your PC, then measure again.</p>';
-        if (!b.boot_known) out += '<p class="fine">' + (OS === 'linux' ? 'Startup time comes from systemd\'s own record, which this system did not provide.' : 'Startup time comes from Windows\' own record, which Sweepwise can read when it has admin permission (during Deep Clean or a restore point).') + '</p>';
+        if (!b.boot_known) out += '<p class="fine">' + (OS === 'mac' ? 'macOS does not record how long it takes to start, so startup time is left out.' : OS === 'linux' ? 'Startup time comes from systemd\'s own record, which this system did not provide.' : 'Startup time comes from Windows\' own record, which Sweepwise can read when it has admin permission (during Deep Clean or a restore point).') + '</p>';
       }
       $('boostReport').innerHTML = out;
     }).catch(function (e) { $('boostReport').innerHTML = '<p class="s">' + esc(e.message) + '</p>'; });
