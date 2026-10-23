@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sweepwise: free PC care that asks first</title>
-<meta name="description" content="Sweepwise clears junk, checks your protection and speeds up your computer, in plain English. Free for everyone, it collects nothing, and it will be open source (GPL-3.0) when it launches.">
+<meta name="description" content="Sweepwise clears junk, checks your protection and speeds up your computer, in plain English. Free for everyone, it collects nothing, and it is open source (GPL-3.0).">
 <link rel="icon" type="image/png" href="favicon.png">
 <style>
 :root { --bg:#0a1020; --card:#121c33; --card2:#16223d; --line:#22304f; --text:#e7eef9; --muted:#9aa8c3;
   --teal:#2dd4bf; --teal2:#14b8a6; --onteal:#032421; --warn:#fbbf24; }
 * { box-sizing:border-box; }
 html { scroll-behavior:smooth; }
-body { margin:0; background:var(--bg); color:var(--text); font:17px/1.6 "Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,Ubuntu,Cantarell,sans-serif; }
+body { margin:0; background:radial-gradient(900px 460px at 78% -120px, rgba(45,212,191,.13), transparent 70%) no-repeat, radial-gradient(700px 400px at -10% 480px, rgba(99,102,241,.07), transparent 70%) no-repeat, var(--bg); color:var(--text); font:17px/1.6 "Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,Ubuntu,Cantarell,sans-serif; }
 a { color:var(--teal); }
 img { max-width:100%; height:auto; display:block; }
 .wrap { max-width:1120px; margin:0 auto; padding:0 20px; }
@@ -26,20 +26,28 @@ nav a:hover, nav a:focus-visible { color:var(--text); }
 nav { display:flex; gap:18px; flex-wrap:wrap; }
 .btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:13px 22px; border-radius:12px; font-weight:600; text-decoration:none; border:1px solid var(--line); color:var(--text); background:var(--card2); }
 .btn.primary { background:linear-gradient(180deg,var(--teal),var(--teal2)); color:var(--onteal); border:0; box-shadow:0 8px 28px rgba(45,212,191,.28); }
+.btn { transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease; }
+.btn:hover { transform:translateY(-1px); border-color:var(--teal2); }
+.btn.primary:hover { box-shadow:0 10px 34px rgba(45,212,191,.38); }
 .btn[aria-disabled="true"] { opacity:.75; cursor:default; }
 .btn small { font-weight:500; opacity:.85; }
 .hero { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.25fr); gap:42px; align-items:center; padding:64px 20px 40px; }
 .hero h1 { font-size:clamp(34px,5vw,54px); line-height:1.08; margin:0 0 16px; letter-spacing:-.5px; }
-.hero h1 span { color:var(--teal); }
+.hero h1 span { background:linear-gradient(90deg,var(--teal),#7dd3fc); -webkit-background-clip:text; background-clip:text; color:transparent; }
 .lead { color:var(--muted); font-size:19px; margin:0 0 26px; }
 .ctas { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:14px; }
 .note { color:var(--muted); font-size:14px; margin:0; }
 .shot { border-radius:14px; border:1px solid var(--line); box-shadow:0 30px 80px rgba(0,0,0,.45), 0 0 0 1px rgba(45,212,191,.06); background:var(--card); }
 section { padding:56px 0; }
 h2 { font-size:clamp(26px,3.4vw,36px); margin:0 0 10px; letter-spacing:-.3px; }
+h2::before { content:""; display:block; width:38px; height:4px; border-radius:4px; margin-bottom:14px; background:linear-gradient(90deg,var(--teal),var(--teal2)); }
+.support h2::before, .privacy h2::before { margin-left:auto; margin-right:auto; }
+.privacy h2::before { margin-left:0; }
 .kicker { color:var(--muted); margin:0 0 30px; max-width:720px; }
 .cards { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; }
 .card { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:22px 22px 20px; }
+.card { transition:border-color .2s ease, transform .2s ease; }
+.card:hover { border-color:rgba(45,212,191,.4); transform:translateY(-2px); }
 .card h3 { margin:6px 0 6px; font-size:19px; }
 .card p { margin:0; color:var(--muted); font-size:15.5px; }
 .num { display:inline-flex; width:34px; height:34px; border-radius:50%; align-items:center; justify-content:center; background:rgba(45,212,191,.14); color:var(--teal); font-weight:700; }
@@ -58,9 +66,19 @@ h2 { font-size:clamp(26px,3.4vw,36px); margin:0 0 10px; letter-spacing:-.3px; }
 .privacy ul { margin:0; padding-left:20px; color:var(--muted); }
 .privacy li { margin:6px 0; }
 .support { text-align:center; }
+.support .wrap { max-width:860px; }
+.helphead { margin:46px 0 16px; font-size:22px; }
+.help { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; text-align:left; }
+.help .card { display:flex; flex-direction:column; gap:4px; }
+.help .card p { margin-bottom:14px; }
+.help .card .btn { align-self:flex-start; margin-top:auto; }
 .support .ctas { justify-content:center; margin:22px 0 10px; }
 details { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:16px 20px; margin:10px 0; }
-summary { cursor:pointer; font-weight:600; }
+summary { cursor:pointer; font-weight:600; list-style:none; display:flex; align-items:center; gap:12px; }
+summary::-webkit-details-marker { display:none; }
+summary::after { content:"+"; margin-left:auto; color:var(--teal); font-size:22px; font-weight:500; line-height:1; }
+details[open] > summary::after { content:"\2212"; }
+details[open] { border-color:rgba(45,212,191,.35); }
 details p { color:var(--muted); margin:10px 0 0; }
 footer { border-top:1px solid var(--line); padding:30px 0 40px; color:var(--muted); font-size:14px; }
 footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-between; }
@@ -68,13 +86,13 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
 @media (max-width:900px) {
   .hero, .feature, .feature.flip, .privacy { grid-template-columns:1fr; }
   .feature.flip .text { order:0; }
-  .cards, .systems { grid-template-columns:1fr; }
+  .cards, .systems, .help { grid-template-columns:1fr; }
   .grid4 { grid-template-columns:repeat(2,minmax(0,1fr)); }
   nav { display:none; }
   .hero { padding-top:36px; }
 }
 @media (max-width:520px) { .grid4 { grid-template-columns:1fr; } .privacy { padding:24px; } body { font-size:16px; } }
-@media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } }
+@media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } .btn, .card { transition:none; } .btn:hover, .card:hover { transform:none; } }
 </style>
 </head>
 <body>
@@ -85,6 +103,7 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
     <nav aria-label="Main">
       <a href="#features">Features</a>
       <a href="#privacy">Privacy</a>
+      <a href="#help">Help</a>
       <a href="#support">Support</a>
       <a href="#faq">Questions</a>
       <a href="https://github.com/AlbertanCoder/sweepwise">GitHub</a>
@@ -99,7 +118,7 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
       <p class="lead">Sweepwise clears out junk, checks that your computer is protected and speeds it up with safe settings you can undo, all in plain English. Free for everyone, kept going by people who chip in.</p>
       <div class="ctas">
         <a class="btn primary" href="https://github.com/AlbertanCoder/sweepwise/releases" aria-disabled="true">Download for Windows <small>(coming soon)</small></a>
-        <a class="btn" href="https://github.com/AlbertanCoder/sweepwise" aria-disabled="true">See the code <small>(at launch)</small></a>
+        <a class="btn" href="https://github.com/AlbertanCoder/sweepwise">See the code</a>
       </div>
       <p class="note">Windows, Linux and Mac in testing. No account, no ads, no paid version.</p>
     </div>
@@ -185,7 +204,7 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
       <div class="privacy">
         <div>
           <h2 id="priv">We collect nothing</h2>
-          <p class="kicker" style="margin-bottom:0">Your files stay on your computer, and so do your scans and choices unless you add your own AI key. Sweepwise will be open source (GPL-3.0) when it launches, so anyone can check.</p>
+          <p class="kicker" style="margin-bottom:0">Your files stay on your computer, and so do your scans and choices unless you add your own AI key. Sweepwise is open source (GPL-3.0), so anyone can check.</p>
         </div>
         <ul>
           <li>Once a day it asks GitHub for the newest version (you can switch this off).</li>
@@ -205,6 +224,11 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
         <a class="btn primary" href="https://ko-fi.com/albertancoder">Buy me a coffee on Ko-fi</a>
       </div>
       <p class="note">This isn't a charity, so support isn't tax-deductible.</p>
+      <h3 class="helphead" id="help">Need a hand?</h3>
+      <div class="help">
+        <div class="card"><h3>Something not working?</h3><p>Tell me what happened and which version of Windows you have. The page is public, so leave out anything personal.</p><a class="btn" href="https://github.com/AlbertanCoder/sweepwise/issues/new">Report a problem</a></div>
+        <div class="card"><h3>A question or an idea?</h3><p>Ask how something works, or suggest what you'd like Sweepwise to do next.</p><a class="btn" href="https://github.com/AlbertanCoder/sweepwise/discussions">Ask or suggest</a></div>
+      </div>
     </div>
   </section>
 
@@ -215,6 +239,7 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
       <details><summary>Can it delete something I need?</summary><p>Safe cleaning only touches temporary files and caches in a fixed list of places. Anything personal waits on the Approve list until you press Approve, your own files only move or go to the Recycle Bin, and History &amp; Undo brings them back.</p></details>
       <details><summary>Does it replace my antivirus?</summary><p>No. On Windows, Windows Security does the virus protection; Sweepwise checks it is switched on, runs its scans and looks for things that should not be there. On Linux it uses ClamAV, which it can install with one click.</p></details>
       <details><summary>Why does Windows warn me when I install it?</summary><p>The download from GitHub isn't signed with a paid certificate yet, so Windows shows "Windows protected your PC". Click More info, then Run anyway.</p></details>
+      <details><summary>How do I get help?</summary><p>Use "Report a problem" or "Ask or suggest" in the Need a hand? section above. Both open a page on GitHub, which needs a free GitHub account.</p></details>
       <details><summary>Do I need an AI key?</summary><p>No. Cleaning, security, speed, storage and email all work without one. A Claude or OpenAI key adds smarter suggestions, the AI Organizer and chat, and most uses cost a few cents on your own account.</p></details>
     </div>
   </section>
@@ -222,7 +247,7 @@ footer .wrap { display:flex; gap:18px; flex-wrap:wrap; justify-content:space-bet
 
 <footer>
   <div class="wrap">
-    <span>Sweepwise will be open source under the GNU GPL, version 3, when it launches. It comes with no warranty. Made by AlbertanCoder.</span>
+    <span>Sweepwise is open source under the GNU GPL, version 3. It comes with no warranty. Made by AlbertanCoder.</span>
     <span><a href="https://github.com/AlbertanCoder/sweepwise">Code</a> · <a href="https://github.com/AlbertanCoder/sweepwise/blob/main/PRIVACY.md">Privacy</a></span>
   </div>
 </footer>

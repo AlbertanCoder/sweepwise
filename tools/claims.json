@@ -9176,17 +9176,17 @@
  {
   "id": "C148",
   "source": "docs/index.html",
-  "why": "The repository is private until launch (canon point 9).",
+  "why": "The repository went public on 2026-10-23 under GPL-3.0, so the wording no longer says \"at launch\" or \"when it launches\".",
   "status": "fixed",
-  "text": "Sweepwise will be open source (GPL-3.0) when it launches, so anyone can check.",
+  "text": "Sweepwise is open source (GPL-3.0), so anyone can check.",
   "proof": [
    {
     "file": "src-tauri/Cargo.toml",
     "contains": "license = \"GPL-3.0-or-later\""
    },
    {
-    "file": "src-tauri/src/engine/update.rs",
-    "contains": "No releases yet (or the project is not public yet): nothing to tell."
+    "file": "LICENSE",
+    "contains": "GNU GENERAL PUBLIC LICENSE"
    }
   ],
   "tests": []
@@ -9718,37 +9718,37 @@
   "id": "docs-x8",
   "source": "docs/index.html",
   "status": "fixed",
-  "text": "it collects nothing, and it will be open source (GPL-3.0) when it launches.",
+  "text": "it collects nothing, and it is open source (GPL-3.0).",
   "proof": [
    {
     "file": "src-tauri/Cargo.toml",
     "contains": "license = \"GPL-3.0-or-later\""
    },
    {
-    "file": "src-tauri/src/engine/update.rs",
-    "contains": "No releases yet (or the project is not public yet): nothing to tell."
+    "file": "LICENSE",
+    "contains": "GNU GENERAL PUBLIC LICENSE"
    }
   ],
   "tests": [],
-  "why": "The meta description said 'open source' while the code is private (canon point 9)."
+  "why": "The repository went public on 2026-10-23 under GPL-3.0, so the wording no longer says \"at launch\" or \"when it launches\"."
  },
  {
   "id": "docs-x9",
   "source": "docs/index.html",
   "status": "fixed",
-  "text": "See the code <small>(at launch)</small>",
+  "text": "See the code",
   "proof": [
    {
     "file": "src-tauri/Cargo.toml",
     "contains": "license = \"GPL-3.0-or-later\""
    },
    {
-    "file": "src-tauri/src/engine/update.rs",
-    "contains": "No releases yet (or the project is not public yet): nothing to tell."
+    "file": "LICENSE",
+    "contains": "GNU GENERAL PUBLIC LICENSE"
    }
   ],
   "tests": [],
-  "why": "The button pointed at a private repository; it now says the code opens at launch, like the Download button."
+  "why": "The repository went public on 2026-10-23 under GPL-3.0, so the wording no longer says \"at launch\" or \"when it launches\"."
  },
  {
   "id": "docs-x10",
@@ -9772,19 +9772,19 @@
   "id": "docs-x12",
   "source": "docs/index.html",
   "status": "fixed",
-  "text": "Sweepwise will be open source under the GNU GPL, version 3, when it launches.",
+  "text": "Sweepwise is open source under the GNU GPL, version 3.",
   "proof": [
    {
     "file": "src-tauri/Cargo.toml",
     "contains": "license = \"GPL-3.0-or-later\""
    },
    {
-    "file": "src-tauri/src/engine/update.rs",
-    "contains": "No releases yet (or the project is not public yet): nothing to tell."
+    "file": "LICENSE",
+    "contains": "GNU GENERAL PUBLIC LICENSE"
    }
   ],
   "tests": [],
-  "why": "The footer said it 'is free software' while the code is private (canon point 9)."
+  "why": "The repository went public on 2026-10-23 under GPL-3.0, so the wording no longer says \"at launch\" or \"when it launches\"."
  },
  {
   "id": "docs-x13",
@@ -11046,5 +11046,47 @@
    "a_newer_release_shows_a_banner_and_only_its_own_page_opens"
   ],
   "why": "The same promise as about.privacy.title (A058): no account, analytics or crash uploads, and screen errors stay on the PC."
+ },
+ {
+  "id": "docs-help1",
+  "source": "docs/index.html",
+  "status": "fixed",
+  "text": "Report a problem",
+  "proof": [
+   {
+    "file": "src/index.html",
+    "contains": "data-open=\"issues\""
+   }
+  ],
+  "tests": [],
+  "why": "Opens GitHub's new-issue page on the public repository (Issues are switched on)."
+ },
+ {
+  "id": "docs-help2",
+  "source": "docs/index.html",
+  "status": "fixed",
+  "text": "Ask or suggest",
+  "proof": [
+   {
+    "file": "src/index.html",
+    "contains": "data-open=\"issues\""
+   }
+  ],
+  "tests": [],
+  "why": "Opens GitHub Discussions on the public repository (switched on 2026-10-23)."
+ },
+ {
+  "id": "docs-help3",
+  "source": "docs/index.html",
+  "status": "fixed",
+  "text": "Both open a page on GitHub, which needs a free GitHub account.",
+  "proof": [
+   {
+    "file": "src/index.html",
+    "contains": "data-open=\"issues\""
+   }
+  ],
+  "tests": [],
+  "why": "Opening an issue or a discussion on GitHub needs a GitHub account."
  }
 ]
