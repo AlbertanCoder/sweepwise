@@ -7470,7 +7470,7 @@
    },
    {
     "file": "src-tauri/src/engine/update.rs",
-    "contains": "let enabled = eng.setting(\"update_check\").as_bool().unwrap_or(true);"
+    "contains": "let enabled = !store && eng.setting(\"update_check\").as_bool().unwrap_or(true);"
    },
    {
     "file": "src/index.html",
@@ -9204,7 +9204,7 @@
    },
    {
     "file": "src-tauri/src/engine/update.rs",
-    "contains": "let enabled = eng.setting(\"update_check\").as_bool().unwrap_or(true);"
+    "contains": "let enabled = !store && eng.setting(\"update_check\").as_bool().unwrap_or(true);"
    }
   ],
   "tests": [

@@ -1582,10 +1582,10 @@ body[data-view="list"] #chatFab { bottom:118px; }
     var ai = null, upd = null, sts = null;
     function band() {
       if (!sts) return;
-      var o = sts.settings || {}, uOn = o.update_check !== false;
+      var o = sts.settings || {}, uOn = o.update_check !== false, uStore = !!(upd && upd.store);
       var rc = [['info', o.reminder ? t('settings.rc.rem_on', 'Weekly reminder on') : t('settings.rc.rem_off', 'Weekly reminder off')],
         ['info', o.auto_clean ? t('settings.rc.auto_on', 'Weekly auto-clean on') : t('settings.rc.auto_off', 'Weekly auto-clean off')],
-        ['info', !uOn ? t('settings.rc.upd_off', 'Update check off') : upd && upd.checked ? tf('settings.rc.upd_at', 'Update check on, last checked {at}', { at: at(upd.checked) }) : t('settings.rc.upd_on', 'Update check on')]];
+        ['info', uStore ? t('settings.rc.upd_store', 'Updates come from the Microsoft Store') : !uOn ? t('settings.rc.upd_off', 'Update check off') : upd && upd.checked ? tf('settings.rc.upd_at', 'Update check on, last checked {at}', { at: at(upd.checked) }) : t('settings.rc.upd_on', 'Update check on')]];
       if (ai) rc.push(['info', ai.connected ? t('settings.rc.ai_on', 'AI helper on') : t('settings.rc.ai_off', 'AI helper off')]);
       pband('setBand', 'ok', t('settings.verdict', 'Sweepwise collects nothing'), rc);
     }
@@ -1596,7 +1596,7 @@ body[data-view="list"] #chatFab { bottom:118px; }
       themeButtons(st.theme || 'dark'); swSet($('advSwitch'), st.advanced); swSet($('remSwitch'), st.reminder); swSet($('updSwitch'), st.update_check !== false);
       band();
     }).catch(function () {});
-    api('/api/update').then(function (u) { upd = u; updStateText(u); band(); }).catch(function () {});
+    api('/api/update').then(function (u) { upd = u; updStateText(u); $('updSwitch').closest('.card').hidden = !!u.store; band(); }).catch(function () {});
   }
   // ---------- theme, advanced details, reminder, updates (Settings) ----------
   function applyTheme(th) { document.documentElement.setAttribute('data-theme', th === 'light' ? 'light' : 'dark'); }

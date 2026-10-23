@@ -494,6 +494,7 @@
  "settings.rc.auto_on": "Weekly auto-clean on",
  "settings.rc.auto_off": "Weekly auto-clean off",
  "settings.rc.upd_on": "Update check on",
+ "settings.rc.upd_store": "Updates come from the Microsoft Store",
  "settings.rc.upd_off": "Update check off",
  "settings.rc.upd_at": "Update check on, last checked {at}",
  "settings.rc.ai_on": "AI helper on",

@@ -12,6 +12,16 @@ pub const RELEASES_API: &str = "https://api.github.com/repos/AlbertanCoder/sweep
 /// Only release pages of Sweepwise's own repository are ever opened from the banner.
 pub const RELEASES_PAGE: &str = "https://github.com/AlbertanCoder/sweepwise/releases";
 
+/// True for a copy installed from the Microsoft Store (Windows puts those under ...\WindowsApps\...).
+pub fn is_store_path(p: &std::path::Path) -> bool {
+    p.to_string_lossy().to_lowercase().replace('/', "\\").contains("\\windowsapps\\")
+}
+
+/// The Store updates its own copy, so a Store copy never asks GitHub about new versions.
+pub fn from_store() -> bool {
+    std::env::current_exe().map_or(false, |p| is_store_path(&p))
+}
+
 pub fn current() -> &'static str {
     env!("CARGO_PKG_VERSION")
 }
@@ -40,6 +50,9 @@ fn file(cfg: &Config) -> std::path::PathBuf {
 /// Asks GitHub now and saves the answer.
 pub fn check(cfg: &Config) -> Value {
     let url = cfg.update_url.clone().unwrap_or_else(|| RELEASES_API.to_string());
+    if from_store() && cfg.update_url.is_none() {
+        return json!({ "checked": Value::Null, "newer": false, "note": "The Microsoft Store updates this version." });
+    }
     if cfg.test && cfg.update_url.is_none() {
         return json!({ "checked": Value::Null, "newer": false, "note": "practice mode" });
     }
@@ -71,7 +84,8 @@ pub fn check(cfg: &Config) -> Value {
 /// GET /api/update: the saved answer; starts a fresh check in the background when the last one is a day old.
 pub fn state(eng: &Arc<Engine>) -> Value {
     let cfg = &eng.cfg;
-    let enabled = eng.setting("update_check").as_bool().unwrap_or(true);
+    let store = from_store();
+    let enabled = !store && eng.setting("update_check").as_bool().unwrap_or(true);
     let saved = util::read_json(&file(cfg)).unwrap_or_else(|| json!({ "newer": false }));
     let stale = saved["checked"].as_str().and_then(|s| chrono::NaiveDateTime::parse_from_str(s, "%Y-%m-%dT%H:%M:%S").ok()).map_or(true, |t| (util::now().naive_local() - t).num_hours() >= 24);
     if enabled && stale && !eng.update_started.swap(true, Ordering::SeqCst) {
@@ -82,6 +96,7 @@ pub fn state(eng: &Arc<Engine>) -> Value {
     }
     let mut out = saved;
     out["enabled"] = json!(enabled);
+    out["store"] = json!(store);
     out["current"] = json!(current());
     // A banner only for a version newer than this one (after updating, the saved answer is no longer "newer").
     let newer = out["latest"].as_str().map_or(false, |l| is_newer(l, current()));
@@ -135,6 +150,16 @@ mod tests {
         assert_eq!(r["newer"], false);
         assert_eq!(r["note"], "No releases yet.");
         testutil::clean(&root);
+    }
+
+    #[test]
+    fn a_store_copy_is_told_apart_from_a_normal_install() {
+        use std::path::Path;
+        assert!(is_store_path(Path::new("C:\\Program Files\\WindowsApps\\AlbertanCoder.Sweepwise_0.1.0.0_x64__abc123\\sweepwise.exe")));
+        assert!(is_store_path(Path::new("c:/program files/windowsapps/x/sweepwise.exe")));
+        assert!(!is_store_path(Path::new("C:\\Program Files\\Sweepwise\\sweepwise.exe")));
+        assert!(!is_store_path(Path::new("C:\\Users\\Me\\windowsapps2\\sweepwise.exe")));
+        assert!(!from_store(), "the test program is not a Store copy");
     }
 
     #[test]
