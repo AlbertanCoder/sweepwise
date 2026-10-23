@@ -363,7 +363,6 @@ pub fn browser_caches(cfg: &Config) -> Vec<Value> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::time::Duration;
 
     fn age(p: &Path, days: u64) {
         crate::engine::testutil::make_old(p, days);

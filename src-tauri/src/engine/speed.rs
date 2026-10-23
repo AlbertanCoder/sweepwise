@@ -269,7 +269,7 @@ pub fn program_leftovers(cfg: &Config) -> Vec<Value> {
     let (full, words): (HashSet<String>, HashSet<String>) = if cfg.test { (HashSet::new(), HashSet::new()) } else { mac_names(cfg) };
     #[cfg(not(any(windows, target_os = "linux", target_os = "macos")))]
     let (full, words): (HashSet<String>, HashSet<String>) = (HashSet::new(), HashSet::new());
-    let mut roots: Vec<(&str, PathBuf)> = if cfg!(windows) {
+    let roots: Vec<(&str, PathBuf)> = if cfg!(windows) {
         vec![("AppData\\Roaming", cfg.roaming.clone()), ("AppData\\Local", cfg.local.clone())]
     } else if cfg!(target_os = "macos") {
         vec![("~/Library/Application Support", cfg.config.clone()), ("~/Library/Caches", cfg.cache.clone())]

@@ -2,7 +2,6 @@
 // here deletes anything for good, and the Recycle Bin is never emptied. Each change is written to the run's
 // undo.json the moment it happens, so Undo still works after a crash. Uninstalls cannot be undone.
 use super::util;
-#[cfg(windows)]
 use super::util::fmt_size;
 use super::{clean, runs, Config};
 use serde_json::{json, Map, Value};
