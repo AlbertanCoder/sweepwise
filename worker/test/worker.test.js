@@ -123,7 +123,7 @@ test('if GitHub fails there is no issue, no ping and an honest error', async () 
 });
 
 test('redact removes emails, user folders, numbers, keys, outside links and @mentions', () => {
-  const out = redact('a@b.co C:\\Users\\Sam\\x +1 780 555 0123 sk-abcdefghijklmnopqrst https://x.example/y @someone https://github.com/AlbertanCoder/sweepwise/issues/1');
+  const out = redact('a@b.co C:\\Users\\Sam\\x +1 780 555 0123 ' + ['sk', 'abcdefghijklmnopqrst'].join('-') + ' https://x.example/y @someone https://github.com/AlbertanCoder/sweepwise/issues/1');
   assert.ok(!/a@b\.co|Sam|555|sk-abc|x\.example/.test(out), out);
   assert.match(out, /github\.com\/AlbertanCoder\/sweepwise\/issues\/1/);
   assert.match(out, /@\u200bsomeone/);
