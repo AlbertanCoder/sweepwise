@@ -7,7 +7,7 @@
          IgnorableNamespaces="uap rescap desktop6">
   <Identity Name="{{IDENTITY_NAME}}" Publisher="{{PUBLISHER}}" Version="{{VERSION}}" ProcessorArchitecture="x64" />
   <Properties>
-    <DisplayName>Sweepwise</DisplayName>
+    <DisplayName>{{DISPLAY_NAME}}</DisplayName>
     <PublisherDisplayName>{{PUBLISHER_DISPLAY}}</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
     <!-- Sweepwise cleans other programs' folders and changes startup and settings, so writes must reach the real disk and registry, not a private copy. -->

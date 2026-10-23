@@ -1,11 +1,12 @@
 # Packs the Windows release program into an .msix for the Microsoft Store (the Store signs it, so it is left unsigned here).
-# Usage: build_msix.ps1 -Exe <path to sweepwise.exe> -IdentityName <Package/Identity/Name> -Publisher <CN=...> -PublisherDisplay <name> [-Version 0.1.0.0] [-Out <folder>]
+# Usage: build_msix.ps1 -Exe <path to sweepwise.exe> -IdentityName <Package/Identity/Name> -Publisher <CN=...> -PublisherDisplay <name> [-DisplayName 'Sweepwise PC Care' (must equal the name reserved in Partner Center)] [-Version 0.1.0.0] [-Out <folder>]
 # The three identity values come from Partner Center (Product identity) after the name Sweepwise is reserved.
 param(
   [Parameter(Mandatory)][string]$Exe,
   [Parameter(Mandatory)][string]$IdentityName,
   [Parameter(Mandatory)][string]$Publisher,
   [Parameter(Mandatory)][string]$PublisherDisplay,
+  [string]$DisplayName = 'Sweepwise PC Care',
   [string]$Version = '0.1.0.0',
   [string]$Out = (Join-Path $PSScriptRoot 'out')
 )
@@ -20,7 +21,7 @@ New-Item -ItemType Directory -Force (Join-Path $layout 'Assets') | Out-Null
 Copy-Item $Exe (Join-Path $layout 'sweepwise.exe')
 foreach ($n in 'StoreLogo', 'Square44x44Logo', 'Square150x150Logo') { Copy-Item (Join-Path $repo "src-tauri\icons\$n.png") (Join-Path $layout "Assets\$n.png") }
 $x = Get-Content (Join-Path $PSScriptRoot 'AppxManifest.xml.template') -Raw
-$x = $x.Replace('{{IDENTITY_NAME}}', $IdentityName).Replace('{{PUBLISHER}}', $Publisher).Replace('{{PUBLISHER_DISPLAY}}', $PublisherDisplay).Replace('{{VERSION}}', $Version)
+$x = $x.Replace('{{IDENTITY_NAME}}', $IdentityName).Replace('{{PUBLISHER}}', $Publisher).Replace('{{PUBLISHER_DISPLAY}}', $PublisherDisplay).Replace('{{DISPLAY_NAME}}', $DisplayName).Replace('{{VERSION}}', $Version)
 [IO.File]::WriteAllText((Join-Path $layout 'AppxManifest.xml'), $x, (New-Object Text.UTF8Encoding $false))
 $pkg = Join-Path $Out "Sweepwise_${Version}_x64.msix"
 if (Test-Path $pkg) { Remove-Item $pkg -Force }
