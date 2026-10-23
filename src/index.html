@@ -138,6 +138,14 @@ button.attn:hover { border-color:var(--teal2); }
 .chips { display:flex; gap:8px; flex-wrap:wrap; margin:0 0 16px; }
 .chip { background:var(--card); border:1px solid var(--line); border-radius:999px; padding:6px 14px; color:var(--muted); font-size:14px; }
 .chip.on { border-color:var(--teal2); color:var(--text); background:var(--card2); }
+details.sect { margin-bottom:10px; }
+details.sect > summary { display:flex; align-items:center; gap:10px; cursor:pointer; list-style:none; padding:11px 14px; background:var(--card2); border:1px solid var(--line2); border-radius:12px; }
+details.sect > summary::-webkit-details-marker { display:none; }
+details.sect > summary::after { content:"+"; margin-left:auto; color:var(--tealtext); font-weight:700; }
+details.sect[open] > summary::after { content:"\2212"; } details.sect[open] > summary { margin-bottom:10px; }
+details.sect .sname { font-size:16px; font-weight:600; } details.sect > summary small { color:var(--muted); font-size:13px; }
+details.sect .secgap { width:16px; flex:none; } details.sect .secpick { flex:none; }
+.ltools { display:flex; flex-wrap:wrap; gap:10px; margin:6px 0 0; }
 .sect { margin-bottom:22px; } .sect h3 { font-size:16px; margin:0 0 4px; } .sect h3 small { color:var(--muted); font-weight:500; margin-left:6px; }
 .sect p { color:var(--muted); font-size:13px; margin:0 0 10px; }
 .rows { overflow:hidden; }
@@ -518,8 +526,9 @@ body[data-view="list"] #chatFab { bottom:118px; }
     <section class="card band sm" id="listBand" aria-labelledby="listBandV"><div class="band-emblem lv-none" id="listBandEm"></div><div class="band-main"><h2 id="listBandV" aria-live="polite"></h2><ul class="receipts" id="listBandR" hidden></ul></div></section>
     <p class="sub psub" id="listSub" data-i18n="sub.listSub">Tick what you want. Nothing happens until you press Approve.</p>
     <div class="chips" id="chips"></div>
+    <div class="ltools" id="listTools" hidden><button class="btn" id="tickSafe" type="button">Tick all safe items</button><button class="btn" id="openAll" type="button">Open all groups</button></div>
     <div id="listBody"></div>
-    <div class="abar" id="approveBar" hidden><div class="abar-info" aria-live="polite"><b id="approveSel"></b><span class="abar-undo" id="approveUndo" hidden></span></div><div class="abar-btns"><button class="btn" id="undoBtn" disabled>Undo this run</button><button class="btn primary" id="approveBtn" data-i18n="button.approve_ticked_items">Approve ticked items</button></div><span id="listStatus" role="status"></span></div>
+    <div class="abar" id="approveBar" hidden><div class="abar-info" aria-live="polite"><b id="approveSel"></b><span class="abar-undo" id="approveUndo" hidden></span></div><div class="abar-btns"><button class="btn" id="clearAll" type="button" disabled>Clear all</button><button class="btn" id="undoBtn" disabled>Undo this run</button><button class="btn primary" id="approveBtn" data-i18n="button.approve_ticked_items">Approve ticked items</button></div><span id="listStatus" role="status"></span></div>
   </section>
 
   <section class="view" id="v-history">
@@ -1218,8 +1227,8 @@ body[data-view="list"] #chatFab { bottom:118px; }
   // One row: its tick box (as it came from the scan), the name, why and where, then its size and what approving does.
   function lrowHtml(s, i, res) {
     var r = res[i.id], done = r && r.ok, where = whereOf(s, i), what = whatOf(s, i);
-    var box = i.can_do && !done ? '<input type="checkbox" class="pick" value="' + esc(i.id) + '"' + (i.checked ? ' checked' : '') + ' aria-label="Approve ' + esc(i.title) + '">' : '';
-    return '<div class="lrow' + (done ? ' done' : r ? ' failed' : '') + '" id="row-' + esc(i.id) + '"><div>' + box + '</div>' +
+    var box = i.can_do && !done ? '<input type="checkbox" class="pick" value="' + esc(i.id) + '" data-sec="' + s + '"' + (i.checked ? ' checked data-scan="1"' : '') + ' aria-label="Approve ' + esc(i.title) + '">' : '';
+    return '<div class="lrow' + (done ? ' done' : r ? ' failed' : '') + (/code history/.test(i.why || '') ? ' risky' : '') + '" id="row-' + esc(i.id) + '"><div>' + box + '</div>' +
       '<div class="lrow-t">' + titleOf(s, i) + (where ? '<span class="where">' + esc(where) + '</span>' : '') + '</div>' +
       '<div class="lrow-s">' + (+i.size > 0 ? '<b>' + size(i.size) + '</b>' : '') + (what ? '<span class="what">' + what + '</span>' : '') + '</div>' +
       (r ? '<div class="res">' + (r.ok ? '✓ ' : '✗ ') + esc(r.message) + '</div>' : '') + '</div>';
@@ -1243,13 +1252,46 @@ body[data-view="list"] #chatFab { bottom:118px; }
     var picked = Array.prototype.map.call(document.querySelectorAll('#listBody input.pick:checked'), function (x) { return listItems[x.value] || {}; });
     var n = picked.length, bytes = 0, un = 0, up = 0;
     picked.forEach(function (i) { bytes += i.size || 0; if (i.s === 'updates') up++; else if (i.s === 'uninstall' && OS !== 'mac') un++; });
-    $('approveSel').textContent = !n ? t('list.bar.none', 'Nothing ticked yet') : (n === 1 ? t('list.bar.one', 'Selected: 1 item') : tf('list.bar.many', 'Selected: {n} items', { n: n })) + (bytes ? ' · ' + size(bytes) : '');
+    $('approveSel').textContent = !n ? t('list.bar.none', 'Nothing ticked yet') : (n === 1 ? t('list.bar.one', '1 ticked') : tf('list.bar.many', '{n} ticked', { n: n })) + (bytes ? ' · ' + size(bytes) : '');
     var words2 = un && up ? t('list.bar.no_undo_both', "Uninstalls and app updates can't be undone.") : un ? t('list.bar.no_undo_un', "Uninstalls can't be undone.") : up ? t('list.bar.no_undo_up', "App updates can't be undone.") : t('list.bar.undo', 'These changes can be undone.');
     if ((un || up) && un + up < n) words2 += ' ' + t('list.bar.rest', 'The rest can be undone.');
     $('approveUndo').innerHTML = n ? st(un || up ? 'warn' : 'ok') + '<span>' + esc(words2) + '</span>' : '';
     $('approveUndo').hidden = !n;
+    $('clearAll').disabled = !n;
+    Array.prototype.forEach.call(document.querySelectorAll('#listBody details.sect'), function (d) {
+      var sp = d.querySelector('.secpick'); if (!sp) return;
+      var boxes = Array.prototype.filter.call(d.querySelectorAll('input.pick'), function (x) { return !x.closest('details.hid'); });
+      var on = boxes.filter(function (x) { return x.checked; }).length;
+      sp.checked = !!boxes.length && on === boxes.length; sp.indeterminate = on > 0 && on < boxes.length;
+    });
   }
-  $('listBody').addEventListener('change', function (e) { if (e.target.classList && e.target.classList.contains('pick')) barUpdate(); });
+  var openSecs = {};
+  $('listBody').addEventListener('change', function (e) {
+    var c = e.target.classList; if (!c) return;
+    if (c.contains('secpick')) {
+      Array.prototype.forEach.call(e.target.closest('details.sect').querySelectorAll('input.pick'), function (x) { if (!x.closest('details.hid')) x.checked = e.target.checked; });
+      barUpdate();
+    } else if (c.contains('pick')) barUpdate();
+  });
+  $('listBody').addEventListener('toggle', function (e) { if (e.target.classList && e.target.classList.contains('sect')) openSecs[e.target.dataset.sec] = e.target.open; }, true);
+  // Ticks only what is clearly safe: in Safe to clean, never a folder with code history, and never an AI or left-behind
+  // item the scan did not tick itself (models and old program folders are for you to pick).
+  $('tickSafe').addEventListener('click', function () {
+    Array.prototype.forEach.call(document.querySelectorAll('#listBody .lgroup[data-group="safe"] input.pick'), function (x) {
+      if (x.closest('details.hid') || x.closest('.lrow.risky')) return;
+      if (x.dataset.sec === 'files' || x.dataset.scan) x.checked = true;
+    });
+    barUpdate();
+  });
+  $('clearAll').addEventListener('click', function () {
+    Array.prototype.forEach.call(document.querySelectorAll('#listBody input.pick:checked'), function (x) { x.checked = false; });
+    barUpdate();
+  });
+  $('openAll').addEventListener('click', function () {
+    var open = $('openAll').dataset.open !== '1';
+    Array.prototype.forEach.call(document.querySelectorAll('#listBody details.sect'), function (d) { d.open = open; });
+    $('openAll').dataset.open = open ? '1' : ''; $('openAll').textContent = open ? 'Close all groups' : 'Open all groups';
+  });
   function loadList() {
     if (!$('listBody').innerHTML) $('listBody').innerHTML = skel(4);
     api('/api/list').then(function (d) {
@@ -1258,7 +1300,7 @@ body[data-view="list"] #chatFab { bottom:118px; }
         pband('listBand', 'none', t('list.verdict.no_run', 'No suggestions yet'), []);
         $('chips').innerHTML = '';
         $('listBody').innerHTML = '<div class="card empty">' + esc(t('list.empty', 'Press Check my PC on Home, and Sweepwise lists its suggestions here for your OK.')) + '</div>';
-        $('approveBtn').disabled = true; $('approveBar').hidden = true; return;
+        $('approveBtn').disabled = true; $('approveBar').hidden = true; $('listTools').hidden = true; return;
       }
       var p = d.proposals || {}, res = d.results || {};
       $('undoBtn').disabled = !d.undo_left;
@@ -1294,21 +1336,30 @@ body[data-view="list"] #chatFab { bottom:118px; }
       var html = '', any = false;
       lgroups.forEach(function (g) {
         var body = '', n = 0, bytes = 0;
-        g.parts.forEach(function (part) {
+        function partBytes(part) { var b = 0; partItems(p, part).forEach(function (i) { if (i.can_do && !(res[i.id] && res[i.id].ok)) b += +i.size || 0; }); return b; }
+        // Biggest first; the "Your call" startup programs come last.
+        g.parts.slice().sort(function (a, b) { return a[0] === 'startup' ? 1 : b[0] === 'startup' ? -1 : partBytes(b) - partBytes(a); }).forEach(function (part) {
           var s = part[0], junk = part[1] === 'junk';
           if (filter !== 'all' && filter !== chipOf(s)) return;
-          var items = partItems(p, part);
-          items.forEach(function (i) { if (i.can_do && !(res[i.id] && res[i.id].ok)) { n++; bytes += +i.size || 0; } });
-          body += '<div class="sect"><h3>' + esc(junk ? t('list.junk.title', 'Junk files') : info[s][0]) + '<small>' + items.length + '</small></h3><p>' +
+          var items = partItems(p, part), key = g.key + ':' + s + (part[1] || '');
+          var todo = items.filter(function (i) { return i.can_do && !(res[i.id] && res[i.id].ok); }), tb = 0;
+          todo.forEach(function (i) { tb += +i.size || 0; });
+          n += todo.length; bytes += tb;
+          var title = junk ? t('list.junk.title', 'Junk files') : info[s][0];
+          var cnt = todo.length ? (todo.length === 1 ? t('list.group.count_one', '1 to approve') : tf('list.group.count', '{n} to approve', { n: todo.length })) + (tb ? ' · ' + size(tb) : '') : t('list.sect.none', 'Nothing this time');
+          body += '<details class="sect" data-sec="' + key + '"' + (openSecs[key] ? ' open' : '') + '><summary>' + (todo.length ? '<input type="checkbox" class="secpick" aria-label="Tick everything in ' + esc(title) + '">' : '<span class="secgap"></span>') +
+            '<span class="sname">' + esc(title) + '</span><small>' + esc(cnt) + '</small></summary><p>' +
             esc(junk ? t('list.junk.desc', 'Empty files, leftover temporary files, installers older than 30 days and exact copies, from your Desktop and Downloads. Approved ones go to the Recycle Bin.') : words(info[s][1])) + '</p>';
-          var res2 = res;
-          var shown = items.filter(function (i) { return !i.hidden || (res2[i.id] && res2[i.id].ok); });
-          var hid = items.filter(function (i) { return i.hidden && !(res2[i.id] && res2[i.id].ok); });
-          if (!shown.length && !hid.length) { body += '<div class="card empty" style="padding:18px">Nothing here this time.</div></div>'; return; }
+          var res2 = res, isDone = function (i) { return res2[i.id] && res2[i.id].ok; };
+          var shown = items.filter(function (i) { return !i.hidden && !isDone(i); });
+          var hid = items.filter(function (i) { return i.hidden && !isDone(i); });
+          var fin = items.filter(isDone);
+          if (!shown.length && !hid.length && !fin.length) { body += '<div class="card empty" style="padding:18px">Nothing here this time.</div></details>'; return; }
           any = any || shown.some(function (i) { return i.can_do; });
           if (shown.length) body += '<div class="card rows">' + shown.map(function (i) { return lrowHtml(s, i, res2); }).join('') + '</div>';
           if (hid.length) body += '<details class="hid"><summary>' + hid.length + ' hidden because you said no twice</summary><div class="card rows" style="margin-top:8px">' + hid.map(function (i) { return lrowHtml(s, i, res2); }).join('') + '</div></details>';
-          body += '</div>';
+          if (fin.length) body += '<details class="hid"><summary>' + fin.length + ' done</summary><div class="card rows" style="margin-top:8px">' + fin.map(function (i) { return lrowHtml(s, i, res2); }).join('') + '</div></details>';
+          body += '</details>';
         });
         if (!body) return;
         // How much of the group you can still approve (rows that are list-only or done don't count).
@@ -1317,7 +1368,7 @@ body[data-view="list"] #chatFab { bottom:118px; }
       });
       $('listBody').innerHTML = html;
       $('approveBtn').disabled = !any;
-      $('approveBar').hidden = false;
+      $('approveBar').hidden = false; $('listTools').hidden = false;
       barUpdate();
       var rc = [['info', tf('list.rc.from', 'From the scan {at}', { at: at(d.when) })]];
       if (doneN) rc.push(['ok', tf('list.rc.done', '{n} done from this list', { n: doneN })]);

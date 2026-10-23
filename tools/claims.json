@@ -6266,7 +6266,7 @@
    },
    {
     "file": "src/index.html",
-    "contains": "class=\"pick\" value=\"' + esc(i.id) + '\"' + (i.checked ? ' checked' : '')"
+    "contains": "class=\"pick\" value=\"' + esc(i.id) + '\" data-sec=\"' + s + '\"' + (i.checked ? ' checked data-scan=\"1\"' : '')"
    },
    {
     "file": "src-tauri/src/engine/files.rs",
@@ -8494,7 +8494,7 @@
    },
    {
     "file": "src/index.html",
-    "contains": "class=\"pick\" value=\"' + esc(i.id) + '\"' + (i.checked ? ' checked' : '')"
+    "contains": "class=\"pick\" value=\"' + esc(i.id) + '\" data-sec=\"' + s + '\"' + (i.checked ? ' checked data-scan=\"1\"' : '')"
    },
    {
     "file": "src-tauri/src/engine/files.rs",
