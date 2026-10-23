@@ -9851,5 +9851,290 @@
   ],
   "tests": [],
   "why": "Support opens the Ko-fi page in the browser; Sweepwise has no payment code (replaces the retired A056, which also named GitHub)."
+ },
+ {
+  "id": "look-a-1",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"home.check.hint\": \"Cleans junk, checks for viruses where it can, then lists suggestions for your OK.\"",
+  "proof": [
+   {
+    "file": "src/index.html",
+    "contains": "$('bigBtn').addEventListener('click', function () { run('scan_clean'); });"
+   },
+   {
+    "file": "src-tauri/src/engine/defender.rs",
+    "contains": "None => (\"not run\".into(), missing.into()),"
+   },
+   {
+    "file": "src-tauri/src/engine/runs.rs",
+    "contains": "if first && !confirmed {"
+   }
+  ],
+  "tests": [],
+  "why": "Check my PC is the old Scan & Clean button (id bigBtn, mode scan_clean): it clears temp files and caches, runs a quick virus scan only where a scanner exists (none on a Mac or Linux computer without ClamAV), then lists suggestions for your OK; the very first run only measures until Clean now. Same sentence as B001."
+ },
+ {
+  "id": "look-a-2",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"home.wait.desc\": \"Nothing changes until you press Approve.\"",
+  "proof": [
+   {
+    "file": "src-tauri/src/engine/actions.rs",
+    "contains": "/// Runs the approved ids in a safe order. Only items on the list that are allowed (can_do) ever run."
+   },
+   {
+    "file": "src/index.html",
+    "contains": "api('/api/approve', { run: listRun, ids: ids, unticked: unticked })"
+   }
+  ],
+  "tests": [
+   "approve_then_undo_puts_everything_back"
+  ],
+  "why": "The card's suggestions are the Approve list's; the list acts only on the ticked ids sent when you press Approve."
+ },
+ {
+  "id": "look-a-3",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"home.undo.note\": \"Changes you approve can be undone, except uninstalls and app updates.\"",
+  "proof": [
+   {
+    "file": "src-tauri/src/engine/actions.rs",
+    "contains": "uninstalled programs cannot be put back automatically"
+   },
+   {
+    "file": "src-tauri/src/engine/actions.rs",
+    "contains": "app updates cannot be undone automatically"
+   },
+   {
+    "file": "src-tauri/src/engine/programs.rs",
+    "contains": "It goes to the Trash, so Undo or Finder's Put Back brings it back."
+   }
+  ],
+  "tests": [
+   "approve_then_undo_puts_everything_back"
+  ],
+  "why": "The canon short form, as in about.promise.2 (A074): Undo reverses approved moves, binned files, startup programs and Speed Boost settings, not uninstalls or app updates (on a Mac removed apps do come back, so this under-promises there)."
+ },
+ {
+  "id": "look-a-4",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"home.undo.junk\": \"Cleared temporary files and caches are deleted for good.\"",
+  "proof": [
+   {
+    "file": "src-tauri/src/engine/clean.rs",
+    "contains": "match fs::remove_file(f) {"
+   },
+   {
+    "file": "src-tauri/src/engine/runs.rs",
+    "contains": "let done = clean::execute(cfg, &plan, &dir.join(\"caches_deleted.csv\"));"
+   }
+  ],
+  "tests": [
+   "only_old_cache_files_are_removed"
+  ],
+  "why": "The clean removes them with fs::remove_file (no Recycle Bin) and only lists them in caches_deleted.csv, so Undo has nothing to put back; the Undo card offers no undo for the junk clean."
+ },
+ {
+  "id": "look-a-5",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"home.temp.wait\": \"A full virus scan waits until your PC cools to 70 °C.\"",
+  "proof": [
+   {
+    "file": "src-tauri/src/engine/defender.rs",
+    "contains": "if t <= 70.0 && free >= 1.5 {"
+   },
+   {
+    "file": "src/index.html",
+    "contains": "$('tempWait').hidden = !(c > 70);"
+   }
+  ],
+  "tests": [],
+  "why": "Shown only above 70 °C; Full Scan's heat guard starts only at 70 °C or below (with 1.5 GB of memory free), so above 70 it waits for the PC to cool to 70."
+ },
+ {
+  "id": "look-a-6",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"home.fix.threat\": \"Windows Security's Protection history shows what it found and what it did.\"",
+  "proof": [
+   {
+    "file": "src-tauri/src/engine/defender.rs",
+    "contains": "See Windows Security > Protection history."
+   },
+   {
+    "file": "src/index.html",
+    "contains": "if (win) { fix = t('home.fix.threat'"
+   }
+  ],
+  "tests": [],
+  "why": "Shown only on Windows when the last clean-up's quick scan found threats; Sweepwise's own scan report sends people to the same Protection history, where Windows Security lists each detection and the action it took."
+ },
+ {
+  "id": "look-a-7",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"home.row.privacy.fact\": \"Apps that used your camera or microphone\"",
+  "proof": [
+   {
+    "file": "src-tauri/src/engine/security.rs",
+    "contains": "/// Apps that used the camera or microphone in the last 30 days (Windows' own record), newest first."
+   },
+   {
+    "file": "src/index.html",
+    "contains": "if (win) rows.push({ go: 'security', name: t('home.row.privacy', 'Privacy')"
+   }
+  ],
+  "tests": [],
+  "why": "The Security check reads Windows' record of apps that used the camera or microphone; the row is only shown on Windows, the one system where that part of the check exists."
+ },
+ {
+  "id": "look-a-8",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"home.row.sec.fact\": \"Firewall, updates, startup items and browsers\"",
+  "proof": [
+   {
+    "file": "src-tauri/src/engine/security.rs",
+    "contains": "checking your virus protection, firewall and safety switches..."
+   },
+   {
+    "file": "src-tauri/src/engine/security.rs",
+    "contains": "checking programs that start by themselves..."
+   },
+   {
+    "file": "src-tauri/src/engine/security.rs",
+    "contains": "checking browser extensions and browser settings (search engine, proxy, hosts file)..."
+   },
+   {
+    "file": "src-tauri/src/engine/security.rs",
+    "contains": "checking for system updates..."
+   }
+  ],
+  "tests": [
+   "extensions_are_judged_by_their_powers",
+   "suspicious_commands_are_explained"
+  ],
+  "why": "The Security check's four steps cover the firewall (with virus protection and safety switches), programs that start by themselves, browser extensions and settings, and updates, on every system."
+ },
+ {
+  "id": "look-a-9",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"home.verdict.none\": \"Sweepwise hasn't checked this PC yet\"",
+  "proof": [
+   {
+    "file": "src/index.html",
+    "contains": "var checked = !!(s.last_run || s.last_scan), lv, verdict"
+   },
+   {
+    "file": "src/index.html",
+    "contains": "var scored = checked && typeof s.score === 'number';"
+   },
+   {
+    "file": "src-tauri/src/engine/health.rs",
+    "contains": "\"last_run\": last,"
+   },
+   {
+    "file": "src-tauri/src/engine/health.rs",
+    "contains": "\"last_scan\": d.last_scan.map(util::iso),"
+   }
+  ],
+  "tests": [],
+  "why": "Shown only when the status has no clean-up run and no virus scan on record, and the health score stays hidden until then (the design study's honest status words)."
+ },
+ {
+  "id": "look-a-10",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"home.rc.scan_clean\": \"Last virus scan {at}: no threats found\"",
+  "proof": [
+   {
+    "file": "src/index.html",
+    "contains": "return gap >= 0 && gap <= 30 * 60000 ? lr.scan : '';"
+   },
+   {
+    "file": "src-tauri/src/engine/defender.rs",
+    "contains": "Some(0) if threats.is_empty() => (\"clean\".into(), \"No threats found.\".into()),"
+   }
+  ],
+  "tests": [],
+  "why": "'No threats found' is added only when the newest scan on record is the one in Sweepwise's last clean-up (within 30 minutes of its start) and that scan came back clean; otherwise only the time is shown, because Sweepwise does not know the results of scans Windows runs by itself."
+ },
+ {
+  "id": "look-a-11",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"home.wait.none\": \"Nothing is waiting for your OK right now.\"",
+  "proof": [
+   {
+    "file": "src-tauri/src/engine/health.rs",
+    "contains": ".filter(|i| i[\"can_do\"].as_bool().unwrap_or(false) && i[\"checked\"].as_bool().unwrap_or(false))"
+   },
+   {
+    "file": "src/index.html",
+    "contains": "var p = s.pending || 0;"
+   }
+  ],
+  "tests": [],
+  "why": "status.pending counts the ticked Approve-list suggestions not yet carried out (the number the engine reports as waiting for your OK); the card says this only when it is 0."
+ },
+ {
+  "id": "look-a-12",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"home.row.virus.unread\": \"Sweepwise could not read Windows Security\"",
+  "proof": [
+   {
+    "file": "src-tauri/src/engine/health.rs",
+    "contains": "pub realtime: Option<bool>,"
+   },
+   {
+    "file": "src/index.html",
+    "contains": "win ? t('home.row.virus.unread'"
+   }
+  ],
+  "tests": [],
+  "why": "Shown on Windows only when the status has no real-time reading, which is what happens when Windows Security's status could not be read."
+ },
+ {
+  "id": "look-a-13",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"home.row.virus.sec\": \"Part of the Security check\"",
+  "proof": [
+   {
+    "file": "src-tauri/src/engine/security.rs",
+    "contains": "\"name\": \"Virus scanner (ClamAV)\", \"ok\": clam,"
+   },
+   {
+    "file": "src-tauri/src/engine/security.rs",
+    "contains": "\"XProtect (built-in malware protection)\""
+   }
+  ],
+  "tests": [],
+  "why": "On a Mac or Linux computer the Security check's Protection list covers the virus scanner (ClamAV, and XProtect on a Mac); the row says so when no definitions or warnings are known."
+ },
+ {
+  "id": "look-a-14",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"home.fix.prot_off\": \"Turn it on in Windows Security.\"",
+  "proof": [
+   {
+    "file": "src-tauri/src/engine/security.rs",
+    "contains": "\"Off: turn it on in Windows Security.\""
+   },
+   {
+    "file": "src-tauri/src/engine/mod.rs",
+    "contains": "\"security\" => \"windowsdefender:\".into(),"
+   }
+  ],
+  "tests": [],
+  "why": "Shown when Windows reports real-time protection off; the button beside it opens Windows Security, where that switch is."
  }
 ]

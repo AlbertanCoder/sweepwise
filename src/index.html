@@ -3,23 +3,28 @@
 <title>Sweepwise</title>
 <style>
 :root { --bg:#0a1020; --side:#0d1528; --card:#121c33; --card2:#16223d; --line:#22304f; --text:#e7eef9; --muted:#8c9bb8;
-  --teal:#2dd4bf; --teal2:#14b8a6; --tealglow:rgba(45,212,191,.35); --good:#34d399; --warn:#fbbf24; --bad:#f87171;
-  --input:#0b1428; --ai:#a5f3fc; --learn:#93c5fd; --onteal:#032421; --ringbg:#1d2a47; }
+  --teal:#2dd4bf; --teal2:#14b8a6; --tealglow:rgba(45,212,191,.35); --good:#4ade80; --warn:#fbbf24; --bad:#f87171;
+  --input:#0b1428; --ai:#a5f3fc; --learn:#93c5fd; --onteal:#032421; --ringbg:#1d2a47;
+  /* Status colours (good, warn, bad, info) stay apart from teal: teal only means "you can press this". */
+  --info:#97a6c2; --line2:#2a3a5d; --tealtext:#2dd4bf; --ringfg:#cdd7ea; --hover:rgba(255,255,255,.03); --icbg:#1a2643; --icfg:#c4cfe4; --badgebg:#26344f; --badgefg:#d5deee; }
 * { box-sizing:border-box; }
 html, body { height:100%; }
 body { margin:0; background:var(--bg); color:var(--text); font:15px/1.5 "Segoe UI Variable Text","Segoe UI",system-ui,sans-serif; display:flex; overflow:hidden; }
 button { font:inherit; color:inherit; cursor:pointer; }
 /* sidebar */
-.side { width:220px; flex:0 0 220px; background:var(--side); border-right:1px solid var(--line); display:flex; flex-direction:column; padding:18px 12px; }
-.brand { display:flex; align-items:center; gap:10px; padding:4px 10px 22px; }
-.brand b { font-size:22px; letter-spacing:.3px; font-weight:650; }
-.nav button { display:flex; align-items:center; gap:12px; width:100%; background:none; border:0; padding:10px 12px; border-radius:10px; color:var(--muted); text-align:left; font-size:15px; }
+.side { width:220px; flex:0 0 220px; background:var(--side); border-right:1px solid var(--line); display:flex; flex-direction:column; padding:16px 10px 14px; }
+.brand { display:flex; align-items:center; gap:9px; padding:2px 10px 18px; }
+.brand svg { width:28px; height:28px; }
+.brand b { font-size:18px; letter-spacing:.2px; font-weight:650; }
+.nav button { display:flex; align-items:center; gap:11px; width:100%; background:none; border:0; padding:8px 10px; margin-bottom:1px; border-radius:8px; color:var(--muted); text-align:left; font-size:14px; }
 .nav button:hover { background:var(--card); color:var(--text); }
-.nav button.on { background:var(--card2); color:var(--text); box-shadow:inset 3px 0 0 var(--teal); }
-.nav svg { width:19px; height:19px; flex:0 0 19px; }
-.badge { margin-left:auto; background:var(--teal2); color:#04201c; font-size:12px; font-weight:700; border-radius:999px; padding:1px 8px; }
+.nav button.on { background:var(--card2); color:var(--text); box-shadow:inset 3px 0 0 var(--teal); font-weight:600; }
+.nav button.on svg { color:var(--teal); }
+.nav svg { width:18px; height:18px; flex:0 0 18px; }
+/* menu counts are a neutral grey, never teal or red */
+.badge { margin-left:auto; background:var(--badgebg); color:var(--badgefg); font-size:11.5px; font-weight:600; line-height:18px; border-radius:999px; padding:0 7px; }
 .badge:empty { display:none; }
-.side .foot { margin-top:auto; color:var(--muted); font-size:12px; padding:0 12px; }
+.side .foot { margin-top:auto; color:var(--muted); font-size:11.5px; line-height:1.45; padding:0 10px; }
 /* main */
 main { flex:1; overflow-y:auto; padding:28px 34px 40px; }
 .view { display:none; max-width:1060px; margin:0 auto; } .view.on { display:block; }
@@ -29,41 +34,90 @@ h1 { font-size:26px; margin:0 0 4px; font-weight:650; } h2 { font-size:18px; mar
 /* hero */
 .hero { display:grid; grid-template-columns:230px 1fr; gap:28px; padding:26px 28px; align-items:center;
   background:radial-gradient(120% 140% at 0% 0%, rgba(45,212,191,.10), transparent 55%), var(--card); }
-.ring { position:relative; width:200px; height:200px; }
-.ring svg { transform:rotate(-90deg); }
-.ring .num { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
-.ring .num b { font-size:52px; font-weight:700; line-height:1; } .ring .num span { color:var(--muted); font-size:13px; margin-top:6px; }
 .hero h2 { margin:0 0 6px; font-size:22px; }
 .reasons { margin:8px 0 18px; padding:0; list-style:none; color:var(--muted); }
 .reasons li { padding:3px 0 3px 22px; position:relative; }
 .reasons li::before { content:""; position:absolute; left:4px; top:11px; width:8px; height:8px; border-radius:50%; background:var(--warn); }
 .reasons li.ok::before { background:var(--good); }
-.big { background:linear-gradient(135deg, var(--teal), var(--teal2)); color:var(--onteal); border:0; border-radius:14px; padding:15px 34px; font-size:18px; font-weight:700;
-  box-shadow:0 8px 30px var(--tealglow); transition:transform .12s, box-shadow .12s; }
-.big:hover { transform:translateY(-1px); box-shadow:0 10px 36px var(--tealglow); } .big:disabled { opacity:.5; cursor:default; transform:none; }
 .hint { color:var(--muted); font-size:13px; margin-left:14px; }
 /* stats */
 .stats { display:grid; grid-template-columns:repeat(5, 1fr); gap:12px; margin-top:16px; }
 .stat { padding:14px 16px; } .stat .k { color:var(--muted); font-size:13px; } .stat .v { font-size:20px; font-weight:650; margin-top:2px; } .stat .s { color:var(--muted); font-size:12px; }
 .good { color:var(--good); } .warn { color:var(--warn); } .bad { color:var(--bad); }
-/* compact home: one health card, one vitals row, a live temperature graph */
-.hero2 { display:grid; grid-template-columns:150px 1fr; gap:26px; padding:22px 26px; align-items:center;
-  background:radial-gradient(120% 140% at 0% 0%, rgba(45,212,191,.10), transparent 55%), var(--card); }
-.ring.sm { width:150px; height:150px; } .ring.sm .num b { font-size:42px; } .ring.sm .num span { font-size:12px; margin-top:4px; }
-.hero2 h2 { margin:0 0 10px; font-size:22px; }
-.attn-row { display:flex; flex-wrap:wrap; gap:8px; margin:0 0 18px; min-height:32px; }
-.attn { display:inline-flex; align-items:center; gap:8px; max-width:100%; background:var(--card2); border:1px solid var(--line); border-radius:999px; padding:6px 12px; font-size:13px; color:var(--text); }
+/* Home, look A "Clear Answer": one verdict band, a "What Sweepwise checked" list and three cards */
+.home-top { display:flex; align-items:baseline; justify-content:space-between; gap:4px 12px; flex-wrap:wrap; margin:0 2px 12px; }
+.home-top h1 { margin:0; font-size:13px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
+.home-top span { font-size:12.5px; color:var(--muted); }
+.band { display:grid; grid-template-columns:76px minmax(0, 1fr) auto; gap:24px; align-items:center; padding:22px 28px 20px; border-radius:18px;
+  background:linear-gradient(180deg, rgba(255,255,255,.018), transparent 60%), var(--card); }
+.band-emblem svg { display:block; width:76px; height:76px; }
+.em-cut, .em-dot { fill:var(--card); } .em-badge { stroke:var(--card); stroke-width:5; } .em-mark { fill:none; stroke:var(--card); stroke-linecap:round; stroke-linejoin:round; }
+.band-vline { display:flex; align-items:center; gap:10px 16px; flex-wrap:wrap; }
+.band h2 { margin:0; min-height:34px; font:600 28px/1.2 "Segoe UI Variable Display","Segoe UI",system-ui,sans-serif; letter-spacing:-.2px; }
+.score { display:flex; align-items:center; gap:9px; background:none; border:0; padding:2px 6px 2px 0; border-radius:10px; text-align:left; }
+.score-ring { position:relative; width:46px; height:46px; flex:0 0 46px; }
+.score-ring svg { display:block; width:46px; height:46px; transform:rotate(-90deg); }
+.score-ring circle { fill:none; stroke-width:4.5; } .score-ring .bg { stroke:var(--ringbg); } .score-ring .arc { stroke:var(--ringfg); stroke-linecap:round; transition:stroke-dashoffset .8s; }
+.score-ring b { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:700; }
+.score-txt { display:flex; flex-direction:column; font-size:12px; line-height:1.3; color:var(--muted); }
+.score-txt u { color:var(--tealtext); text-decoration:none; font-weight:600; font-size:12.5px; }
+.score:hover .score-txt u { text-decoration:underline; }
+.band-fix { margin:8px 0 0; font-size:15px; }
+.linkbtn { background:none; border:0; padding:0; margin-left:8px; color:var(--tealtext); font-weight:600; text-decoration:underline; text-underline-offset:2px; }
+.receipts { display:flex; flex-wrap:wrap; gap:4px 18px; margin:9px 0 0; padding:0; list-style:none; color:var(--muted); font-size:14.5px; }
+.receipts li { display:inline-flex; align-items:center; gap:7px; max-width:100%; }
+.st { display:block; flex:0 0 auto; }
+.receipts .st, .attn .st, .stword .st { width:16px; height:16px; }
+.lv-ok { color:var(--good); } .lv-warn { color:var(--warn); } .lv-bad { color:var(--bad); } .lv-none, .lv-info { color:var(--info); }
+.attn-row { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+.attn { display:inline-flex; align-items:center; gap:8px; max-width:100%; padding:6px 10px 6px 9px; border-radius:10px; border:1px solid var(--line2); background:var(--card2); color:var(--text); font-size:13.5px; text-align:left; }
 button.attn:hover { border-color:var(--teal2); }
-.attn i { width:8px; height:8px; border-radius:50%; background:var(--warn); flex:0 0 8px; } .attn.ok i { background:var(--good); } .attn.bad i { background:var(--bad); }
-.attn span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:440px; }
+.attn > span { min-width:0; overflow-wrap:anywhere; }
+.attn .chev { width:14px; height:14px; flex:0 0 14px; color:var(--muted); }
 .attn.more { color:var(--muted); }
-.hero-actions { display:flex; flex-wrap:wrap; align-items:center; gap:10px; }
-.hero-actions .big { padding:13px 30px; font-size:17px; }
-.vitals { display:grid; grid-template-columns:2fr 1fr; gap:12px; margin-top:14px; }
-.vit { display:grid; grid-template-columns:repeat(4, 1fr); padding:16px 4px; }
-.vit .m { padding:0 16px; border-left:1px solid var(--line); display:flex; flex-direction:column; gap:2px; min-width:0; } .vit .m:first-child { border-left:0; }
-.vit .k, .temp .k { color:var(--muted); font-size:13px; } .vit b, .temp b { font-size:19px; font-weight:650; } .vit .s, .temp .s { color:var(--muted); font-size:12px; }
-.temp { padding:14px 16px 10px; } .temp .th { display:flex; align-items:baseline; gap:10px; } .temp svg { display:block; width:100%; height:54px; margin-top:6px; overflow:visible; }
+.why { margin:12px 0 0; padding:10px 14px; border-radius:10px; background:var(--card2); border:1px solid var(--line); font-size:13px; color:var(--muted); }
+.why b { color:var(--text); font-weight:600; } .why ul { margin:4px 0 0; padding:0 0 0 18px; } .why li { margin:2px 0; } .why p { margin:4px 0 0; }
+.cta { display:flex; flex-direction:column; align-items:flex-end; gap:9px; }
+.cta-wrap { position:relative; }
+.split { display:flex; border-radius:12px; box-shadow:0 8px 26px rgba(45,212,191,.22); }
+.cta-go, .cta-more { border:0; height:44px; color:var(--onteal); background:linear-gradient(135deg, var(--teal), var(--teal2)); }
+.cta-go { padding:0 22px 0 24px; border-radius:12px 0 0 12px; font-size:16px; font-weight:700; letter-spacing:.1px; }
+.cta-more { width:40px; border-radius:0 12px 12px 0; border-left:1px solid rgba(4,34,31,.28); display:flex; align-items:center; justify-content:center; }
+.cta-more svg { width:16px; height:16px; }
+.cta-go:hover:not(:disabled), .cta-more:hover { filter:brightness(1.07); }
+.cta-go:disabled { opacity:.55; cursor:default; }
+.cta-hint { margin:0; max-width:240px; font-size:12.5px; line-height:1.4; color:var(--muted); text-align:right; }
+.cta-menu { position:absolute; right:0; z-index:5; width:300px; max-width:calc(100vw - 32px); margin-top:6px; padding:6px; background:var(--card2); border:1px solid var(--line2); border-radius:12px; box-shadow:0 18px 40px rgba(0,0,0,.45); }
+.cta-menu button { display:block; width:100%; padding:9px 12px; background:none; border:0; border-radius:8px; color:var(--text); text-align:left; }
+.cta-menu button b { display:block; font-weight:600; } .cta-menu button small { display:block; color:var(--muted); font-size:12px; line-height:1.4; }
+.cta-menu button:hover:not(:disabled), .cta-menu button:focus-visible { background:var(--card); }
+.cta-menu button:disabled { opacity:.5; cursor:default; }
+.home-cols { display:grid; grid-template-columns:minmax(0, 1.55fr) minmax(0, 1fr); gap:16px; align-items:start; margin-top:14px; }
+.checked { padding:6px 0 4px; }
+.checked header { display:flex; align-items:baseline; justify-content:space-between; gap:4px 10px; flex-wrap:wrap; padding:12px 20px 8px; }
+.checked h2, .hcard h3 { margin:0; font-size:15px; font-weight:600; }
+.checked header span { font-size:12.5px; color:var(--muted); }
+.crow { display:grid; grid-template-columns:24px minmax(0, 1fr) auto 16px; gap:14px; align-items:center; width:100%; min-height:64px; padding:10px 20px; background:none; border:0; border-top:1px solid var(--line); color:var(--text); text-align:left; }
+.crow:hover { background:var(--hover); } .crow:hover .chev { color:var(--tealtext); }
+.crow .st { width:22px; height:22px; } .crow .chev { width:16px; height:16px; color:var(--muted); }
+.crow-t { min-width:0; display:flex; flex-direction:column; gap:1px; }
+.crow-t b { font-size:14.5px; font-weight:600; } .crow-t span { font-size:13px; color:var(--muted); overflow-wrap:anywhere; }
+.crow-s { display:flex; flex-direction:column; align-items:flex-end; gap:1px; text-align:right; }
+.crow-s em { font-style:normal; font-size:13px; font-weight:600; } .crow-s small { font-size:12px; color:var(--muted); white-space:nowrap; }
+.home-side { display:flex; flex-direction:column; gap:12px; }
+.hcard { padding:12px 16px 13px; }
+.hcard header { display:flex; align-items:center; gap:10px; margin-bottom:6px; min-height:30px; }
+.hcard header .btn { margin-left:auto; }
+.hc-ic { width:30px; height:30px; flex:0 0 30px; border-radius:9px; display:flex; align-items:center; justify-content:center; background:var(--icbg); color:var(--icfg); }
+.hc-ic svg { width:17px; height:17px; }
+.hc-count { margin-left:auto; min-width:26px; padding:0 8px; border-radius:999px; background:var(--badgebg); color:var(--badgefg); font-size:12.5px; font-weight:700; line-height:22px; text-align:center; }
+.hcard p { margin:0 0 4px; font-size:13.5px; line-height:1.45; color:var(--muted); }
+.hcard p b { color:var(--text); font-weight:600; }
+.hc-acts { display:flex; align-items:center; gap:12px; margin-top:8px; flex-wrap:wrap; }
+.stword { margin-left:auto; display:inline-flex; align-items:center; gap:6px; font-size:13px; font-weight:600; }
+.temp-now { display:flex; align-items:center; gap:16px; margin:0 0 4px; }
+.temp-now b { font-size:26px; font-weight:650; line-height:1.05; white-space:nowrap; }
+.temp-now svg { display:block; flex:1 1 auto; min-width:0; height:54px; overflow:visible; }
 /* tiles */
 .tiles { display:grid; grid-template-columns:repeat(4, 1fr); gap:14px; }
 .tile { position:relative; text-align:left; background:var(--card); border:1px solid var(--line); border-radius:16px; padding:18px; min-height:132px; transition:border-color .12s, transform .12s, background .12s; }
@@ -126,7 +180,7 @@ th { color:var(--muted); font-weight:600; font-size:13px; } tr:last-child td { b
 .check { display:flex; gap:10px; padding:8px 0; border-top:1px solid var(--line); } .check:first-of-type { border-top:0; }
 .dot { width:10px; height:10px; border-radius:50%; flex:0 0 10px; margin-top:7px; background:var(--good); } .dot.warn { background:var(--warn); } .dot.bad { background:var(--bad); } .dot.info { background:#60a5fa; }
 .check b { display:block; font-weight:550; } .check span { color:var(--muted); font-size:13px; display:block; word-break:break-word; }
-.tag { font-size:12px; border-radius:999px; padding:1px 9px; border:1px solid var(--line); color:var(--muted); } .tag.good { color:var(--good); border-color:rgba(52,211,153,.4); } .tag.warn { color:var(--warn); border-color:rgba(251,191,36,.4); } .tag.bad { color:var(--bad); border-color:rgba(248,113,113,.4); }
+.tag { font-size:12px; border-radius:999px; padding:1px 9px; border:1px solid var(--line); color:var(--muted); } .tag.good { color:var(--good); border-color:rgba(74,222,128,.4); } .tag.warn { color:var(--warn); border-color:rgba(251,191,36,.4); } .tag.bad { color:var(--bad); border-color:rgba(248,113,113,.4); }
 .links { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
 .btn.sm { padding:6px 12px; font-size:13px; border-radius:9px; }
 .ai { display:block; margin-top:4px; font-size:13px; color:var(--ai); } .ai button { margin-left:6px; }
@@ -137,7 +191,7 @@ details.hid { margin:6px 0 0; } details.hid summary { color:var(--muted); font-s
 .form input:focus { border-color:var(--teal2); outline:none; }
 .setgrid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; }
 .code { font:700 26px/1 "Cascadia Mono", Consolas, monospace; letter-spacing:3px; color:var(--teal); background:var(--input); border:1px dashed var(--teal2); border-radius:12px; padding:12px 16px; display:inline-block; margin:8px 0; }
-.ver { color:var(--muted); font-size:12px; padding:8px 12px 0; }
+.ver { color:var(--muted); font-size:11.5px; padding:6px 0 0; }
 /* stage 5: brain + chat */
 .sugg { display:flex; gap:14px; align-items:center; padding:16px 18px; margin-bottom:10px; background:linear-gradient(90deg, rgba(45,212,191,.08), transparent 60%), var(--card); }
 .sugg div { flex:1; } .sugg b { display:block; } .sugg span { color:var(--muted); font-size:13px; }
@@ -176,13 +230,13 @@ details.hid { margin:6px 0 0; } details.hid summary { color:var(--muted); font-s
 .dm-box b { display:block; font-size:12px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-shadow:0 1px 2px rgba(0,0,0,.4); }
 .dm-box span { font-size:11px; opacity:.85; }
 .dm-box.flat { cursor:default; }
-.crumbs { display:flex; gap:4px; flex-wrap:wrap; align-items:center; font-size:14px; } .crumbs button { background:none; border:0; color:var(--teal); padding:2px 4px; } .crumbs i { color:var(--muted); font-style:normal; }
+.crumbs { display:flex; gap:4px; flex-wrap:wrap; align-items:center; font-size:14px; } .crumbs button { background:none; border:0; color:var(--tealtext); padding:2px 4px; } .crumbs i { color:var(--muted); font-style:normal; }
 .dmside h3 { margin:0 0 6px; word-break:break-word; } .dmside .big2 { font-size:28px; font-weight:700; } .dmside .links { flex-direction:column; align-items:stretch; }
 .view.on { animation:viewIn .38s cubic-bezier(.2,.8,.2,1); }
 @keyframes viewIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
 .skel { background:linear-gradient(90deg, var(--card) 0%, var(--card2) 50%, var(--card) 100%); background-size:200% 100%; animation:shimmer 1.2s infinite linear; border-radius:14px; height:64px; margin-bottom:10px; border:1px solid var(--line); }
 @keyframes shimmer { from { background-position:200% 0; } to { background-position:-200% 0; } }
-.btn:active, .big:active, .tile:active:not(:disabled), .chip:active { transform:scale(.97); }
+.btn:active, .tile:active:not(:disabled), .chip:active { transform:scale(.97); }
 .spin { width:22px; height:22px; flex:0 0 22px; } .spin circle { transform-origin:center; animation:spin 1s linear infinite; }
 @keyframes spin { to { transform:rotate(360deg); } }
 .done-mark { display:none; align-items:center; gap:14px; margin:6px 0 4px; position:relative; }
@@ -193,28 +247,31 @@ details.hid { margin:6px 0 0; } details.hid summary { color:var(--muted); font-s
 .burst i { position:absolute; width:6px; height:6px; border-radius:50%; background:var(--teal); opacity:0; animation:fly .9s ease-out forwards; }
 @keyframes fly { 0% { transform:translate(0,0) scale(1); opacity:1; } 100% { transform:translate(var(--dx), var(--dy)) scale(.3); opacity:0; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; } }
-@media (max-width:1100px) { .trends { grid-template-columns:repeat(2, 1fr); } .dmwrap { grid-template-columns:1fr; } .vitals { grid-template-columns:1fr; } }
-@media (max-width:900px) { .vit { grid-template-columns:repeat(2, 1fr); row-gap:14px; } .vit .m:nth-child(3) { border-left:0; } .hero2 { grid-template-columns:1fr; justify-items:start; } }
+@media (max-width:1100px) { .trends { grid-template-columns:repeat(2, 1fr); } .dmwrap { grid-template-columns:1fr; } }
 @media (max-width:1100px) { .tiles { grid-template-columns:repeat(3, 1fr); } .secgrid, .setgrid { grid-template-columns:1fr; } }
 @media (max-width:900px) { .stats { grid-template-columns:repeat(2, 1fr); } .tiles { grid-template-columns:repeat(2, 1fr); } .hero { grid-template-columns:1fr; } .row { grid-template-columns:34px 1fr; } .row .what, .row .res { grid-column:2; } }
 /* public polish: light theme, welcome, help, support, banners, switches, keyboard use */
 :root[data-theme="light"] { --bg:#f3f6fb; --side:#ffffff; --card:#ffffff; --card2:#eef3fa; --line:#d5deeb; --text:#0f1b2d; --muted:#55657d;
-  --teal:#0b8577; --teal2:#086b60; --tealglow:rgba(11,133,119,.22); --good:#047857; --warn:#b45309; --bad:#c62828;
-  --input:#f8fafc; --ai:#0e7490; --learn:#1d4ed8; --onteal:#ffffff; --ringbg:#e2e8f0; }
+  --teal:#0b8577; --teal2:#086b60; --tealglow:rgba(11,133,119,.22); --good:#15803d; --warn:#b45309; --bad:#c62828;
+  --input:#f8fafc; --ai:#0e7490; --learn:#1d4ed8; --onteal:#ffffff; --ringbg:#e2e8f0;
+  --info:#55657d; --line2:#c7d2e3; --tealtext:#086b60; --ringfg:#475569; --hover:rgba(15,27,45,.035); --icbg:#eaf0f8; --icfg:#334155; --badgebg:#e3e9f3; --badgefg:#334155; }
 :root[data-theme="light"] .modal-back { background:rgba(15,27,45,.35); }
-:root[data-theme="light"] .toast, :root[data-theme="light"] .modal, :root[data-theme="light"] #chat, :root[data-theme="light"] .welcome { box-shadow:0 12px 34px rgba(15,27,45,.16); }
-:root[data-theme="light"] .badge { color:#ffffff; }
-.ring svg > circle:first-of-type { stroke:var(--ringbg); }
+:root[data-theme="light"] .toast, :root[data-theme="light"] .modal, :root[data-theme="light"] #chat, :root[data-theme="light"] .welcome, :root[data-theme="light"] .cta-menu { box-shadow:0 12px 34px rgba(15,27,45,.16); }
+:root[data-theme="light"] .band { background:var(--card); }
+:root[data-theme="light"] .split { box-shadow:0 8px 22px rgba(11,133,119,.2); }
+:root[data-theme="light"] .cta-more { border-left-color:rgba(255,255,255,.35); }
+:root[data-theme="light"] .tag.good { border-color:rgba(21,128,61,.35); }
 [hidden] { display:none !important; }
 html:not([data-os="windows"]) .win-only { display:none !important; }
 .skip { position:absolute; left:-9999px; top:10px; z-index:60; background:var(--teal); color:var(--onteal); padding:9px 16px; border-radius:10px; font-weight:700; text-decoration:none; }
 .skip:focus { left:14px; }
 main:focus { outline:none; }
-.footlinks { display:grid; gap:2px; margin-bottom:10px; }
-.nav-bottom { margin:0 -12px 10px; }
-.back { background:none; border:0; padding:0 0 6px; color:var(--muted); font-size:13px; } .back:hover { color:var(--teal); }
-.footlinks button { background:none; border:0; padding:4px 0; text-align:left; color:var(--muted); font-size:13px; }
-.footlinks button:hover, .footlinks button.on { color:var(--teal); }
+.footlinks { display:grid; gap:0; margin:0 0 10px; }
+.nav-bottom { margin:0 -10px 6px; }
+.back { background:none; border:0; padding:0 0 6px; color:var(--muted); font-size:13px; } .back:hover { color:var(--tealtext); }
+.footlinks button { background:none; border:0; padding:3px 0; text-align:left; color:var(--muted); font-size:12.5px; }
+.footlinks button:hover, .footlinks button.on { color:var(--tealtext); }
+.footlinks svg { display:none; }
 .banner { display:flex; gap:12px; align-items:center; flex-wrap:wrap; padding:14px 18px; margin:0 0 18px; border:1px solid var(--teal2); border-radius:14px; background:linear-gradient(90deg, rgba(45,212,191,.10), transparent 70%), var(--card); }
 .banner[hidden] { display:none; } .banner > div { flex:1 1 260px; } .banner b { display:block; } .banner span { color:var(--muted); font-size:13px; }
 .switch { position:relative; width:48px; height:28px; flex:0 0 48px; border-radius:999px; border:1px solid var(--line); background:var(--card2); padding:0; }
@@ -226,7 +283,7 @@ main:focus { outline:none; }
 .seg button[aria-checked="true"] { background:var(--teal2); color:#ffffff; font-weight:600; }
 .adv { display:none !important; } body.advanced .adv { display:block !important; }
 .faq { margin-bottom:10px; } .faq summary { cursor:pointer; padding:14px 18px; font-weight:600; list-style:none; display:flex; justify-content:space-between; gap:12px; }
-.faq summary::-webkit-details-marker { display:none; } .faq summary::after { content:"+"; color:var(--teal); font-weight:700; } .faq[open] summary::after { content:"\2212"; }
+.faq summary::-webkit-details-marker { display:none; } .faq summary::after { content:"+"; color:var(--tealtext); font-weight:700; } .faq[open] summary::after { content:"\2212"; }
 .faq p { margin:0; padding:0 18px 16px; color:var(--muted); }
 .supgrid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; } .supgrid .btn { margin-top:6px; }
 .fine { color:var(--muted); font-size:13px; margin:8px 0 0; }
@@ -258,6 +315,35 @@ main:focus { outline:none; }
 .tabs { display:flex; gap:6px; margin:4px 0 12px; } .tabs button { background:var(--card2); border:1px solid var(--line); border-radius:999px; padding:6px 14px; color:var(--muted); }
 .tabs button[aria-selected="true"] { border-color:var(--teal2); color:var(--text); }
 @media (max-width:900px) { .supgrid { grid-template-columns:1fr; } }
+/* Smaller windows: the band stacks, the sidebar becomes a 64 px icon rail (labels show when you point at an icon),
+   the two Home columns stack, and on very narrow windows the button goes full width. */
+@media (max-width:1100px) {
+  .band { grid-template-columns:64px minmax(0, 1fr); } .band-emblem svg { width:64px; height:64px; }
+  .cta { grid-column:1 / -1; flex-direction:row; flex-wrap:wrap; align-items:center; justify-content:flex-start; gap:10px 16px; }
+  .cta-hint { flex:1 1 220px; max-width:none; text-align:left; } .cta-menu { left:0; right:auto; }
+}
+@media (max-width:1000px) {
+  .side { width:64px; flex:0 0 64px; padding:14px 8px; }
+  .brand { justify-content:center; padding:2px 0 16px; } .brand b { display:none; }
+  .nav button, .footlinks button { position:relative; display:flex; justify-content:center; padding:10px 0; }
+  .nav button > span[data-i18n], .footlinks button > span { position:absolute; left:calc(100% + 10px); top:50%; z-index:30; transform:translateY(-50%); padding:4px 9px; border-radius:8px; background:var(--card2); border:1px solid var(--line2); color:var(--text); font-size:12.5px; font-weight:500; white-space:nowrap; pointer-events:none; opacity:0; transition:opacity .12s; }
+  .nav button:hover > span[data-i18n], .nav button:focus-visible > span[data-i18n], .footlinks button:hover > span, .footlinks button:focus-visible > span { opacity:1; }
+  .badge { position:absolute; top:3px; right:4px; margin:0; padding:0 5px; font-size:10.5px; line-height:15px; }
+  .side .foot { padding:0; } .side .foot > span, .ver { display:none; }
+  .nav-bottom { margin:0 0 2px; } .footlinks { gap:1px; margin:0 0 4px; } .footlinks svg { display:block; width:18px; height:18px; }
+}
+@media (max-width:900px) { .home-cols { grid-template-columns:minmax(0, 1fr); } }
+@media (max-width:600px) {
+  main { padding:20px 16px 32px; }
+  .band { grid-template-columns:48px minmax(0, 1fr); gap:14px; padding:18px 16px; } .band-emblem { align-self:start; } .band-emblem svg { width:48px; height:48px; }
+  .band h2 { font-size:22px; min-height:0; }
+  .cta { flex-direction:column; align-items:stretch; } .cta-wrap, .split { width:100%; } .cta-go { flex:1 1 auto; } .cta-menu { width:100%; }
+  .checked header { padding:12px 16px 8px; }
+  .crow { grid-template-columns:22px minmax(0, 1fr) 14px; gap:3px 12px; padding:10px 16px; }
+  .crow .st { grid-column:1; grid-row:1 / span 2; align-self:start; margin-top:1px; } .crow-t { grid-column:2; grid-row:1; }
+  .crow-s { grid-column:2; grid-row:2; flex-direction:row; flex-wrap:wrap; align-items:baseline; gap:2px 8px; text-align:left; }
+  .crow .chev { grid-column:3; grid-row:1 / span 2; }
+}
 </style></head><body>
 <a class="skip" href="#main" data-i18n="a11y.skip">Skip to content</a>
 <aside class="side">
@@ -276,41 +362,61 @@ main:focus { outline:none; }
     <nav class="nav nav-bottom" aria-label="Settings">
       <button data-view="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span data-i18n="nav.settings">Settings</span></button>
     </nav>
-    <div class="footlinks"><button data-view="help" data-i18n="nav.help">Help</button><button data-view="support" data-i18n="nav.support">Support Sweepwise</button><button data-view="about" data-i18n="nav.about">About &amp; privacy</button></div>
+    <div class="footlinks"><button data-view="help"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 1 1 3.4 2.4c-.6.3-1 .8-1 1.4v.4"/><path d="M12 16.8h.01"/></svg><span data-i18n="nav.help">Help</span></button><button data-view="support"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 20l-1.2-1.1C6.2 14.8 3 12 3 8.5 3 5.9 5.1 4 7.6 4c1.6 0 3.2.8 4.4 2.1C13.2 4.8 14.8 4 16.4 4 18.9 4 21 5.9 21 8.5c0 3.5-3.2 6.3-7.8 10.4z"/></svg><span data-i18n="nav.support">Support Sweepwise</span></button><button data-view="about"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5"/><path d="M12 7.8h.01"/></svg><span data-i18n="nav.about">About &amp; privacy</span></button></div>
     <span data-i18n="foot.promise">Nothing personal changes without your OK. Changes you approve can be undone, except uninstalls and app updates.</span><div class="ver" id="verText">Sweepwise</div></div>
 </aside>
 <main id="main" tabindex="-1">
   <div class="banner" id="updBanner" role="status" hidden><div><b id="updTitle">A new version of Sweepwise is ready</b><span id="updSub"></span></div><button class="btn sm" id="updNotes" data-i18n="button.whats_new">What's new</button><button class="btn sm primary" id="updGo" data-i18n="button.update">Update</button><button class="btn sm" id="updHide" data-i18n="button.not_now">Not now</button></div>
   <section class="view on" id="v-home">
-    <h1 data-i18n="h1.your_pc">Your PC</h1><p class="sub" id="homeSub" data-i18n="sub.homeSub">Checking...</p>
+    <div class="home-top"><h1 data-i18n="h1.your_pc">Your PC</h1><span id="homeSys"></span></div>
     <div class="banner" id="remBanner" hidden><div><b data-i18n="rem.title">Time for your weekly clean-up</b><span data-i18n="rem.desc">Want Sweepwise to run Scan &amp; Clean now? Nothing personal changes without your OK.</span></div><button class="btn sm primary" id="remGo" data-i18n="button.scan_clean">Scan &amp; Clean</button><button class="btn sm" id="remHide" data-i18n="button.not_now">Not now</button></div>
-    <div class="card hero2">
-      <div class="ring sm"><svg width="150" height="150" viewBox="0 0 200 200"><circle cx="100" cy="100" r="86" fill="none" stroke="#1d2a47" stroke-width="14"/>
-        <circle id="ringArc" cx="100" cy="100" r="86" fill="none" stroke="url(#rg)" stroke-width="14" stroke-linecap="round" stroke-dasharray="540.4" stroke-dashoffset="540.4" style="transition:stroke-dashoffset 1s"/>
-        <defs><linearGradient id="rg"><stop offset="0" stop-color="#14b8a6"/><stop offset="1" stop-color="#5eead4"/></linearGradient></defs></svg>
-        <div class="num"><b id="score">--</b><span>health score</span></div></div>
-      <div class="hero-main">
-        <h2 id="scoreWord">Checking your PC</h2>
-        <div class="attn-row" id="attn"></div>
-        <div class="hero-actions">
-          <button class="big" id="bigBtn" data-i18n="button.scan_clean" title="Cleans junk, checks for viruses where it can, then lists suggestions for your OK.">Scan &amp; Clean</button>
-          <button class="btn" data-run="quick" data-i18n="tile.quick_scan.title">Quick Scan</button>
-          <button class="btn" data-ask="full" data-i18n="tile.full_scan.title">Full Scan</button>
-          <button class="btn" data-ask="deep" data-i18n="tile.deep_clean.title">Deep Clean</button>
+    <section class="card band" id="verdictBand" aria-labelledby="verdict">
+      <div class="band-emblem lv-none" id="bandEmblem"></div>
+      <div class="band-main">
+        <div class="band-vline">
+          <h2 id="verdict" aria-live="polite"></h2>
+          <button class="score" id="scoreBtn" type="button" aria-expanded="false" aria-controls="whyBox" hidden><span class="score-ring"><svg viewBox="0 0 46 46" aria-hidden="true"><circle class="bg" cx="23" cy="23" r="19"/><circle class="arc" id="scoreArc" cx="23" cy="23" r="19" stroke-dasharray="119.38" stroke-dashoffset="119.38"/></svg><b id="score">--</b></span><span class="score-txt"><span data-i18n="home.score">Health score</span><u data-i18n="home.why">Why?</u></span></button>
         </div>
+        <p class="band-fix" id="verdictFix" hidden><span id="verdictFixText"></span><button class="linkbtn" id="verdictFixGo" type="button"></button></p>
+        <ul class="receipts" id="receipts" hidden></ul>
+        <div class="attn-row" id="attn" hidden></div>
+        <div class="why" id="whyBox" hidden></div>
       </div>
-    </div>
-    <div class="vitals">
-      <div class="card vit">
-        <div class="m"><span class="k">Free memory</span><b id="sRam">--</b><span class="s" id="sRam2"></span></div>
-        <div class="m"><span class="k">Free space</span><b id="sDisk">--</b><span class="s" id="sDisk2"></span></div>
-        <div class="m"><span class="k">Virus protection</span><b id="sProt">--</b><span class="s" id="sProt2"></span></div>
-        <div class="m"><span class="k">Last scan</span><b id="sScan">--</b><span class="s" id="sScan2"></span></div>
+      <div class="cta">
+        <div class="cta-wrap">
+          <div class="split"><button class="cta-go" id="bigBtn" type="button" aria-describedby="ctaHint" data-i18n="home.check">Check my PC</button><button class="cta-more" id="ctaMore" type="button" aria-expanded="false" aria-controls="ctaMenu" aria-label="More ways to check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button></div>
+          <div class="cta-menu" id="ctaMenu" hidden>
+            <button type="button" data-run="quick"><b data-i18n="home.menu.quick">Quick scan</b><small data-i18n="tile.quick_scan.desc">Windows Security checks the places viruses usually hide. 1-2 minutes.</small></button>
+            <button type="button" data-ask="full"><b data-i18n="home.menu.full">Full virus scan</b><small data-i18n="tile.full_scan.desc">A full virus scan. If Sweepwise can read the temperature, it waits until your PC is cool.</small></button>
+            <button type="button" data-ask="deep"><b data-i18n="home.menu.deep">Deep clean</b><small data-i18n="tile.deep_clean.desc">Windows' own system cleanup and repair. Asks for admin.</small></button>
+          </div>
+        </div>
+        <p class="cta-hint" id="ctaHint" data-i18n="home.check.hint">Cleans junk, checks for viruses where it can, then lists suggestions for your OK.</p>
       </div>
-      <div class="card temp">
-        <div class="th"><span class="k">Temperature</span><b id="sTemp">--</b><span class="s" id="sTemp2"></span></div>
-        <svg id="cTemp" role="img" aria-label="Temperature over the last 10 minutes"></svg>
-        <div class="s" id="sTemp3">Live, last 10 minutes</div>
+    </section>
+    <div class="home-cols">
+      <section class="card checked" aria-labelledby="checkedTitle">
+        <header><h2 id="checkedTitle" data-i18n="home.checked.title">What Sweepwise checked</h2><span data-i18n="home.checked.hint">Click a row to open it</span></header>
+        <div id="checkedList"></div>
+      </section>
+      <div class="home-side">
+        <section class="card hcard" id="waitCard" aria-labelledby="waitTitle">
+          <header><span class="hc-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg></span><h3 id="waitTitle" data-i18n="home.wait.title">Waiting for your OK</h3><span class="hc-count" id="waitCount" hidden></span></header>
+          <p id="waitText"></p>
+          <div class="hc-acts"><button class="btn sm" type="button" data-show="list" data-i18n="home.wait.review">Review</button></div>
+        </section>
+        <section class="card hcard" id="undoCard" aria-labelledby="undoTitle">
+          <header><span class="hc-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 3"/></svg></span><h3 id="undoTitle" data-i18n="home.undo.title">Undo</h3><button class="btn sm" type="button" data-show="history" data-i18n="nav.history_undo">History &amp; Undo</button></header>
+          <p id="undoLast"></p>
+          <p data-i18n="home.undo.note">Changes you approve can be undone, except uninstalls and app updates.</p>
+          <p data-i18n="home.undo.junk">Cleared temporary files and caches are deleted for good.</p>
+        </section>
+        <section class="card hcard" id="tempCard" aria-labelledby="tempTitle">
+          <header><span class="hc-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 14.8V4a2 2 0 1 0-4 0v10.8a4 4 0 1 0 4 0z"/><path d="M12 9v7"/></svg></span><h3 id="tempTitle" data-i18n="home.temp.title">Temperature</h3><span class="stword" id="sTemp2"></span></header>
+          <div class="temp-now"><b id="sTemp">--</b><svg id="cTemp" role="img" aria-label="Temperature over the last 10 minutes"></svg></div>
+          <p id="sTemp3"></p>
+          <p id="tempWait" data-i18n="home.temp.wait" hidden>A full virus scan waits until your PC cools to 70 °C.</p>
+        </section>
       </div>
     </div>
   </section>
@@ -567,7 +673,10 @@ main:focus { outline:none; }
   fetch('i18n/en.json').then(function (r) { return r.json(); }).then(function (d) {
     STR = d;
     Array.prototype.forEach.call(document.querySelectorAll('[data-i18n]'), function (el) { var v = d[el.dataset.i18n + '@' + OS] || d[el.dataset.i18n]; if (v) el.textContent = words(v); });
+    if (homeStatus) renderHome(homeStatus);
   }).catch(function () {});
+  // t() with {name} blanks filled in, for sentences that carry a number or a time.
+  function tf(k, fallback, v) { return t(k, fallback).replace(/\{(\w+)\}/g, function (m, n) { return v && v[n] != null ? v[n] : m; }); }
   var current = 'home';
   function show(v) {
     if (v === 'storage') v = show.storage || 'diskmap';
@@ -627,63 +736,207 @@ main:focus { outline:none; }
   $('mOk').addEventListener('click', function () { var f = modalOk; closeModal(); if (f) f(); });
   Array.prototype.forEach.call(document.querySelectorAll('.nav button, .footlinks button, [data-show]'), function (b) { b.addEventListener('click', function () { show(b.dataset.view || b.dataset.show); }); });
 
-  // ---------- home ----------
+  // ---------- home (look A "Clear Answer"): one plain verdict with its receipts, what Sweepwise checked, and three cards ----------
   function loadStatus() {
     api('/api/status').then(function (s) {
       firstStatus(s);
-      var sc = s.score; countUp($('score'), sc); dmRoots = s.roots || dmRoots;
-      $('ringArc').style.strokeDashoffset = 540.4 * (1 - sc / 100);
-      $('scoreWord').textContent = sc >= 85 ? 'Your PC is in great shape' : sc >= 65 ? 'Your PC is doing OK' : 'Your PC needs attention';
-      attention(s);
-      $('homeSub').textContent = s.last_run ? 'Last clean-up ' + ago(s.last_run.when) + (s.last_run.freed ? ', freed ' + size(s.last_run.freed) : '') + '.' : 'Sweepwise has not run yet.';
-      $('sRam').textContent = s.free_ram_gb + ' GB'; $('sRam').className = s.free_ram_gb < 1.5 ? 'warn' : ''; $('sRam2').textContent = 'of ' + Math.round(s.total_ram_gb) + ' GB';
-      $('sDisk').textContent = size(s.free_disk); $('sDisk2').textContent = 'of ' + size(s.total_disk) + ' on C:';
-      tempSample(s.temp_c);
-      $('sProt').textContent = s.realtime === false ? 'Off' : s.realtime ? 'On' : 'n/a'; $('sProt').className = s.realtime === false ? 'bad' : 'good';
-      $('sProt2').textContent = s.definitions_age == null ? '' : 'definitions ' + (s.definitions_age === 0 ? 'up to date' : s.definitions_age + ' day(s) old');
-      $('sScan').textContent = ago(s.last_scan); $('sScan2').textContent = s.last_run && s.last_run.scan === 'threats' ? 'threat found' : s.last_scan ? 'no threats' : '';
+      dmRoots = s.roots || dmRoots;
       $('navCount').textContent = s.pending || '';
       lastTemp = s.temp_c;
       var sp = s.security ? s.security.problems : '';
       $('navSec').textContent = sp || '';
       aiParts(s.ai_on);
       setBusy(s.job_running);
+      renderHome(s);
+      tempSample(s.temp_c);
       if (s.job_running && current === 'home') { show('work'); pollJob(); }
-    }).catch(function (e) { $('homeSub').textContent = 'Could not reach the Sweepwise engine: ' + e.message; });
+    }).catch(function (e) { $('verdict').textContent = t('home.error', 'Could not reach the Sweepwise engine:') + ' ' + e.message; });
   }
   function aiParts(on) {
     $('navOrganizer').hidden = !on; $('chatFab').hidden = !on;
     if (!on && current === 'organizer') show('home');
   }
+  var CHEV = '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
+  // A small status icon: a tick (good), an exclamation (worth a look, or act now), a dot (checked, nothing to judge) or a dash
+  // (not checked). It always sits next to a word, so colour is never the only signal.
+  function st(lv) {
+    var ring = lv === 'none' ? '<circle cx="10" cy="10" r="8.2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-dasharray="3.2 2.4"/>'
+      : '<circle cx="10" cy="10" r="8.6" fill="currentColor" fill-opacity=".14" stroke="currentColor" stroke-width="1.6"/>';
+    var mark = lv === 'ok' ? '<path d="M6.2 10.3l2.5 2.5 5.1-5.3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'
+      : lv === 'warn' || lv === 'bad' ? '<path d="M10 5.6v5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="10" cy="14" r="1.2" fill="currentColor"/>'
+      : lv === 'info' ? '<circle cx="10" cy="10" r="2.3" fill="currentColor"/>'
+      : '<path d="M6.8 10h6.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>';
+    return '<svg class="st lv-' + lv + '" viewBox="0 0 20 20" aria-hidden="true">' + ring + mark + '</svg>';
+  }
+  // Sweepwise's own broom-shield in the status colour, with a tick (all good), an exclamation (worth a look, or act now)
+  // or a dot (not checked yet).
+  function emblem(lv) {
+    var mark = lv === 'ok' ? '<path class="em-mark" d="M71.5 78.5l4.5 4.5 8.5-9" stroke-width="4"/>'
+      : lv === 'none' ? '<circle class="em-dot" cx="78" cy="78" r="4.2"/>'
+      : '<path class="em-mark" d="M78 70.5v8" stroke-width="4.2"/><circle class="em-dot" cx="78" cy="85" r="2.6"/>';
+    return '<svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 5 C62 13 76 16 90 17 C92 52 80 80 50 96 C20 80 8 52 10 17 C24 16 38 13 50 5 Z" fill="currentColor" fill-opacity=".13" stroke="currentColor" stroke-width="3"/>' +
+      '<line x1="66.5" y1="24.5" x2="45.6" y2="55.2" stroke="currentColor" stroke-width="4.6" stroke-linecap="round"/><path d="M37.18 53.98 L49.27 62.86 L44.07 80.5 C35 78.6 26 72 21.5 64.85 Z" fill="currentColor"/>' +
+      '<path class="em-cut" d="M39.95 51.05 L51.23 59.34 L48.87 62.56 L37.58 54.27 Z"/><path d="M74.5 38 Q74.5 42.5 79 42.5 Q74.5 42.5 74.5 47 Q74.5 42.5 70 42.5 Q74.5 42.5 74.5 38 Z" fill="currentColor"/>' +
+      '<circle class="em-badge" cx="78" cy="78" r="15" fill="currentColor"/>' + mark + '</svg>';
+  }
+  // A time on a status line: "today 3:25 PM", "yesterday 9:10 AM", or the date for anything older.
+  function at(s) {
+    var d = new Date(s); if (!s || isNaN(d)) return '';
+    var now = new Date(), days = Math.round((new Date(now.getFullYear(), now.getMonth(), now.getDate()) - new Date(d.getFullYear(), d.getMonth(), d.getDate())) / 864e5);
+    var hm = d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+    return days === 0 ? tf('home.time.today', 'today {t}', { t: hm }) : days === 1 ? tf('home.time.yesterday', 'yesterday {t}', { t: hm }) : when(s);
+  }
+  function defsText(age) { return age === 0 ? t('home.rc.defs_new', 'Virus definitions under a day old') : age === 1 ? t('home.rc.defs_one', 'Virus definitions 1 day old') : tf('home.rc.defs', 'Virus definitions {n} days old', { n: age }); }
+  // The result of the virus scan in Sweepwise's last clean-up, given only when that scan is also the newest one on record
+  // (Windows Security runs scans by itself too, and Sweepwise does not know their results).
+  function scanResult(s) {
+    var lr = s.last_run; if (!lr || !s.last_scan || (lr.scan !== 'clean' && lr.scan !== 'threats')) return '';
+    var gap = new Date(s.last_scan) - new Date(lr.when);
+    return gap >= 0 && gap <= 30 * 60000 ? lr.scan : '';
+  }
+  // Puts new content in a box only when it changed, and keeps keyboard focus on the same button.
+  function swap(el, html) {
+    if (el._html === html) return;
+    var f = document.activeElement, i = el.contains(f) ? Array.prototype.indexOf.call(el.querySelectorAll('button'), f) : -1;
+    el.innerHTML = html; el._html = html;
+    if (i >= 0) { var b = el.querySelectorAll('button')[i]; if (b) b.focus(); }
+  }
   // What needs the person: short pills that open the right page (at most 3, the rest one click away).
-  function attention(s) {
+  // Suggestions waiting for your OK and the temperature have their own cards on Home, so they are not repeated here.
+  function attnItems(s) {
     var where = function (r) {
-      if (/waiting for your OK/i.test(r)) return 'list';
-      if (/not cleaned yet|No clean-up|is hot/i.test(r)) return null;
+      if (/waiting for your OK|is hot/i.test(r)) return null;
+      if (/not cleaned yet|No clean-up/i.test(r)) return '';
       if (/drive is getting full/i.test(r)) return 'finder';
       if (/memory is low/i.test(r)) return '';
       return 'security';
     };
-    var items = (s.reasons || []).map(function (r) { return { text: r, go: where(r) }; }).filter(function (i) { return i.go !== null; });
-    var pill = function (i) {
-      var bad = /off|threat|harmful/i.test(i.text) && !/Sweepwise/.test(i.text);
-      return i.go ? '<button class="attn' + (bad ? ' bad' : '') + '" data-attn="' + i.go + '" title="' + esc(i.text) + '"><i></i><span>' + esc(i.text) + '</span> &#8250;</button>'
-        : '<span class="attn" title="' + esc(i.text) + '"><i></i><span>' + esc(i.text) + '</span></span>';
-    };
-    var open = attention.open;
-    var shown = open ? items : items.slice(0, 3);
-    var html = items.length ? shown.map(pill).join('') : '<span class="attn ok"><i></i><span>Nothing needs your attention.</span></span>';
-    if (!open && items.length > 3) html += '<button class="attn more" id="attnMore">+' + (items.length - 3) + ' more</button>';
-    $('attn').innerHTML = html;
-    Array.prototype.forEach.call(document.querySelectorAll('[data-attn]'), function (b) { b.addEventListener('click', function () { show(b.dataset.attn); }); });
-    if ($('attnMore')) $('attnMore').addEventListener('click', function () { attention.open = true; attention(s); });
+    return (s.reasons || []).map(function (r) { return { text: r, go: where(r), bad: /off|threat|harmful/i.test(r) && !/Sweepwise/.test(r) }; }).filter(function (i) { return i.go !== null; });
   }
+  function attention(items) {
+    attention.items = items;
+    var pill = function (i) {
+      var lv = i.bad ? 'bad' : 'warn';
+      return i.go ? '<button type="button" class="attn' + (i.bad ? ' bad' : '') + '" data-attn="' + i.go + '">' + st(lv) + '<span>' + esc(i.text) + '</span>' + CHEV + '</button>'
+        : '<span class="attn">' + st(lv) + '<span>' + esc(i.text) + '</span></span>';
+    };
+    var shown = attention.open ? items : items.slice(0, 3);
+    swap($('attn'), shown.map(pill).join('') + (!attention.open && items.length > 3 ? '<button type="button" class="attn more" id="attnMore">' + esc(tf('home.more', '+{n} more', { n: items.length - 3 })) + '</button>' : ''));
+    $('attn').hidden = !items.length;
+  }
+  $('attn').addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    if (b.id === 'attnMore') { attention.open = true; attention(attention.items || []); return; }
+    if (b.dataset.attn) show(b.dataset.attn);
+  });
+  var homeStatus = null, SCORE_C = 119.38; // the score ring's length: 2 x pi x 19
+  function renderHome(s) {
+    homeStatus = s;
+    var reasons = s.reasons || [], lr = s.last_run, win = OS === 'windows', prot = s.realtime === true;
+    var has = function (re) { return reasons.some(function (r) { return re.test(r); }); };
+    var items = attnItems(s), bad = items.filter(function (i) { return i.bad; });
+    // The verdict only says what Sweepwise knows. Before the first check (no clean-up and no virus scan on record) there is
+    // no score. Act now names the problem and the fix; worth a look counts the pills under it.
+    var checked = !!(s.last_run || s.last_scan), lv, verdict, fix = '', fixGo = '', said = null;
+    if (!checked) { lv = 'none'; verdict = t('home.verdict.none', "Sweepwise hasn't checked this PC yet"); }
+    else if (s.realtime === false) { lv = 'bad'; verdict = t('home.verdict.prot_off', 'Virus protection is off'); fix = t('home.fix.prot_off', 'Turn it on in Windows Security.'); fixGo = 'ws'; said = /virus protection is off/i; }
+    else if (lr && lr.scan === 'threats') {
+      lv = 'bad'; verdict = t('home.verdict.threat', 'The last scan found a threat'); said = /found a threat/i;
+      if (win) { fix = t('home.fix.threat', "Windows Security's Protection history shows what it found and what it did."); fixGo = 'ws'; }
+    } else if (bad.length) {
+      var txt = bad[0].text.replace(/\.$/, ''), cut = txt.indexOf(': '), named = cut > 0 && cut < 40;
+      lv = 'bad'; verdict = named ? tf('home.verdict.needs', '{name} needs your attention', { name: txt.slice(0, cut) }) : txt;
+      fix = (named ? txt.slice(cut + 2) + '. ' : '') + t('home.fix.security', 'The Security page has the details.'); fixGo = 'sec'; said = bad[0].text;
+    } else if (items.length) {
+      var n = items.length; lv = 'warn';
+      verdict = prot ? (n === 1 ? t('home.verdict.look_one', 'Protected, 1 thing worth a look') : tf('home.verdict.look_many', 'Protected, {n} things worth a look', { n: n }))
+        : (n === 1 ? t('home.verdict.np_look_one', '1 thing worth a look') : tf('home.verdict.np_look_many', '{n} things worth a look', { n: n }));
+    } else { lv = 'ok'; verdict = prot ? t('home.verdict.ok', 'Protected and tidy') : t('home.verdict.np_ok', 'Nothing needs your attention'); }
+    var chips = items.filter(function (i) { return !said || (typeof said === 'string' ? i.text !== said : !said.test(i.text)); });
+    var em = $('bandEmblem'); if (em.dataset.lv !== lv) { em.dataset.lv = lv; em.className = 'band-emblem lv-' + lv; em.innerHTML = emblem(lv); }
+    if ($('verdict').textContent !== verdict) $('verdict').textContent = verdict;
+    $('verdictFix').hidden = !fix; $('verdictFixText').textContent = fix;
+    $('verdictFixGo').hidden = !fixGo; $('verdictFixGo').dataset.go = fixGo;
+    $('verdictFixGo').textContent = fixGo === 'ws' ? t('home.fix.open_ws', 'Open Windows Security') : t('home.fix.open_sec', 'Open the Security page');
+    // The health score: a small ring, only after the first check, with its reasons one click away.
+    var scored = checked && typeof s.score === 'number';
+    $('scoreBtn').hidden = !scored;
+    if (scored) { countUp($('score'), s.score); $('scoreArc').style.strokeDashoffset = (SCORE_C * (1 - Math.max(0, Math.min(100, s.score)) / 100)).toFixed(2); }
+    else { $('whyBox').hidden = true; $('scoreBtn').setAttribute('aria-expanded', 'false'); }
+    swap($('whyBox'), '<b>' + esc(t('home.why.title', 'What lowers the score')) + '</b>' + (reasons.length ? '<ul>' + reasons.map(function (r) { return '<li>' + esc(r) + '</li>'; }).join('') + '</ul>' : '<p>' + esc(t('home.why.none', 'Nothing is lowering the score.')) + '</p>'));
+    // Receipts: proof with times, next to the verdict.
+    var rc = [], stale = has(/No clean-up in the last/i);
+    if (s.realtime === true) rc.push(['ok', t('home.rc.prot_on', 'Windows Security on')]);
+    else if (s.realtime === false) rc.push(['bad', t('home.rc.prot_off', 'Virus protection off')]);
+    if (s.definitions_age != null) rc.push([s.definitions_age > 3 ? 'warn' : 'ok', defsText(s.definitions_age)]);
+    if (s.last_scan) {
+      var res = scanResult(s), sat = { at: at(s.last_scan) };
+      if (res === 'threats') rc.push(['bad', tf('home.rc.scan_threat', 'Last virus scan {at}: a threat was found', sat)]);
+      else rc.push([Date.now() - new Date(s.last_scan) > 7 * 864e5 ? 'warn' : 'ok', res === 'clean' ? tf('home.rc.scan_clean', 'Last virus scan {at}: no threats found', sat) : tf('home.rc.scan', 'Last virus scan {at}', sat)]);
+    }
+    if (lr) rc.push([stale ? 'warn' : 'ok', tf('home.rc.clean', 'Last clean-up {at}: {size} freed', { at: at(lr.when), size: size(lr.freed) })]);
+    swap($('receipts'), rc.map(function (r) { return '<li>' + st(r[0]) + '<span>' + esc(r[1]) + '</span></li>'; }).join(''));
+    $('receipts').hidden = !rc.length;
+    attention(chips);
+    // What Sweepwise checked: one row per area, each with a status icon, one fact from the status, a time and its page.
+    var rows = [], look = t('home.word.look', 'Worth a look'), live = t('home.time.live', 'live reading'), unknown = t('home.word.unknown', 'Not known');
+    var vreason = reasons.filter(function (r) { return /No virus scanner yet|Virus definitions are|No virus scan in the/i.test(r); })[0];
+    var vlv = s.realtime === false || (lr && lr.scan === 'threats') ? 'bad' : vreason ? 'warn' : (prot || s.last_scan) ? 'ok' : 'none';
+    rows.push({ go: 'security', name: t('home.row.virus', 'Virus protection'), lv: vlv,
+      word: s.realtime === false ? t('home.word.off', 'Off') : vlv === 'bad' ? t('home.word.threat', 'Threat found') : vlv === 'warn' ? look : prot ? t('home.word.on', 'On') : vlv === 'ok' ? t('home.word.scanned', 'Scanned') : unknown,
+      fact: s.realtime === false ? t('home.row.virus.off', 'Turn it on in Windows Security') : vreason ? vreason.replace(/\.$/, '') : prot ? t('home.row.virus.on', 'Windows Security is on')
+        : win ? t('home.row.virus.unread', 'Sweepwise could not read Windows Security') : s.definitions_age != null ? defsText(s.definitions_age) : t('home.row.virus.sec', 'Part of the Security check'),
+      time: s.last_scan ? tf('home.time.scan', 'last scan {at}', { at: at(s.last_scan) }) : t('home.time.no_scan', 'no scan yet') });
+    rows.push({ go: 'list', name: t('home.row.junk', 'Junk'), lv: lr ? (stale ? 'warn' : 'ok') : 'none',
+      word: lr ? (stale ? look : t('home.word.cleaned', 'Cleaned')) : t('home.word.not_yet', 'Not yet'),
+      fact: lr ? tf('home.row.junk.freed', 'Last clean-up freed {size}', { size: size(lr.freed) }) : t('home.row.junk.never', 'Sweepwise has not cleaned yet'), time: lr ? at(lr.when) : '' });
+    var ram = s.free_ram_gb != null, low = ram && s.free_ram_gb < 1.5, mem = { free: s.free_ram_gb, total: s.total_ram_gb };
+    rows.push({ go: 'boost', name: t('home.row.speed', 'Speed'), lv: !ram ? 'none' : low ? 'warn' : 'ok', word: !ram ? unknown : low ? look : t('home.word.fine', 'OK'),
+      fact: !ram ? '' : low ? tf('home.row.speed.low', 'Free memory is low: {free} GB of {total} GB', mem) : tf('home.row.speed.ram', 'Free memory: {free} GB of {total} GB', mem), time: live });
+    var disk = s.total_disk > 0, full = has(/drive is getting full/i);
+    rows.push({ go: 'storage', name: t('home.row.storage', 'Storage'), lv: !disk ? 'none' : full ? 'warn' : 'ok', word: !disk ? unknown : full ? look : t('home.word.fine', 'OK'),
+      fact: disk ? tf('home.row.storage.free', '{free} free of {total}', { free: size(s.free_disk), total: size(s.total_disk) }) : '', time: live });
+    var checkedAt = s.security ? tf('home.time.checked', 'checked {at}', { at: at(s.security.checked) }) : '';
+    // Camera and microphone use is only read on Windows (Windows' own record), so the row is left out elsewhere.
+    if (win) rows.push({ go: 'security', name: t('home.row.privacy', 'Privacy'), lv: s.security ? 'info' : 'none', word: s.security ? t('home.word.checked', 'Checked') : t('home.word.not_checked', 'Not checked'),
+      fact: t('home.row.privacy.fact', 'Apps that used your camera or microphone'), time: s.security ? checkedAt : t('home.time.with_sec', 'with the Security check') });
+    var sp = s.security ? (s.security.problems || 0) : 0;
+    rows.push({ go: 'security', name: t('home.row.sec', 'Security check'), lv: s.security && !sp ? 'ok' : 'warn',
+      word: !s.security ? t('home.word.not_run', 'Not run yet') : sp ? tf('home.word.to_look', '{n} to look at', { n: sp }) : t('home.word.no_problems', 'No problems found'),
+      fact: t('home.row.sec.fact', 'Firewall, updates, startup items and browsers'), time: checkedAt });
+    swap($('checkedList'), rows.map(function (r) {
+      return '<button type="button" class="crow" data-go="' + r.go + '">' + st(r.lv) + '<span class="crow-t"><b>' + esc(r.name) + '</b><span>' + esc(r.fact) + '</span></span>' +
+        '<span class="crow-s"><em class="lv-' + r.lv + '">' + esc(r.word) + '</em><small>' + esc(r.time) + '</small></span>' + CHEV + '</button>';
+    }).join(''));
+    // The cards: waiting for your OK, Undo (approved changes, never the junk clean) and the temperature.
+    var p = s.pending || 0;
+    $('waitCount').textContent = p; $('waitCount').hidden = !p;
+    swap($('waitText'), p ? '<b>' + esc(p === 1 ? t('home.wait.one', '1 suggestion is ready for you to look over.') : tf('home.wait.many', '{n} suggestions are ready for you to look over.', { n: p })) + '</b> ' + esc(t('home.wait.desc', 'Nothing changes until you press Approve.'))
+      : esc(t('home.wait.none', 'Nothing is waiting for your OK right now.')));
+    var scanWord = lr ? ({ clean: t('home.scan.clean', 'no threats found'), threats: t('home.scan.threats', 'a threat was found'), 'not run': t('home.scan.skipped', 'virus scan skipped'), failed: t('home.scan.failed', "virus scan didn't finish") }[lr.scan] || '') : '';
+    swap($('undoLast'), lr ? '<b>' + esc(tf('home.undo.last', 'Last clean-up {at}', { at: at(lr.when) })) + '</b><br>' + esc(tf('home.undo.freed', '{size} freed', { size: size(lr.freed) }) + (scanWord ? ' · ' + scanWord : ''))
+      : '<b>' + esc(t('home.undo.never', 'Sweepwise has not cleaned yet.')) + '</b>');
+    $('homeSys').textContent = [s.os, s.version ? 'Sweepwise ' + s.version : ''].filter(Boolean).join(' · ');
+  }
+  $('scoreBtn').addEventListener('click', function () { var w = $('whyBox'); w.hidden = !w.hidden; $('scoreBtn').setAttribute('aria-expanded', String(!w.hidden)); });
+  $('verdictFixGo').addEventListener('click', function () { if ($('verdictFixGo').dataset.go === 'ws') api('/api/open', { what: 'security' }).catch(function (e) { toast(e.message); }); else show('security'); });
+  $('checkedList').addEventListener('click', function (e) { var b = e.target.closest('[data-go]'); if (b) show(b.dataset.go); });
+  // Check my PC's arrow opens Quick scan, Full virus scan and Deep clean: the same buttons and dialogs as before.
+  function ctaMenu(open) { $('ctaMenu').hidden = !open; $('ctaMore').setAttribute('aria-expanded', String(open)); }
+  $('ctaMore').addEventListener('click', function () { var open = $('ctaMenu').hidden; ctaMenu(open); if (open) { var f = $('ctaMenu').querySelector('button:not(:disabled)'); if (f) f.focus(); } });
+  // Closes before the chosen item runs, so a dialog it opens hands focus back to the arrow.
+  $('ctaMenu').addEventListener('click', function (e) { if (e.target.closest('button')) { ctaMenu(false); $('ctaMore').focus(); } }, true);
+  document.addEventListener('click', function (e) { if (!$('ctaMenu').hidden && !e.target.closest('.cta-wrap')) ctaMenu(false); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !$('ctaMenu').hidden) { ctaMenu(false); $('ctaMore').focus(); } });
   // Live temperature: a reading every 5 seconds while Home is open, the last 10 minutes drawn as a line.
   var temps = [];
   function tempSample(c) {
-    $('sTemp').textContent = c == null ? 'n/a' : c + '°C'; $('sTemp').className = c >= 85 ? 'bad' : c >= 75 ? 'warn' : c == null ? '' : 'good';
-    $('sTemp2').textContent = c == null ? 'no sensor' : c >= 85 ? 'hot: let it cool' : c >= 75 ? 'warm' : 'cool';
-    if (c == null) { $('cTemp').innerHTML = ''; $('sTemp3').textContent = 'This computer does not report its temperature.'; return; }
+    var lv = c == null ? 'none' : c >= 85 ? 'bad' : c >= 75 ? 'warn' : 'ok';
+    $('sTemp').textContent = c == null ? '--' : c + ' °C';
+    $('sTemp2').className = 'stword lv-' + lv;
+    $('sTemp2').innerHTML = st(lv) + esc(c == null ? t('home.temp.no_sensor', 'No sensor') : c >= 85 ? t('home.temp.hot', 'Hot: let it cool') : c >= 75 ? t('home.temp.warm', 'Warm') : t('home.temp.cool', 'Cool'));
+    $('tempWait').hidden = !(c > 70);
+    if (c == null) { $('cTemp').innerHTML = ''; $('sTemp3').textContent = t('home.temp.none', 'This computer does not report its temperature.'); return; }
     var now = Date.now();
     temps.push({ x: now, y: c });
     temps = temps.filter(function (p) { return now - p.x <= 600000; });
@@ -692,17 +945,17 @@ main:focus { outline:none; }
   function drawTemp() {
     var svg = $('cTemp'), W = svg.clientWidth || 260, H = 54, pad = 4;
     svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
-    if (temps.length < 2) { svg.innerHTML = ''; $('sTemp3').textContent = 'Live, last 10 minutes (building up)'; return; }
+    if (temps.length < 2) { svg.innerHTML = ''; $('sTemp3').textContent = t('home.temp.building', 'Live, last 10 minutes (building up)'); return; }
     var ys = temps.map(function (p) { return p.y; }), lo = Math.min.apply(null, ys), hi = Math.max.apply(null, ys);
     var y0 = Math.max(0, lo - 4), y1 = hi + 4, x0 = temps[0].x, x1 = Math.max(temps[temps.length - 1].x, x0 + 1);
     var pts = temps.map(function (p) { return [pad + (p.x - x0) / (x1 - x0) * (W - pad * 2), H - pad - (p.y - y0) / (y1 - y0) * (H - pad * 2)]; });
-    var last = temps[temps.length - 1].y, col = last >= 85 ? 'var(--bad)' : last >= 75 ? 'var(--warn)' : 'var(--teal)';
+    var last = temps[temps.length - 1].y, col = last >= 85 ? 'var(--bad)' : last >= 75 ? 'var(--warn)' : 'var(--good)';
     var line = pts.map(function (p, i) { return (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1); }).join(' ');
     var area = line + ' L' + pts[pts.length - 1][0].toFixed(1) + ' ' + (H - pad) + ' L' + pts[0][0].toFixed(1) + ' ' + (H - pad) + ' Z';
     var end = pts[pts.length - 1];
     svg.innerHTML = '<path d="' + area + '" fill="' + col + '" opacity=".12"/><path d="' + line + '" fill="none" stroke="' + col + '" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>' +
       '<circle cx="' + end[0].toFixed(1) + '" cy="' + end[1].toFixed(1) + '" r="3.5" fill="' + col + '"/>';
-    $('sTemp3').textContent = 'Live, last 10 minutes · low ' + lo + '°C, high ' + hi + '°C';
+    $('sTemp3').textContent = tf('home.temp.range', 'Live, last 10 minutes · low {lo} °C, high {hi} °C', { lo: lo, hi: hi });
   }
   setInterval(function () { if (current === 'home' && !document.hidden) api('/api/temp').then(function (d) { tempSample(d.temp_c); }).catch(function () {}); }, 5000);
   function setBusy(b) { $('bigBtn').disabled = b; Array.prototype.forEach.call(document.querySelectorAll('[data-run]'), function (x) { x.disabled = b; }); }
