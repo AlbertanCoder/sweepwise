@@ -130,3 +130,20 @@ test('redact removes emails, user folders, numbers, keys, outside links and @men
   assert.match(out, /github\.com\/AlbertanCoder\/sweepwise\/issues\/1/);
   assert.match(out, /@\u200bsomeone/);
 });
+
+test('a reply that stops early is tried once more and never shown half-written', async () => {
+  let n = 0;
+  globalThis.fetch = async () => {
+    n++;
+    const body = n === 1 ? { choices: [{ message: { content: 'No, Sweep' }, finish_reason: 'length' }] } : { choices: [{ message: { content: 'It is free.' }, finish_reason: 'stop' }] };
+    return new Response(JSON.stringify(body), { status: 200 });
+  };
+  const r = await worker.fetch(req('/chat', ask('is it free?')), makeEnv());
+  assert.deepEqual(await r.json(), { reply: 'It is free.' });
+  assert.equal(n, 2);
+  n = 0;
+  globalThis.fetch = async () => { n++; return new Response(JSON.stringify({ choices: [{ message: { content: 'No, Sweep' }, finish_reason: 'length' }] }), { status: 200 }); };
+  const bad = await worker.fetch(req('/chat', ask('is it free?')), makeEnv());
+  assert.equal(bad.status, 502);
+  assert.equal(n, 2);
+});

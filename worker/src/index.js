@@ -77,17 +77,21 @@ async function chat(request, env, origin) {
   if (!(await bump(env, 'total:' + day, parseInt(env.DAILY_MESSAGE_CAP || '1200', 10)))) return send(env, origin, 429, { error: 'resting' });
   if (!(await bump(env, 'v:' + (await visitorId(request, day)), parseInt(env.PER_VISITOR_CAP || '20', 10)))) return send(env, origin, 429, { error: 'limit' });
 
-  let r;
-  try {
-    r = await fetch((env.API_BASE || 'https://openrouter.ai/api/v1') + '/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + env.AI_API_KEY, 'HTTP-Referer': env.ALLOWED_ORIGIN, 'X-Title': 'Sweepwise Help' },
-      body: JSON.stringify({ model: env.MODEL || 'deepseek/deepseek-v4-flash', max_tokens: 400, temperature: 0.2, messages: [{ role: 'system', content: SYSTEM }, ...messages] }),
-    });
-  } catch { return send(env, origin, 502, { error: 'unavailable' }); }
-  if (!r.ok) return send(env, origin, 502, { error: 'unavailable' });
+  // A reply that stops early (the AI service ends it for any reason but a normal finish) is tried once more, never shown half-written.
   let text = '';
-  try { text = ((await r.json()).choices[0].message.content || '').trim(); } catch { return send(env, origin, 502, { error: 'unavailable' }); }
+  for (let attempt = 0; attempt < 2 && !text; attempt++) {
+    try {
+      const r = await fetch((env.API_BASE || 'https://openrouter.ai/api/v1') + '/chat/completions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + env.AI_API_KEY, 'HTTP-Referer': env.ALLOWED_ORIGIN, 'X-Title': 'Sweepwise Help' },
+        body: JSON.stringify({ model: env.MODEL || 'deepseek/deepseek-v4-flash', max_tokens: 400, temperature: 0.2, messages: [{ role: 'system', content: SYSTEM }, ...messages] }),
+      });
+      if (!r.ok) continue;
+      const choice = (await r.json()).choices[0];
+      const got = ((choice.message && choice.message.content) || '').trim();
+      if (got && (!choice.finish_reason || choice.finish_reason === 'stop')) text = got;
+    } catch { /* try again once */ }
+  }
   if (!text) return send(env, origin, 502, { error: 'unavailable' });
 
   const i = text.indexOf(MARK);
