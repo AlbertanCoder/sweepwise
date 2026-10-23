@@ -9391,16 +9391,8 @@
  {
   "id": "C159",
   "source": "docs/index.html",
-  "why": "No signing step exists in the Tauri config or the CI build.",
-  "status": "proven",
-  "text": "The download from GitHub isn't signed with a paid certificate yet, so Windows shows \"Windows protected your PC\".",
-  "proof": [
-   {
-    "file": ".github/workflows/ci.yml",
-    "contains": "run: npx tauri build --bundles ${{ matrix.bundles }}"
-   }
-  ],
-  "tests": []
+  "why": "The Windows-warning answer is removed: there is no GitHub download yet, so it warned about something visitors cannot do.",
+  "status": "removed"
  },
  {
   "id": "C160",
