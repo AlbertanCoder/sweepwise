@@ -13,6 +13,8 @@ ALLOWED_ORIGIN = "https://albertancoder.github.io"
 # OpenRouter passes the question to the chosen model (DeepSeek V4 Flash). Any OpenAI-compatible service works: change these two to switch.
 API_BASE = "https://openrouter.ai/api/v1"
 MODEL = "deepseek/deepseek-v4-flash"
+# If the first model hiccups, OpenRouter tries this one (still DeepSeek, a little dearer per message).
+FALLBACK_MODEL = "deepseek/deepseek-v3.2"
 # Well under US$1 a day at normal question sizes; 20 messages per visitor per day.
 DAILY_MESSAGE_CAP = "1200"
 PER_VISITOR_CAP = "20"

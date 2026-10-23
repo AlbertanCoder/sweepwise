@@ -58,6 +58,13 @@ test('the AI company and model can be switched with two settings', async () => {
   assert.equal(ai.body.model, 'other-model');
 });
 
+test('a backup model is named so one provider hiccup does not become an error', async () => {
+  const calls = fakeFetch();
+  await worker.fetch(req('/chat', ask('hi')), makeEnv({ FALLBACK_MODEL: 'backup/model' }));
+  const ai = calls.find((c) => c.url.includes('/chat/completions'));
+  assert.deepEqual(ai.body.models, ['deepseek/deepseek-v4-flash', 'backup/model']);
+});
+
 test('a problem the bot cannot fix becomes an offer to hand it on', async () => {
   fakeFetch('I can pass this on to the maker.\n[[HANDOFF]] The app closes when pressing Approve; jo@example.com');
   const r = await (await worker.fetch(req('/chat', ask('it crashes')), makeEnv())).json();

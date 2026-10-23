@@ -143,7 +143,7 @@
         wait.remove();
         if (!x.ok) {
           history.pop();
-          fallback(x.d && x.d.error === 'limit' ? 'That’s all the questions I can take from one visitor today.' : 'The chat is resting right now.');
+          fallback(x.d && x.d.error === 'limit' ? 'That’s all the questions I can take from one visitor today.' : x.d && x.d.error === 'resting' ? 'The chat is resting right now.' : 'I couldn’t get an answer just then. Please try asking again.');
           return;
         }
         say(x.d.reply, 'bot');

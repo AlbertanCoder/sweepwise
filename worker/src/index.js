@@ -84,7 +84,7 @@ async function chat(request, env, origin) {
       const r = await fetch((env.API_BASE || 'https://openrouter.ai/api/v1') + '/chat/completions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + env.AI_API_KEY, 'HTTP-Referer': env.ALLOWED_ORIGIN, 'X-Title': 'Sweepwise Help' },
-        body: JSON.stringify({ model: env.MODEL || 'deepseek/deepseek-v4-flash', max_tokens: 400, temperature: 0.2, messages: [{ role: 'system', content: SYSTEM }, ...messages] }),
+        body: JSON.stringify({ model: env.MODEL || 'deepseek/deepseek-v4-flash', ...(env.FALLBACK_MODEL ? { models: [env.MODEL || 'deepseek/deepseek-v4-flash', env.FALLBACK_MODEL] } : {}), max_tokens: 400, temperature: 0.2, messages: [{ role: 'system', content: SYSTEM }, ...messages] }),
       });
       if (!r.ok) continue;
       const choice = (await r.json()).choices[0];

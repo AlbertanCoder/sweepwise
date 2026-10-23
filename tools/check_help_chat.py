@@ -52,6 +52,8 @@ def main():
                     posts.append((u.replace(FAKE, ''), body))
                     h = {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'}
                     if u.endswith('/chat'):
+                        if mode['chat'] == 'down':
+                            return r.fulfill(status=502, headers=h, body=json.dumps({'error': 'unavailable'}))
                         if mode['chat'] == 'resting':
                             return r.fulfill(status=429, headers=h, body=json.dumps({'error': 'resting'}))
                         if mode['chat'] == 'handoff':
@@ -69,7 +71,7 @@ def main():
             ctx.route('**/*', route)
             pg = ctx.new_page()
             pg.on('pageerror', lambda e: errors.append(str(e)))
-            pg.on('console', lambda m: errors.append(m.text) if m.type == 'error' and 'ERR_FAILED' not in m.text and 'status of 429' not in m.text else None)
+            pg.on('console', lambda m: errors.append(m.text) if m.type == 'error' and 'ERR_FAILED' not in m.text and 'status of 429' not in m.text and 'status of 502' not in m.text else None)
             return ctx, pg
 
         # off by default: no back-end address means no bubble
@@ -117,6 +119,12 @@ def main():
         pg.press('.hc-in', 'Enter')
         pg.wait_for_selector('.hc-bot:has-text("resting")')
         check(pg.locator('.hc-bot a[href="https://github.com/AlbertanCoder/sweepwise/issues/new"]').count() >= 1, 'when the chat is resting the person is pointed to Report a problem')
+        mode['chat'] = 'down'
+        pg.wait_for_function("() => !document.querySelector('.hc-form button').disabled")
+        pg.fill('.hc-in', 'again')
+        pg.press('.hc-in', 'Enter')
+        pg.wait_for_selector('.hc-bot:has-text("try asking again")')
+        check('resting' not in pg.inner_text('.hc-bot:last-of-type') and pg.locator('.hc-bot a[href$="/issues/new"]').count() >= 1, 'a provider hiccup says "try asking again", not "resting"')
         pg.keyboard.press('Escape')
         check(not pg.is_visible('.hc-panel') and pg.is_visible('.hc-open'), 'Escape closes the chat')
         ctx.close()
