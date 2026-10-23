@@ -1,6 +1,7 @@
 // Asking for support (PUBLIC_SPEC 6, 7, 27, 28): only after a real win (a clean that freed 500 MB or more), at
 // most once every 30 days, never again after "Don't ask again". Wording is "Support Sweepwise" / "Buy me a coffee",
 // never anything else. Every feature stays free for everyone either way; there are no perks to unlock.
+use super::update;
 use super::util::{self, fmt_size};
 use super::Engine;
 use serde_json::{json, Value};
@@ -8,9 +9,23 @@ use serde_json::{json, Value};
 /// Where support goes (the accounts are the maker's own; Sweepwise never sees payment details).
 pub const KOFI: &str = "https://ko-fi.com/albertancoder";
 pub const SPONSORS: &str = "https://github.com/sponsors/AlbertanCoder";
+/// The Microsoft Store page of the Store version (its rating box opens from "Rate on the Store").
+pub const STORE_REVIEW: &str = "ms-windows-store://review/?ProductId=9PM74K476VTS";
 /// A clean this big counts as a real win.
 pub const WIN_BYTES: u64 = 500 * 1024 * 1024;
 pub const DAYS_BETWEEN: i64 = 30;
+
+/// The card's first line. Rating comes first and carries no pressure; someone who already rated is only offered the coffee.
+pub fn ask_text(freed: u64, store: bool, rated: bool) -> String {
+    let size = fmt_size(freed);
+    if rated {
+        format!("Sweepwise freed {} today. If it helped, you can buy me a coffee.", size)
+    } else if store {
+        format!("Sweepwise freed {} today. If it helped, a rating on the Microsoft Store helps other people find it.", size)
+    } else {
+        format!("Sweepwise freed {} today. If it helped, a star on GitHub helps other people find it.", size)
+    }
+}
 
 /// After a clean: should Sweepwise ask now? If it does, the 30-day clock starts at this moment.
 pub fn ask_after_win(eng: &Engine, freed: u64) -> Option<Value> {
@@ -24,13 +39,16 @@ pub fn ask_after_win(eng: &Engine, freed: u64) -> Option<Value> {
         }
     }
     eng.set_setting("support_last", json!(util::iso(util::now())));
-    Some(json!({ "freed": freed, "text": format!("Sweepwise freed {} today. If it helped, you can buy me a coffee.", fmt_size(freed)) }))
+    let store = update::from_store();
+    let rated = eng.setting("support_rated").as_bool() == Some(true);
+    Some(json!({ "freed": freed, "text": ask_text(freed, store, rated), "store": store, "rate": !rated }))
 }
 
-/// POST /api/support/answer: "never" (Don't ask again), "later" (Maybe later) or "opened" (went to the Support page).
+/// POST /api/support/answer: "never" (Don't ask again), "later" (Maybe later), "opened" (went to the Support page) or "rated" (opened the rating or star page).
 pub fn answer(eng: &Engine, answer: &str) -> Result<Value, String> {
     match answer {
         "never" => eng.set_setting("support_never", json!(true)),
+        "rated" => eng.set_setting("support_rated", json!(true)),
         "later" | "opened" => {}
         _ => return Err("unknown answer".into()),
     }
@@ -41,6 +59,8 @@ pub fn answer(eng: &Engine, answer: &str) -> Result<Value, String> {
 pub fn state(eng: &Engine) -> Value {
     json!({
         "never": eng.setting("support_never").as_bool().unwrap_or(false),
+        "rated": eng.setting("support_rated").as_bool().unwrap_or(false),
+        "store": update::from_store(),
         "last_asked": eng.setting("support_last"),
         "kofi": KOFI,
         "sponsors": SPONSORS,
@@ -73,6 +93,29 @@ mod tests {
         assert_eq!(state(&eng)["never"], true);
         assert!(answer(&eng, "maybe").is_err());
         testutil::clean(&root);
+    }
+
+    #[test]
+    fn the_card_asks_for_a_rating_first_and_never_twice() {
+        assert!(ask_text(4 * 1024 * 1024 * 1024, true, false).contains("rating on the Microsoft Store"));
+        assert!(ask_text(4 * 1024 * 1024 * 1024, false, false).contains("star on GitHub"));
+        assert!(ask_text(4 * 1024 * 1024 * 1024, true, true).contains("buy me a coffee"), "after rating, only the coffee");
+        let (eng, root) = testutil::engine("support_rated");
+        let first = ask_after_win(&eng, 2 * 1024 * 1024 * 1024).unwrap();
+        assert_eq!(first["rate"], true);
+        assert!(first["text"].as_str().unwrap().contains("star on GitHub"), "the test program is not a Store copy");
+        answer(&eng, "rated").unwrap();
+        eng.set_setting("support_last", json!("2020-01-01T00:00:00"));
+        let again = ask_after_win(&eng, 2 * 1024 * 1024 * 1024).unwrap();
+        assert_eq!(again["rate"], false);
+        assert!(again["text"].as_str().unwrap().contains("buy me a coffee"));
+        assert_eq!(state(&eng)["rated"], true);
+        testutil::clean(&root);
+    }
+
+    #[test]
+    fn the_rating_page_is_the_stores_own() {
+        assert!(STORE_REVIEW.starts_with("ms-windows-store://review/?ProductId=9PM74K476VTS"));
     }
 
     #[test]

@@ -538,6 +538,14 @@ fn open_place(cfg: &Config, what: &str) -> Result<Value, String> {
         // Support, help, source code, licence and the update page: Sweepwise's own public pages only.
         "kofi" => support::KOFI.into(),
         "sponsors" => support::SPONSORS.into(),
+        // The rating box of the Microsoft Store version, or a star on the code page for other copies.
+        "rate" => {
+            if !update::from_store() {
+                return Err("The Store rating is only for the Microsoft Store version.".into());
+            }
+            support::STORE_REVIEW.into()
+        }
+        "star" => SOURCE.into(),
         "discussions" => format!("{}/discussions", SOURCE),
         "issues" => format!("{}/issues", SOURCE),
         "source" => SOURCE.into(),

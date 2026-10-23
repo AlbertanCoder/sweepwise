@@ -517,7 +517,7 @@ body[data-view="list"] #chatFab { bottom:118px; }
       <div class="sub" id="workTime" style="margin:0 0 14px"></div>
       <div class="log" id="workLog"></div>
       <div style="margin-top:18px; display:none" id="workDone"><button class="btn primary" id="workReview" data-i18n="button.review_suggestions">Review suggestions</button> <button class="btn" id="workHome" data-i18n="button.back_to_home">Back to Home</button></div>
-      <div class="card supportcard" id="supportCard" hidden><div class="heart" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21l-1.4-1.3C5.4 15 2 12 2 8.2 2 5.2 4.4 3 7.3 3c1.7 0 3.4.8 4.7 2.1C13.3 3.8 15 3 16.7 3 19.6 3 22 5.2 22 8.2c0 3.8-3.4 6.8-8.6 11.5z"/></svg></div><div><b id="supText">If Sweepwise helped, you can buy me a coffee.</b><span data-i18n="support.card.desc">Sweepwise is free for everyone and kept going by people who chip in. It unlocks nothing: everything is already free.</span></div><div class="links" style="margin:0"><button class="btn sm primary" id="supGo" data-i18n="button.support">Support Sweepwise</button><button class="btn sm" id="supLater" data-i18n="button.maybe_later">Maybe later</button><button class="btn sm" id="supNever" data-i18n="button.dont_ask_again">Don't ask again</button></div></div>
+      <div class="card supportcard" id="supportCard" hidden><div class="heart" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21l-1.4-1.3C5.4 15 2 12 2 8.2 2 5.2 4.4 3 7.3 3c1.7 0 3.4.8 4.7 2.1C13.3 3.8 15 3 16.7 3 19.6 3 22 5.2 22 8.2c0 3.8-3.4 6.8-8.6 11.5z"/></svg></div><div><b id="supText">If Sweepwise helped, you can buy me a coffee.</b><span data-i18n="support.card.desc">Sweepwise is free for everyone and kept going by people who chip in. It unlocks nothing: everything is already free.</span></div><div class="links" style="margin:0"><button class="btn sm primary" id="supRate" hidden data-i18n="button.rate_store">Rate on the Store</button><button class="btn sm primary" id="supGo" data-i18n="button.support">Support Sweepwise</button><button class="btn sm" id="supLater" data-i18n="button.maybe_later">Maybe later</button><button class="btn sm" id="supNever" data-i18n="button.dont_ask_again">Don't ask again</button></div></div>
     </div>
   </section>
 
@@ -1140,7 +1140,14 @@ body[data-view="list"] #chatFab { bottom:118px; }
         $('workReview').textContent = j.mode === 'security' ? 'See the results' : j.mode === 'organize' ? 'See the plan' : j.mode === 'diskmap' ? 'See the map' : j.mode === 'finder' || j.mode === 'email' ? 'See what was found' : 'Review suggestions';
         $('workReview').dataset.go = goTo;
         $('workReview').dataset.clean = '';
-        if (j.support && j.support.text) { $('supText').textContent = j.support.text; $('supportCard').hidden = false; } else { $('supportCard').hidden = true; }
+        if (j.support && j.support.text) {
+          $('supText').textContent = j.support.text; $('supportCard').hidden = false;
+          // Rating (Store copies) or a star (other copies) comes first; once someone has rated, only the coffee is offered.
+          var rb = $('supRate'), canRate = j.support.rate !== false;
+          rb.hidden = !canRate; rb.dataset.what = j.support.store ? 'rate' : 'star';
+          rb.textContent = j.support.store ? t('button.rate_store', 'Rate on the Store') : t('button.star_github', 'Star on GitHub');
+          $('supGo').className = 'btn sm' + (canRate ? '' : ' primary');
+        } else { $('supportCard').hidden = true; }
         // First run: Sweepwise only measured. Nothing is removed until the person presses Clean now.
         if (preview) {
           $('workTitle').textContent = titles[j.mode] + ': ready to clean';
@@ -1646,6 +1653,7 @@ body[data-view="list"] #chatFab { bottom:118px; }
   $('remGo').addEventListener('click', function () { $('remBanner').hidden = true; run('scan_clean'); });
   $('remHide').addEventListener('click', function () { $('remBanner').hidden = true; });
   // ---------- Support card (after a real win, at most once a month) ----------
+  $('supRate').addEventListener('click', function () { api('/api/open', { what: $('supRate').dataset.what }).catch(function () {}); api('/api/support/answer', { answer: 'rated' }).catch(function () {}); $('supportCard').hidden = true; toast('Thank you. Sweepwise will not ask for a rating again.'); });
   $('supGo').addEventListener('click', function () { api('/api/support/answer', { answer: 'opened' }).catch(function () {}); $('supportCard').hidden = true; show('support'); });
   $('supLater').addEventListener('click', function () { api('/api/support/answer', { answer: 'later' }).catch(function () {}); $('supportCard').hidden = true; toast('No problem. Sweepwise will not ask again for at least a month.'); });
   $('supNever').addEventListener('click', function () { api('/api/support/answer', { answer: 'never' }).catch(function () {}); $('supportCard').hidden = true; toast('Got it. Sweepwise will not ask again. The Support page stays in the menu if you ever want it.'); });
@@ -1739,7 +1747,7 @@ body[data-view="list"] #chatFab { bottom:118px; }
     if (/^welcome[123]?$/.test(name)) { openWelcome(+(name.slice(7) || 1)); return; }
     $('welcome').hidden = true;
     if (name === 'keyguide') { show('settings'); setTimeout(function () { keyGuide('claude'); }, 800); return; }
-    if (name === 'supportcard') { show('work'); $('workTitle').textContent = 'Scan & Clean: finished'; $('supText').textContent = 'Sweepwise freed 4.2 GB today. If it helped, you can buy me a coffee.'; $('supportCard').hidden = false; return; }
+    if (name === 'supportcard') { show('work'); $('workTitle').textContent = 'Scan & Clean: finished'; $('supText').textContent = 'Sweepwise freed 4.2 GB today. If it helped, a rating on the Microsoft Store helps other people find it.'; $('supRate').hidden = false; $('supRate').dataset.what = 'rate'; $('supGo').className = 'btn sm'; $('supportCard').hidden = false; return; }
     if ($('v-' + name)) show(name);
   }
 
