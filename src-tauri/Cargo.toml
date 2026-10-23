@@ -1,6 +1,6 @@
 [package]
 name = "sweepwise"
-version = "0.1.0"
+version = "0.1.1"
 description = "Sweepwise: free, open-source PC care for Windows, Mac and Linux, funded by the people who use it."
 authors = ["AlbertanCoder"]
 license = "GPL-3.0-or-later"

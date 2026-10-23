@@ -7,10 +7,12 @@ param(
   [Parameter(Mandatory)][string]$Publisher,
   [Parameter(Mandatory)][string]$PublisherDisplay,
   [string]$DisplayName = 'Sweepwise PC Care',
-  [string]$Version = '0.1.0.0',
+  [string]$Version = '',
   [string]$Out = (Join-Path $PSScriptRoot 'out')
 )
 $ErrorActionPreference = 'Stop'
+# The package version follows the app's own version number (0.1.1 becomes 0.1.1.0) unless one is given.
+if (-not $Version) { $Version = (Get-Content (Join-Path $PSScriptRoot '..\..\src-tauri\tauri.conf.json') -Raw | ConvertFrom-Json).version + '.0' }
 if ($Version -notmatch '^\d+\.\d+\.\d+\.0$') { throw "Version must look like 0.1.0.0 (the Store keeps the last part at 0), got $Version" }
 $sdk = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin\*\x64\makeappx.exe" | Sort-Object FullName | Select-Object -Last 1
 if (-not $sdk) { throw 'makeappx.exe not found: install the Windows 10/11 SDK.' }

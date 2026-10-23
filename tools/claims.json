@@ -9489,41 +9489,37 @@
   "id": "en-x3",
   "source": "src/i18n/en.json",
   "status": "fixed",
-  "text": "\"about.licence.title\": \"Free, and open source at launch\"",
+  "text": "\"about.licence.title\": \"Free, and open source\"",
   "proof": [
+   {
+    "file": "src-tauri/Cargo.toml",
+    "contains": "license = \"GPL-3.0-or-later\""
+   },
    {
     "file": "LICENSE",
     "contains": "GNU GENERAL PUBLIC LICENSE"
-   },
-   {
-    "file": "src-tauri/src/engine/update.rs",
-    "contains": "(or the project is not public yet)"
    }
   ],
   "tests": [],
-  "why": "The code is private until launch, so the title says open source at launch (canon point 9)."
+  "why": "The repository is public under GPL-3.0 (2026-10-23), so the app no longer says \"at launch\"."
  },
  {
   "id": "en-x4",
   "source": "src/i18n/en.json",
   "status": "fixed",
-  "text": "When it launches, its code will be open source under the GNU General Public License, version 3",
+  "text": "Its code is open source under the GNU General Public License, version 3",
   "proof": [
    {
+    "file": "src-tauri/Cargo.toml",
+    "contains": "license = \"GPL-3.0-or-later\""
+   },
+   {
     "file": "LICENSE",
-    "contains": "Version 3, 29 June 2007"
-   },
-   {
-    "file": "src-tauri/src/engine/mod.rs",
-    "contains": "\"licence\": \"GPL-3.0-or-later\""
-   },
-   {
-    "file": "src-tauri/src/engine/update.rs",
-    "contains": "(or the project is not public yet)"
+    "contains": "GNU GENERAL PUBLIC LICENSE"
    }
   ],
   "tests": [],
-  "why": "The code is private until launch, so it says the code will be open source under GPL-3.0 when it launches (canon point 9)."
+  "why": "The repository is public under GPL-3.0 (2026-10-23)."
  },
  {
   "id": "en-x5",
