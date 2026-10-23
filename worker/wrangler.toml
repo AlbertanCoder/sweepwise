@@ -10,10 +10,10 @@ id = "62f39a374a7345c88b349c4ae677c29e"
 
 [vars]
 ALLOWED_ORIGIN = "https://albertancoder.github.io"
-# Any OpenAI-compatible service works: change these two to switch the AI.
-API_BASE = "https://api.deepseek.com"
-MODEL = "deepseek-chat"
-# About US$1 a day on DeepSeek at normal question sizes; 20 messages per visitor per day.
+# OpenRouter passes the question to the chosen model (DeepSeek V4 Flash). Any OpenAI-compatible service works: change these two to switch.
+API_BASE = "https://openrouter.ai/api/v1"
+MODEL = "deepseek/deepseek-v4-flash"
+# Well under US$1 a day at normal question sizes; 20 messages per visitor per day.
 DAILY_MESSAGE_CAP = "1200"
 PER_VISITOR_CAP = "20"
 GITHUB_REPO = "AlbertanCoder/sweepwise"

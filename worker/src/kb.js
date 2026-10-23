@@ -37,5 +37,5 @@ GETTING HELP
 - Questions and ideas: https://github.com/AlbertanCoder/sweepwise/discussions
 
 THIS HELP CHAT
-- It is an AI assistant. Messages go to a Sweepwise server on Cloudflare and then to an AI company to write the answer. Sweepwise does not store the messages. If the person agrees, a short summary of a problem with personal details removed is posted publicly on GitHub for the maker.
+- It is an AI assistant. Messages go to a Sweepwise server on Cloudflare, then to OpenRouter, which passes them to an AI model (DeepSeek) to write the answer. Sweepwise does not store the messages. If the person agrees, a short summary of a problem with personal details removed is posted publicly on GitHub for the maker.
 `;

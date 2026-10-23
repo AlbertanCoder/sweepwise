@@ -1,5 +1,5 @@
 // Sweepwise Help: the website's support chat. A Cloudflare Worker that
-//  1. answers questions about Sweepwise from kb.js using an OpenAI-compatible AI (DeepSeek first; change API_BASE and MODEL to switch),
+//  1. answers questions about Sweepwise from kb.js using an OpenAI-compatible AI (OpenRouter with DeepSeek V4 Flash first; change API_BASE and MODEL to switch),
 //  2. with the person's OK, files a short, redacted summary as a public GitHub issue and pings the maker privately on Discord.
 // It stores no messages. The only things kept are counters (a hashed visitor id per day and a daily total) for the spending caps.
 import { KB } from './kb.js';
@@ -79,10 +79,10 @@ async function chat(request, env, origin) {
 
   let r;
   try {
-    r = await fetch((env.API_BASE || 'https://api.deepseek.com') + '/chat/completions', {
+    r = await fetch((env.API_BASE || 'https://openrouter.ai/api/v1') + '/chat/completions', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + env.AI_API_KEY },
-      body: JSON.stringify({ model: env.MODEL || 'deepseek-chat', max_tokens: 400, temperature: 0.2, messages: [{ role: 'system', content: SYSTEM }, ...messages] }),
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + env.AI_API_KEY, 'HTTP-Referer': env.ALLOWED_ORIGIN, 'X-Title': 'Sweepwise Help' },
+      body: JSON.stringify({ model: env.MODEL || 'deepseek/deepseek-v4-flash', max_tokens: 400, temperature: 0.2, messages: [{ role: 'system', content: SYSTEM }, ...messages] }),
     });
   } catch { return send(env, origin, 502, { error: 'unavailable' }); }
   if (!r.ok) return send(env, origin, 502, { error: 'unavailable' });

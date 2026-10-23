@@ -40,7 +40,9 @@ test('answers from the AI, sends the facts, uses the key and hides personal deta
   assert.equal(r.status, 200);
   assert.deepEqual(await r.json(), { reply: 'It is free.' });
   const ai = calls.find((c) => c.url.includes('/chat/completions'));
-  assert.equal(ai.url, 'https://api.deepseek.com/chat/completions');
+  assert.equal(ai.url, 'https://openrouter.ai/api/v1/chat/completions');
+  assert.equal(ai.body.model, 'deepseek/deepseek-v4-flash');
+  assert.equal(ai.init.headers['X-Title'], 'Sweepwise Help');
   assert.equal(ai.init.headers.Authorization, 'Bearer test-ai-key');
   assert.match(ai.body.messages[0].content, /Sweepwise Help/);
   assert.match(ai.body.messages[0].content, /No account, no ads, no paid version/);

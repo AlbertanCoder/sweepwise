@@ -1,6 +1,6 @@
 # Sweepwise Help (the website's support chat)
 
-A small Cloudflare Worker. It answers questions about Sweepwise from `src/kb.js` using an OpenAI-compatible AI (DeepSeek first), and, only if the visitor says yes, files a short redacted summary as a public GitHub issue and pings the maker on Discord. It stores no messages: the only things kept are counters (a hashed visitor id per day and a daily total) for the spending caps.
+A small Cloudflare Worker. It answers questions about Sweepwise from `src/kb.js` using an OpenAI-compatible AI (OpenRouter, with DeepSeek V4 Flash first), and, only if the visitor says yes, files a short redacted summary as a public GitHub issue and pings the maker on Discord. It stores no messages: the only things kept are counters (a hashed visitor id per day and a daily total) for the spending caps.
 
 Tests: `cd worker && node --test` (a fake AI, GitHub and Discord are used; nothing real is contacted).
 
@@ -8,7 +8,7 @@ Tests: `cd worker && node --test` (a fake AI, GitHub and Discord are used; nothi
 
 1. Make a free account at cloudflare.com.
 2. In a terminal in this `worker` folder: `npx wrangler@3 login`, then `npx wrangler@3 kv namespace create RATE`. Paste the id it prints into `wrangler.toml` where it says `PASTE_THE_KV_ID_HERE`.
-3. Make a DeepSeek account at platform.deepseek.com, add a small prepaid balance (US$5 lasts a very long time) and create an API key.
+3. Make an OpenRouter account at openrouter.ai, add a small prepaid balance (US$5 lasts a very long time), turn off prompt logging in its privacy settings, and create an API key with a US$5 limit.
 4. Make a GitHub fine-grained token (GitHub > Settings > Developer settings): repository `AlbertanCoder/sweepwise` only, permission **Issues: Read and write**, nothing else.
 5. In a private Discord channel make a webhook (Channel settings > Integrations > Webhooks).
 6. Store the three secrets (each command asks you to paste the value; it is never written to a file):
