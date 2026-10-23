@@ -14,4 +14,6 @@ Restricted capabilities the Store will ask you to explain (paste into the submis
 - `runFullTrust`: Sweepwise is a normal desktop program (Tauri and Rust). It cleans files, changes startup entries and Windows settings and runs Windows' own cleanup tools.
 - `unvirtualizedResources`: the cleaning has to reach real folders and registry keys, not a private copy of them.
 
-Open question: the app checks GitHub once a day for a newer version. The Store only wants updates delivered through the Store, so a Store build may need that check switched off or reworded.
+Updates: a Store copy skips the daily GitHub update check (done 2026-10-23; the Store updates it). The current Store policy (10.2.5, version 7.20) requires Store-only updates for games and Xbox products, not ordinary apps, so this is a safe choice rather than a requirement.
+
+Certification note to write plainly: Speed Boost updates your other programs through winget (policy 10.2.3 says a product must not offer to install secondary software; this updates programs the person already has, after they tick them).
