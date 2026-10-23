@@ -4376,24 +4376,6 @@
   "tests": []
  },
  {
-  "id": "B049",
-  "source": "src/index.html",
-  "why": "List items only run through /api/approve, which the Approve button sends after a second confirming click.",
-  "status": "proven",
-  "text": "Tick what you want; nothing happens until you press Approve.",
-  "proof": [
-   {
-    "file": "src-tauri/src/engine/mod.rs",
-    "contains": "actions::approve_list(&self.cfg, &s(\"run\"), &ids(&body, \"ids\"), &ids(&body, \"unticked\"))"
-   },
-   {
-    "file": "src/index.html",
-    "contains": "'Click again to approve ' + ids.length"
-   }
-  ],
-  "tests": []
- },
- {
   "id": "B050",
   "source": "src/index.html",
   "why": "Each unclear file's size, last-changed date and Desktop/Downloads location go with its name, plus the 'about you' facts.",
@@ -10136,5 +10118,933 @@
   ],
   "tests": [],
   "why": "Shown when Windows reports real-time protection off; the button beside it opens Windows Security, where that switch is."
+ },
+ {
+  "id": "look-a2-1",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"list.empty\": \"Press Check my PC on Home, and Sweepwise lists its suggestions here for your OK.\"",
+  "proof": [
+   {
+    "file": "src/index.html",
+    "contains": "$('bigBtn').addEventListener('click', function () { run('scan_clean'); });"
+   },
+   {
+    "file": "src-tauri/src/engine/runs.rs",
+    "contains": "/// The newest run that has an Approve list (Scan & Clean or Clean; not Space Finder or AI Organizer runs)."
+   },
+   {
+    "file": "src-tauri/src/engine/mod.rs",
+    "contains": "\"/api/list\" => Ok(runs::list_state(&self.cfg)),"
+   },
+   {
+    "file": "src-tauri/src/engine/actions.rs",
+    "contains": "/// Runs the approved ids in a safe order. Only items on the list that are allowed (can_do) ever run."
+   }
+  ],
+  "tests": [
+   "approve_then_undo_puts_everything_back"
+  ],
+  "why": "Check my PC runs Scan & Clean, whose suggestions are saved with the run and are what the Approve list shows; none of them runs until approved."
+ },
+ {
+  "id": "look-a2-2",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"list.group.safe\": \"Safe to clean\"",
+  "proof": [
+   {
+    "file": "src/index.html",
+    "contains": "{ key: 'safe', name: 'Safe to clean'"
+   },
+   {
+    "file": "src/index.html",
+    "contains": "return part[1] ? items.filter(function (i) { return (i.action === 'recycle') === (part[1] === 'junk'); }) : items;"
+   },
+   {
+    "file": "src-tauri/src/engine/leftovers.rs",
+    "contains": "\"action\": if f.can_do { \"recycle\" } else { \"list\" }"
+   },
+   {
+    "file": "src-tauri/src/engine/speed.rs",
+    "contains": "\"note\": if can_do { \"\" } else { \"too big for the Recycle Bin; left alone\" },"
+   },
+   {
+    "file": "src-tauri/src/engine/actions.rs",
+    "contains": "Ok(\"restored from the Recycle Bin\".into())"
+   }
+  ],
+  "tests": [
+   "approve_then_undo_puts_everything_back",
+   "the_list_moves_unticked_and_bins_exact_copies"
+  ],
+  "why": "The group holds only rows whose approved action is recycle (junk files, AI leftovers, left-behind folders; anything that can't be binned gets no tick box), and Undo restores recycled items from the Recycle Bin, so cleaning them can be reversed. The group's one-line description says exactly that."
+ },
+ {
+  "id": "look-a2-3",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"list.group.safe.desc\": \"Junk and leftovers Sweepwise found. What you approve goes to the Recycle Bin, so Undo can bring it back.\"",
+  "proof": [
+   {
+    "file": "src/index.html",
+    "contains": "{ key: 'safe', name: 'Safe to clean'"
+   },
+   {
+    "file": "src/index.html",
+    "contains": "return part[1] ? items.filter(function (i) { return (i.action === 'recycle') === (part[1] === 'junk'); }) : items;"
+   },
+   {
+    "file": "src-tauri/src/engine/leftovers.rs",
+    "contains": "\"action\": if f.can_do { \"recycle\" } else { \"list\" }"
+   },
+   {
+    "file": "src-tauri/src/engine/speed.rs",
+    "contains": "\"note\": if can_do { \"\" } else { \"too big for the Recycle Bin; left alone\" },"
+   },
+   {
+    "file": "src-tauri/src/engine/actions.rs",
+    "contains": "Ok(\"restored from the Recycle Bin\".into())"
+   }
+  ],
+  "tests": [
+   "approve_then_undo_puts_everything_back",
+   "the_list_moves_unticked_and_bins_exact_copies"
+  ],
+  "why": "Same rows as look-a2-2: every approvable row in the group is a recycle action, and Undo's recycle step restores it from the Recycle Bin ('can', since a person may empty the bin themselves)."
+ },
+ {
+  "id": "look-a2-4",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"list.group.yours.desc\": \"Your own files from your Desktop and Downloads, sorted into folders when you approve. None start ticked, and Undo moves them back.\"",
+  "proof": [
+   {
+    "file": "src-tauri/src/engine/files.rs",
+    "contains": "for (area, dir) in [(\"Desktop\", &cfg.folders.desktop), (\"Downloads\", &cfg.folders.downloads)] {"
+   },
+   {
+    "file": "src-tauri/src/engine/files.rs",
+    "contains": "\"checked\": x.verdict.action == \"recycle\""
+   },
+   {
+    "file": "src-tauri/src/engine/brain.rs",
+    "contains": "i[\"checked\"] = json!(false);"
+   },
+   {
+    "file": "src-tauri/src/engine/actions.rs",
+    "contains": "Ok(\"moved back\".into())"
+   },
+   {
+    "file": "src/index.html",
+    "contains": "{ key: 'yours', name: 'Your files'"
+   }
+  ],
+  "tests": [
+   "the_list_moves_unticked_and_bins_exact_copies",
+   "approve_then_undo_puts_everything_back"
+  ],
+  "why": "The group holds the loose Desktop and Downloads files whose action is move; a file starts ticked only when its action is recycle, what Sweepwise learned can only untick, and Undo's move step puts each file back."
+ },
+ {
+  "id": "look-a2-5",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"list.group.apps.desc\": \"Programs that start by themselves, speed-up settings, app updates and programs to remove. Uninstalls and app updates can't be undone.\"",
+  "proof": [
+   {
+    "file": "src-tauri/src/engine/actions.rs",
+    "contains": "\"uninstall\" => Err(\"uninstalled programs cannot be put back automatically; reinstall it if you need it\".into()),"
+   },
+   {
+    "file": "src-tauri/src/engine/actions.rs",
+    "contains": "\"app_update\" => Err(\"app updates cannot be undone automatically; the app's maker may offer the old version\".into()),"
+   },
+   {
+    "file": "src/index.html",
+    "contains": "parts: [['speed'], ['updates'], ['startup'], ['uninstall']]"
+   }
+  ],
+  "tests": [
+   "approve_then_undo_puts_everything_back"
+  ],
+  "why": "The group holds the speed-up, app update, startup and uninstall sections; Undo refuses uninstalls and app updates (the Mac wording is look-a2-6)."
+ },
+ {
+  "id": "look-a2-6",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"list.group.apps.desc@mac\": \"Programs that start by themselves, app updates and apps to move to the Recycle Bin. App updates can't be undone.\"",
+  "proof": [
+   {
+    "file": "src-tauri/src/engine/actions.rs",
+    "contains": "Ok(\"moved to the Trash; Undo brings it back\".into())"
+   },
+   {
+    "file": "src-tauri/src/engine/actions.rs",
+    "contains": "\"app_update\" => Err(\"app updates cannot be undone automatically; the app's maker may offer the old version\".into()),"
+   },
+   {
+    "file": "src/index.html",
+    "contains": "info.speed[1] = 'Sweepwise has no speed-up settings for Macs yet.';"
+   }
+  ],
+  "tests": [],
+  "why": "On a Mac removed apps go to the Trash (the app shows 'Recycle Bin' as Trash there) and Undo brings them back, app updates can't be undone, and Macs have no speed-up settings, so none are named."
+ },
+ {
+  "id": "look-a2-7",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"list.junk.desc\": \"Empty files, leftover temporary files, installers older than 30 days and exact copies, from your Desktop and Downloads. Approved ones go to the Recycle Bin.\"",
+  "proof": [
+   {
+    "file": "src-tauri/src/engine/files.rs",
+    "contains": "return v(\"recycle\", None, \"J1\", \"empty file (0 bytes)\");"
+   },
+   {
+    "file": "src-tauri/src/engine/files.rs",
+    "contains": "return v(\"recycle\", None, \"J2\", \"leftover temporary or lock file\");"
+   },
+   {
+    "file": "src-tauri/src/engine/files.rs",
+    "contains": "v(\"recycle\", None, \"I1\", \"installer older than 30 days (you can download it again)\")"
+   },
+   {
+    "file": "src-tauri/src/engine/files.rs",
+    "contains": "item[\"rule\"] = json!(\"D3\");"
+   },
+   {
+    "file": "src-tauri/src/engine/files.rs",
+    "contains": "for (area, dir) in [(\"Desktop\", &cfg.folders.desktop), (\"Downloads\", &cfg.folders.downloads)] {"
+   },
+   {
+    "file": "src-tauri/src/engine/actions.rs",
+    "contains": "\"recycle\" => {"
+   }
+  ],
+  "tests": [
+   "the_list_moves_unticked_and_bins_exact_copies"
+  ],
+  "why": "The loose-file rules that bin are exactly these four (empty file, leftover temporary or lock file, installer older than 30 days, exact copy), over the Desktop and Downloads only, and a recycle action sends the file to the Recycle Bin."
+ },
+ {
+  "id": "look-a2-8",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"list.bar.undo\": \"These changes can be undone.\"",
+  "proof": [
+   {
+    "file": "src/index.html",
+    "contains": "if (i.s === 'updates') up++; else if (i.s === 'uninstall' && OS !== 'mac') un++;"
+   },
+   {
+    "file": "src-tauri/src/engine/actions.rs",
+    "contains": "Ok(\"moved back\".into())"
+   },
+   {
+    "file": "src-tauri/src/engine/actions.rs",
+    "contains": "Ok(\"restored from the Recycle Bin\".into())"
+   },
+   {
+    "file": "src-tauri/src/engine/actions.rs",
+    "contains": "Ok(\"starts with Windows again\".into())"
+   },
+   {
+    "file": "src-tauri/src/engine/actions.rs",
+    "contains": "\"uninstall\" => Err(\"uninstalled programs cannot be put back automatically; reinstall it if you need it\".into()),"
+   },
+   {
+    "file": "src-tauri/src/engine/actions.rs",
+    "contains": "\"app_update\" => Err(\"app updates cannot be undone automatically; the app's maker may offer the old version\".into()),"
+   }
+  ],
+  "tests": [
+   "approve_then_undo_puts_everything_back"
+  ],
+  "why": "Shown only when no app update (and, off a Mac, no uninstall) is ticked. Every other Approve-list action records an undo step that Undo reverses: moves go back, binned items come back from the Recycle Bin, startup programs start again, and Speed Boost settings switch back."
+ },
+ {
+  "id": "look-a2-9",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"list.bar.no_undo_un\": \"Uninstalls can't be undone.\"",
+  "proof": [
+   {
+    "file": "src-tauri/src/engine/actions.rs",
+    "contains": "\"uninstall\" => Err(\"uninstalled programs cannot be put back automatically; reinstall it if you need it\".into()),"
+   },
+   {
+    "file": "src/index.html",
+    "contains": "if (i.s === 'updates') up++; else if (i.s === 'uninstall' && OS !== 'mac') un++;"
+   }
+  ],
+  "tests": [],
+  "why": "Shown when an uninstall is ticked off a Mac; Undo refuses uninstall steps (on a Mac removed apps go to the Trash, so the bar doesn't count them)."
+ },
+ {
+  "id": "look-a2-10",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"list.bar.no_undo_up\": \"App updates can't be undone.\"",
+  "proof": [
+   {
+    "file": "src-tauri/src/engine/actions.rs",
+    "contains": "\"app_update\" => Err(\"app updates cannot be undone automatically; the app's maker may offer the old version\".into()),"
+   },
+   {
+    "file": "src/index.html",
+    "contains": "if (i.s === 'updates') up++; else if (i.s === 'uninstall' && OS !== 'mac') un++;"
+   }
+  ],
+  "tests": [],
+  "why": "Shown when an app update is ticked; Undo refuses app update steps."
+ },
+ {
+  "id": "look-a2-11",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"list.bar.no_undo_both\": \"Uninstalls and app updates can't be undone.\"",
+  "proof": [
+   {
+    "file": "src-tauri/src/engine/actions.rs",
+    "contains": "\"uninstall\" => Err(\"uninstalled programs cannot be put back automatically; reinstall it if you need it\".into()),"
+   },
+   {
+    "file": "src-tauri/src/engine/actions.rs",
+    "contains": "\"app_update\" => Err(\"app updates cannot be undone automatically; the app's maker may offer the old version\".into()),"
+   },
+   {
+    "file": "src/index.html",
+    "contains": "if (i.s === 'updates') up++; else if (i.s === 'uninstall' && OS !== 'mac') un++;"
+   }
+  ],
+  "tests": [],
+  "why": "Shown when both are ticked; Undo refuses both kinds of step."
+ },
+ {
+  "id": "look-a2-12",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"list.bar.rest\": \"The rest can be undone.\"",
+  "proof": [
+   {
+    "file": "src/index.html",
+    "contains": "if ((un || up) && un + up < n) words2 += ' ' + t('list.bar.rest'"
+   },
+   {
+    "file": "src-tauri/src/engine/actions.rs",
+    "contains": "Ok(\"moved back\".into())"
+   },
+   {
+    "file": "src-tauri/src/engine/actions.rs",
+    "contains": "Ok(\"restored from the Recycle Bin\".into())"
+   }
+  ],
+  "tests": [
+   "approve_then_undo_puts_everything_back"
+  ],
+  "why": "Added only when something besides uninstalls and app updates is ticked; those other actions all have undo steps (see look-a2-8)."
+ },
+ {
+  "id": "look-a2-13",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"list.verdict.many\": \"{n} suggestions waiting for your OK\"",
+  "proof": [
+   {
+    "file": "src/index.html",
+    "contains": "if (res[i.id] && res[i.id].ok) doneN++; else if (i.checked && !i.hidden) waiting++; else if (!i.hidden) more++;"
+   },
+   {
+    "file": "src-tauri/src/engine/health.rs",
+    "contains": ".filter(|i| i[\"can_do\"].as_bool().unwrap_or(false) && i[\"checked\"].as_bool().unwrap_or(false))"
+   },
+   {
+    "file": "src-tauri/src/engine/actions.rs",
+    "contains": "/// Runs the approved ids in a safe order. Only items on the list that are allowed (can_do) ever run."
+   }
+  ],
+  "tests": [],
+  "why": "Counts the rows the scan ticked that are not done yet, the same count as the menu and Home's Waiting for your OK card (status.pending); none of them runs until it is approved."
+ },
+ {
+  "id": "look-a2-14",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"list.verdict.one\": \"1 suggestion waiting for your OK\"",
+  "proof": [
+   {
+    "file": "src/index.html",
+    "contains": "if (res[i.id] && res[i.id].ok) doneN++; else if (i.checked && !i.hidden) waiting++; else if (!i.hidden) more++;"
+   },
+   {
+    "file": "src-tauri/src/engine/health.rs",
+    "contains": ".filter(|i| i[\"can_do\"].as_bool().unwrap_or(false) && i[\"checked\"].as_bool().unwrap_or(false))"
+   },
+   {
+    "file": "src-tauri/src/engine/actions.rs",
+    "contains": "/// Runs the approved ids in a safe order. Only items on the list that are allowed (can_do) ever run."
+   }
+  ],
+  "tests": [],
+  "why": "The same count as look-a2-13, for one."
+ },
+ {
+  "id": "look-a2-15",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"list.verdict.none_waiting\": \"Nothing is waiting for your OK right now\"",
+  "proof": [
+   {
+    "file": "src/index.html",
+    "contains": "if (res[i.id] && res[i.id].ok) doneN++; else if (i.checked && !i.hidden) waiting++; else if (!i.hidden) more++;"
+   },
+   {
+    "file": "src-tauri/src/engine/health.rs",
+    "contains": ".filter(|i| i[\"can_do\"].as_bool().unwrap_or(false) && i[\"checked\"].as_bool().unwrap_or(false))"
+   }
+  ],
+  "tests": [],
+  "why": "Shown when that count is 0, the same rule and words as Home's card (home.wait.none)."
+ },
+ {
+  "id": "look-a2-16",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"list.rc.more\": \"{n} more you can tick\"",
+  "proof": [
+   {
+    "file": "src/index.html",
+    "contains": "if (res[i.id] && res[i.id].ok) doneN++; else if (i.checked && !i.hidden) waiting++; else if (!i.hidden) more++;"
+   }
+  ],
+  "tests": [],
+  "why": "Counts the rows that can be approved but that the scan left unticked (hidden ones left out)."
+ },
+ {
+  "id": "look-a2-17",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"list.rc.done\": \"{n} done from this list\"",
+  "proof": [
+   {
+    "file": "src/index.html",
+    "contains": "if (res[i.id] && res[i.id].ok) doneN++; else if (i.checked && !i.hidden) waiting++; else if (!i.hidden) more++;"
+   },
+   {
+    "file": "src-tauri/src/engine/runs.rs",
+    "contains": "\"results\": results_map(&dir),"
+   }
+  ],
+  "tests": [],
+  "why": "Counts the rows whose approved result came back ok."
+ },
+ {
+  "id": "look-a2-18",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"sec.verdict.ok\": \"Windows Security is protecting this PC\"",
+  "proof": [
+   {
+    "file": "src/index.html",
+    "contains": "else v = win ? t('sec.verdict.ok'"
+   },
+   {
+    "file": "src/index.html",
+    "contains": "off = prot.filter(function (x) { return !x.ok; })"
+   },
+   {
+    "file": "src-tauri/src/engine/security.rs",
+    "contains": "\"name\": \"Antivirus\", \"ok\": !av.is_empty(),"
+   },
+   {
+    "file": "src-tauri/src/engine/security.rs",
+    "contains": "\"name\": \"Real-time protection\", \"ok\": rt,"
+   }
+  ],
+  "tests": [],
+  "why": "Shown only on Windows, only when every protection check in the saved Security report passes (antivirus registered, real-time and tamper protection on, definitions up to date, unwanted-app blocking and the firewall on) and nothing else in the report is worth a look."
+ },
+ {
+  "id": "look-a2-19",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"sec.verdict.prot\": \"{n} protection settings need your attention\"",
+  "proof": [
+   {
+    "file": "src/index.html",
+    "contains": "off = prot.filter(function (x) { return !x.ok; })"
+   }
+  ],
+  "tests": [],
+  "why": "Counts the protection checks in the report that did not pass."
+ },
+ {
+  "id": "look-a2-20",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"sec.verdict.none\": \"Security check not run yet\"",
+  "proof": [
+   {
+    "file": "src-tauri/src/engine/mod.rs",
+    "contains": "\"/api/security\" => Ok(json!({ \"report\": util::read_json(&self.cfg.data_dir.join(\"security.json\")) })),"
+   },
+   {
+    "file": "src/index.html",
+    "contains": "if (!r) { pband('secBand', 'none', t('sec.verdict.none'"
+   }
+  ],
+  "tests": [],
+  "why": "Shown when there is no saved Security report (security.json)."
+ },
+ {
+  "id": "look-a2-21",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"sec.rc.checked\": \"Checked {at}\"",
+  "proof": [
+   {
+    "file": "src-tauri/src/engine/security.rs",
+    "contains": "json!({ \"checked\": util::iso(util::now()), \"protection\": prot,"
+   }
+  ],
+  "tests": [],
+  "why": "The report's own time stamp, written when the check ran."
+ },
+ {
+  "id": "look-a2-22",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"sec.rc.update\": \"Last update installed {at}\"",
+  "proof": [
+   {
+    "file": "src-tauri/src/engine/security.rs",
+    "contains": "\"restart_pending\": pending, \"last_update\": last.as_ref().map(|(w, _)| util::iso(*w)),"
+   }
+  ],
+  "tests": [],
+  "why": "The time of the newest installed update that the check read; the same field the Windows Update card showed before."
+ },
+ {
+  "id": "look-a2-23",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"sec.rc.restart\": \"A restart is needed to finish updates\"",
+  "proof": [
+   {
+    "file": "src-tauri/src/engine/security.rs",
+    "contains": "\"restart_pending\": pending,"
+   },
+   {
+    "file": "src/index.html",
+    "contains": "if (u.restart_pending) rc.push(['warn', t('sec.rc.restart'"
+   }
+  ],
+  "tests": [],
+  "why": "Shown when the check found updates waiting on a restart (the card's 'A restart is needed' row)."
+ },
+ {
+  "id": "look-a2-24",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"sec.ext.desc\": \"Extensions can see what you do online. Ones with a warning sign deserve a real look; ones with a dot are powerful but normal for their kind. Remove any you do not use.\"",
+  "proof": [
+   {
+    "file": "src/index.html",
+    "contains": "reason(e.level === 'check' ? 'warn' : 'info'"
+   }
+  ],
+  "tests": [
+   "extensions_are_judged_by_their_powers"
+  ],
+  "why": "Extensions the check marks 'check' get the warning-sign icon and 'note' ones the dot; the words now name the icons instead of colours."
+ },
+ {
+  "id": "look-a2-25",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"sec.more.desc\": \"Microsoft's extra tools, for when you think something got past the usual scans.\"",
+  "proof": [
+   {
+    "file": "src-tauri/src/engine/security.rs",
+    "contains": "// ---------- Microsoft's Malicious Software Removal Tool (needs admin; runs through the admin helper) ----------"
+   },
+   {
+    "file": "src-tauri/src/engine/mod.rs",
+    "contains": "\"offline_scan\" => \"windowsdefender://threat\".into(),"
+   }
+  ],
+  "tests": [],
+  "why": "The row holds Microsoft's Malicious Software Removal Tool and the Microsoft Defender Offline scan, the same two buttons as before."
+ },
+ {
+  "id": "look-a2-26",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"sec.more.mrt\": \"Microsoft's own tool looks for common harmful software and removes it. Windows asks for admin.\"",
+  "proof": [
+   {
+    "file": "src-tauri/src/engine/security.rs",
+    "contains": "// ---------- Microsoft's Malicious Software Removal Tool (needs admin; runs through the admin helper) ----------"
+   },
+   {
+    "file": "src/index.html",
+    "contains": "run('mrt'); });"
+   }
+  ],
+  "tests": [],
+  "why": "The button opens the same dialog as before and runs Microsoft's MRT through the admin helper (Windows asks first); the short form of B066."
+ },
+ {
+  "id": "look-a2-27",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"sec.more.offline\": \"For stubborn malware that hides while Windows runs. Your PC restarts to scan, so save your work first.\"",
+  "proof": [
+   {
+    "file": "src-tauri/src/engine/mod.rs",
+    "contains": "\"offline_scan\" => \"windowsdefender://threat\".into(),"
+   },
+   {
+    "file": "src/index.html",
+    "contains": "Pick Microsoft Defender Offline scan, then Scan now."
+   }
+  ],
+  "tests": [],
+  "why": "The button opens the same dialog as before, whose steps open Windows Security's scan options; the Defender Offline scan restarts the PC and scans before Windows starts. Sweepwise only opens the page."
+ },
+ {
+  "id": "look-a2-28",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"boost.verdict.boot\": \"Last measured start-up: {n} s\"",
+  "proof": [
+   {
+    "file": "src-tauri/src/engine/speed.rs",
+    "contains": "let boot = util::read_json(&cfg.data_dir.join(\"boot.json\")).and_then(|b| b[\"boots\"][0][\"boot_seconds\"].as_f64());"
+   },
+   {
+    "file": "src-tauri/src/engine/restore.rs",
+    "contains": "save_boot_times(data_dir);"
+   },
+   {
+    "file": "src/index.html",
+    "contains": "v = bs == null ? appsText"
+   }
+  ],
+  "tests": [
+   "boot_times_are_read_from_windows_records"
+  ],
+  "why": "Shown only when the report has a start-up time: Windows' own boot record saved by the admin helpers (systemd's record on Linux); otherwise the verdict counts apps."
+ },
+ {
+  "id": "look-a2-29",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"boost.verdict.boot_was\": \"Last measured start-up: {n} s (was {was} s)\"",
+  "proof": [
+   {
+    "file": "src-tauri/src/engine/speed.rs",
+    "contains": "let boot = util::read_json(&cfg.data_dir.join(\"boot.json\")).and_then(|b| b[\"boots\"][0][\"boot_seconds\"].as_f64());"
+   },
+   {
+    "file": "src-tauri/src/engine/restore.rs",
+    "contains": "save_boot_times(data_dir);"
+   },
+   {
+    "file": "src-tauri/src/engine/speed.rs",
+    "contains": "if s.get(\"before\").map_or(true, |b| b.is_null()) {"
+   }
+  ],
+  "tests": [
+   "boot_times_are_read_from_windows_records",
+   "the_first_measurement_is_the_before"
+  ],
+  "why": "The 'was' figure is the first measurement's start-up time, shown only when both exist and differ by a second or more."
+ },
+ {
+  "id": "look-a2-30",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"boost.verdict.apps\": \"{n} apps start with your PC\"",
+  "proof": [
+   {
+    "file": "src-tauri/src/engine/speed.rs",
+    "contains": "let startup_apps = startup::proposals(cfg).iter().filter(|i| i[\"note\"] != \"already turned off\").count();"
+   }
+  ],
+  "tests": [],
+  "why": "The live count of startup items that are not turned off, as the before-and-after table shows."
+ },
+ {
+  "id": "look-a2-31",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"boost.verdict.apps_was\": \"{n} apps start with your PC (was {was})\"",
+  "proof": [
+   {
+    "file": "src-tauri/src/engine/speed.rs",
+    "contains": "let startup_apps = startup::proposals(cfg).iter().filter(|i| i[\"note\"] != \"already turned off\").count();"
+   },
+   {
+    "file": "src-tauri/src/engine/speed.rs",
+    "contains": "if s.get(\"before\").map_or(true, |b| b.is_null()) {"
+   }
+  ],
+  "tests": [
+   "the_first_measurement_is_the_before"
+  ],
+  "why": "The same count, with the first measurement's count when it differs."
+ },
+ {
+  "id": "look-a2-32",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"boost.rc.before\": \"First measured {at}\"",
+  "proof": [
+   {
+    "file": "src-tauri/src/engine/speed.rs",
+    "contains": "if s.get(\"before\").map_or(true, |b| b.is_null()) {"
+   }
+  ],
+  "tests": [
+   "the_first_measurement_is_the_before"
+  ],
+  "why": "The 'before' measurement is the first one Sweepwise ever saved; its time is shown."
+ },
+ {
+  "id": "look-a2-33",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"boost.rc.mem\": \"{n} GB of memory in use now\"",
+  "proof": [
+   {
+    "file": "src-tauri/src/engine/speed.rs",
+    "contains": "let used = sys.total_memory().saturating_sub(sys.available_memory()) as f64 / util::GB;"
+   },
+   {
+    "file": "src-tauri/src/engine/speed.rs",
+    "contains": "let mut now = measure(&eng.cfg);"
+   }
+  ],
+  "tests": [],
+  "why": "The report measures memory in use when the screen asks for it."
+ },
+ {
+  "id": "look-a2-34",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"boost.verdict.none\": \"Not measured yet\"",
+  "proof": [
+   {
+    "file": "src-tauri/src/engine/speed.rs",
+    "contains": "let list = if before.is_null() { Vec::new() } else { changes(&before, &now) };"
+   },
+   {
+    "file": "src/index.html",
+    "contains": "if (!bf) v = t('boost.verdict.none'"
+   }
+  ],
+  "tests": [],
+  "why": "Shown when no 'before' measurement exists yet."
+ },
+ {
+  "id": "look-a2-35",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"stor.rc.used\": \"{pct}% used · live reading\"",
+  "proof": [
+   {
+    "file": "src-tauri/src/engine/health.rs",
+    "contains": "let h = snapshot(cfg);"
+   },
+   {
+    "file": "src-tauri/src/engine/health.rs",
+    "contains": "\"free_disk\": h[\"free_disk\"],"
+   },
+   {
+    "file": "src/index.html",
+    "contains": "tf('stor.rc.used'"
+   }
+  ],
+  "tests": [],
+  "why": "The status reads the system drive's free and total space each time it is asked, and the share used is worked out from those two numbers."
+ },
+ {
+  "id": "look-a2-36",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"stor.rc.mapped\": \"Drive mapped {at}\"",
+  "proof": [
+   {
+    "file": "src-tauri/src/engine/diskmap.rs",
+    "contains": "let out = json!({ \"made\": util::iso(util::now()), \"free\": free, \"tree\": to_json(&top) });"
+   }
+  ],
+  "tests": [],
+  "why": "The map's own time stamp."
+ },
+ {
+  "id": "look-a2-37",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"stor.rc.searched\": \"Last search {at}\"",
+  "proof": [
+   {
+    "file": "src-tauri/src/engine/finder.rs",
+    "contains": "\"when\": util::read_json(&dir.join(\"summary.json\")).and_then(|s| s.get(\"started\").cloned()),"
+   }
+  ],
+  "tests": [],
+  "why": "The start time of the newest duplicates and big files search."
+ },
+ {
+  "id": "look-a2-38",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"hist.verdict.many\": \"{n} runs can still be undone\"",
+  "proof": [
+   {
+    "file": "src-tauri/src/engine/runs.rs",
+    "contains": ".filter(|e| !e.get(\"undone\").and_then(|v| v.as_bool()).unwrap_or(false) && !matches!(e.get(\"type\").and_then(|v| v.as_str()), Some(\"uninstall\") | Some(\"app_update\")))"
+   },
+   {
+    "file": "src/index.html",
+    "contains": "undoable = runs.filter(function (r) { return r.undo_left > 0; }).length"
+   }
+  ],
+  "tests": [
+   "approve_then_undo_puts_everything_back"
+  ],
+  "why": "Counts runs with undo steps that are not undone yet and are not uninstalls or app updates (which Undo can't reverse)."
+ },
+ {
+  "id": "look-a2-39",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"hist.verdict.one\": \"1 run can still be undone\"",
+  "proof": [
+   {
+    "file": "src-tauri/src/engine/runs.rs",
+    "contains": ".filter(|e| !e.get(\"undone\").and_then(|v| v.as_bool()).unwrap_or(false) && !matches!(e.get(\"type\").and_then(|v| v.as_str()), Some(\"uninstall\") | Some(\"app_update\")))"
+   },
+   {
+    "file": "src/index.html",
+    "contains": "undoable = runs.filter(function (r) { return r.undo_left > 0; }).length"
+   }
+  ],
+  "tests": [
+   "approve_then_undo_puts_everything_back"
+  ],
+  "why": "The same count as look-a2-38, for one."
+ },
+ {
+  "id": "look-a2-40",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"hist.verdict.nothing\": \"Nothing left to undo\"",
+  "proof": [
+   {
+    "file": "src-tauri/src/engine/runs.rs",
+    "contains": ".filter(|e| !e.get(\"undone\").and_then(|v| v.as_bool()).unwrap_or(false) && !matches!(e.get(\"type\").and_then(|v| v.as_str()), Some(\"uninstall\") | Some(\"app_update\")))"
+   },
+   {
+    "file": "src/index.html",
+    "contains": "undoable = runs.filter(function (r) { return r.undo_left > 0; }).length"
+   }
+  ],
+  "tests": [],
+  "why": "Shown when no listed run has such an undo step left."
+ },
+ {
+  "id": "look-a2-41",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"hist.cleared\": \"temporary files and caches cleared\"",
+  "proof": [
+   {
+    "file": "src-tauri/src/engine/runs.rs",
+    "contains": "\"started\": started, \"dry_run\": false, \"planned_bytes\": plan.bytes, \"freed_bytes\": done.bytes,"
+   },
+   {
+    "file": "src-tauri/src/engine/autoclean.rs",
+    "contains": "\"freed_bytes\": done.bytes,"
+   },
+   {
+    "file": "src/index.html",
+    "contains": "if (cleaned && r.freed > 0) bits.push(t('hist.cleared'"
+   }
+  ],
+  "tests": [],
+  "why": "Shown for clean-ups and weekly auto-cleans whose freed bytes come from the temp-file and cache clean."
+ },
+ {
+  "id": "look-a2-42",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"hist.approved.many\": \"{n} approved changes done\"",
+  "proof": [
+   {
+    "file": "src-tauri/src/engine/runs.rs",
+    "contains": "let approved = results_map(&d).values().filter(|r| r.get(\"ok\").and_then(|v| v.as_bool()).unwrap_or(false)).count();"
+   }
+  ],
+  "tests": [],
+  "why": "Counts the approved items that came back done (ok) in that run."
+ },
+ {
+  "id": "look-a2-43",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"hist.undo_left.many\": \"{n} changes can be undone\"",
+  "proof": [
+   {
+    "file": "src-tauri/src/engine/runs.rs",
+    "contains": ".filter(|e| !e.get(\"undone\").and_then(|v| v.as_bool()).unwrap_or(false) && !matches!(e.get(\"type\").and_then(|v| v.as_str()), Some(\"uninstall\") | Some(\"app_update\")))"
+   }
+  ],
+  "tests": [
+   "approve_then_undo_puts_everything_back"
+  ],
+  "why": "The run's undo steps not undone yet, uninstalls and app updates left out."
+ },
+ {
+  "id": "look-a2-44",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"hist.no_undo\": \"Nothing to undo\"",
+  "proof": [
+   {
+    "file": "src-tauri/src/engine/runs.rs",
+    "contains": ".filter(|e| !e.get(\"undone\").and_then(|v| v.as_bool()).unwrap_or(false) && !matches!(e.get(\"type\").and_then(|v| v.as_str()), Some(\"uninstall\") | Some(\"app_update\")))"
+   },
+   {
+    "file": "src/index.html",
+    "contains": "t('hist.no_undo', 'Nothing to undo')"
+   }
+  ],
+  "tests": [],
+  "why": "Shown when the run has no such undo step left."
+ },
+ {
+  "id": "look-a2-45",
+  "source": "src/i18n/en.json",
+  "status": "proven",
+  "text": "\"settings.verdict\": \"Sweepwise collects nothing\"",
+  "proof": [
+   {
+    "file": "src-tauri/src/engine/mod.rs",
+    "contains": "Screen errors are written to a small file on this PC (never sent anywhere)"
+   },
+   {
+    "file": "src-tauri/src/engine/update.rs",
+    "contains": "assert!(!sent.to_lowercase().contains(\"cookie\") && !sent.contains(\"Authorization\"), \"nothing personal is sent\");"
+   }
+  ],
+  "tests": [
+   "a_newer_release_shows_a_banner_and_only_its_own_page_opens"
+  ],
+  "why": "The same promise as about.privacy.title (A058): no account, analytics or crash uploads, and screen errors stay on the PC."
  }
 ]
