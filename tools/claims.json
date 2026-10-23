@@ -9569,19 +9569,19 @@
   "id": "docs-x1",
   "source": "README.md",
   "status": "fixed",
-  "text": "It will be open source (GPL-3.0) when it\nlaunches.",
+  "text": "It is open source (GPL-3.0).",
   "proof": [
    {
     "file": "src-tauri/Cargo.toml",
     "contains": "license = \"GPL-3.0-or-later\""
    },
    {
-    "file": "src-tauri/src/engine/update.rs",
-    "contains": "No releases yet (or the project is not public yet): nothing to tell."
+    "file": "LICENSE",
+    "contains": "GNU GENERAL PUBLIC LICENSE"
    }
   ],
   "tests": [],
-  "why": "The code is private until launch (GitHub: private: true), so 'open-source' becomes canon point 9's wording."
+  "why": "The repository is public under GPL-3.0 (2026-10-23), so \"when it launches\" is gone."
  },
  {
   "id": "docs-x2",

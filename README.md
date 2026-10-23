@@ -1,7 +1,6 @@
 # Sweepwise
 
-Free PC care for Windows, Linux and Mac, funded by the people who use it. It will be open source (GPL-3.0) when it
-launches.
+Free PC care for Windows, Linux and Mac, funded by the people who use it. It is open source (GPL-3.0).
 
 Sweepwise clears out junk, checks that your computer is protected, speeds it up with safe, reversible settings and
 suggests tidy-ups, in plain English. Every feature is free for everyone. There are no ads, no paid version and no
