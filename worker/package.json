@@ -1,0 +1,12 @@
+{
+  "name": "sweepwise-help",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "The Sweepwise website's help chat (a Cloudflare Worker).",
+  "license": "GPL-3.0-or-later",
+  "scripts": {
+    "test": "node --test",
+    "deploy": "npx wrangler@3 deploy"
+  }
+}

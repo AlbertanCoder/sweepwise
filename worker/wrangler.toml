@@ -1,0 +1,24 @@
+name = "sweepwise-help"
+main = "src/index.js"
+compatibility_date = "2026-10-01"
+
+# One free "KV" store holds only counters (a hashed visitor id per day and a daily total) for the spending caps.
+# Create it once with:  npx wrangler@3 kv namespace create RATE   and paste the id it prints below.
+[[kv_namespaces]]
+binding = "RATE"
+id = "PASTE_THE_KV_ID_HERE"
+
+[vars]
+ALLOWED_ORIGIN = "https://albertancoder.github.io"
+# Any OpenAI-compatible service works: change these two to switch the AI.
+API_BASE = "https://api.deepseek.com"
+MODEL = "deepseek-chat"
+# About US$1 a day on DeepSeek at normal question sizes; 20 messages per visitor per day.
+DAILY_MESSAGE_CAP = "1200"
+PER_VISITOR_CAP = "20"
+GITHUB_REPO = "AlbertanCoder/sweepwise"
+
+# Secrets are never written here. Set each one yourself, once:
+#   npx wrangler@3 secret put AI_API_KEY
+#   npx wrangler@3 secret put GITHUB_TOKEN          (a fine-grained token for this one repo, "Issues: read and write" only)
+#   npx wrangler@3 secret put DISCORD_WEBHOOK_URL   (a webhook for a private channel)
