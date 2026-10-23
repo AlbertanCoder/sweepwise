@@ -159,7 +159,7 @@ pub fn scan_and_clean(eng: &Arc<Engine>, j: &Job, scan: bool, confirmed: bool) -
     let started = util::iso(util::now());
     let before = health::snapshot(cfg);
     let done = clean::execute(cfg, &plan, &dir.join("caches_deleted.csv"));
-    j.say(format!("  Cleared {} ({} files).{}", fmt_size(done.bytes), done.removed, if done.in_use > 0 { format!(" {} files were in use and left alone.", done.in_use) } else { String::new() }));
+    j.say(format!("  Cleared {} ({} files).{}", fmt_size(done.bytes), done.removed, if done.in_use > 0 { format!(" {} files could not be removed (in use or locked) and were left alone.", done.in_use) } else { String::new() }));
     eng.set_setting("first_clean_done", json!(true));
     // A real win: the screen may show the Support card (at most once every 30 days).
     if let Some(card) = support::ask_after_win(eng, done.bytes) {
@@ -174,7 +174,7 @@ pub fn scan_and_clean(eng: &Arc<Engine>, j: &Job, scan: bool, confirmed: bool) -
 
     let mut n = 2;
     if scan {
-        j.step(n, total, "running a Windows Security quick virus scan (about 1-2 minutes)...");
+        j.step(n, total, if cfg!(windows) { "running a Windows Security quick virus scan (about 1-2 minutes)..." } else { "running a ClamAV quick virus scan (about 1-2 minutes)..." });
         let (result, detail) = defender::quick_scan(cfg, j);
         j.say(format!("  {}", detail));
         if result == "threats" {
@@ -210,7 +210,7 @@ pub fn scan_and_clean(eng: &Arc<Engine>, j: &Job, scan: bool, confirmed: bool) -
     n += 1;
 
     n += 1;
-    j.step(n - 1, total, "looking for speed-ups and app updates (Microsoft's own tools)...");
+    j.step(n - 1, total, "looking for speed-ups and app updates (your system's own tools)...");
     let speed_items = speed::proposals(cfg);
     let leftover_items = speed::program_leftovers(cfg);
     let update_items = apps::proposals(cfg);

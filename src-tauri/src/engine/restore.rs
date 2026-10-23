@@ -29,9 +29,9 @@ pub fn make_point(description: &str) -> Result<String, String> {
         if SRSetRestorePointW(&info, &mut status) == 0 {
             let code = status.nStatus;
             return Err(match code {
-                1058 => "System Restore is switched off on this PC, so no restore point was made. Sweepwise's own Undo still works.".to_string(),
+                1058 => "System Restore is switched off on this PC, so no restore point was made.".to_string(),
                 5 => "Windows needs admin rights to make a restore point.".to_string(),
-                _ => format!("Windows could not make a restore point (code {}). Sweepwise's own Undo still works.", code),
+                _ => format!("Windows could not make a restore point (code {}).", code),
             });
         }
         // Mark the change as finished so the restore point is complete.

@@ -181,7 +181,7 @@ fn models(cfg: &Config, out: &mut Vec<Found>) {
             size: st.bytes,
             newest: st.newest.unwrap_or_else(SystemTime::now),
             path: d,
-            why: format!("AI model downloaded by {}; it downloads again if a program needs it", app),
+            why: format!("AI model downloaded by {}; you can download it again if you need it", app),
             checked: false,
             can_do,
             note: if can_do { String::new() } else { format!("too big for the Recycle Bin; remove it inside {}", app) },

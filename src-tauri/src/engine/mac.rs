@@ -583,7 +583,7 @@ pub fn timer(cfg: &Config, name: &str, calendar: &str, exe: &Path, arg: &str, on
 pub fn tm_snapshot(_why: &str) -> Result<String, String> {
     match run("/usr/bin/tmutil", &["localsnapshot"]) {
         Some((0, _)) => Ok("Time Machine snapshot made.".into()),
-        _ => Ok("macOS could not make a Time Machine snapshot on this Mac, so none was made. Sweepwise's own Undo still works.".into()),
+        _ => Err("macOS could not make a Time Machine snapshot on this Mac, so none was made.".into()),
     }
 }
 

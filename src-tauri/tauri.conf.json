@@ -30,8 +30,8 @@
     "publisher": "AlbertanCoder",
     "copyright": "Copyright (C) 2026 AlbertanCoder. Licensed under the GNU GPL v3.",
     "category": "Utility",
-    "shortDescription": "Free PC care: clean, scan, organize. Funded by its users.",
-    "longDescription": "Sweepwise cleans junk, checks your protection, finds duplicates and big forgotten files, maps your drive and (optionally, with your own AI key) helps organize your folders. Nothing personal changes without your OK, everything can be undone, and nothing is ever collected.",
+    "shortDescription": "Free PC care: clean, scan, organize. Chipping in is optional.",
+    "longDescription": "Sweepwise cleans junk, checks your protection, finds duplicates and big forgotten files, maps your drive and (optionally, with your own AI key) helps organize your folders. It changes nothing personal without your OK, approved changes can be undone except uninstalls and app updates, and nothing is ever collected.",
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",

@@ -173,7 +173,9 @@ pub fn targets(cfg: &Config) -> Vec<Target> {
 /// Folders inside the cache areas that are never cleared automatically.
 pub fn excludes(cfg: &Config) -> Vec<PathBuf> {
     let temp = cfg.local.join("Temp");
-    let mut v = vec![temp.join("claude"), cfg.data_dir.clone()];
+    // Outlook keeps copies of opened attachments in the web cache, sometimes edited ones: leave them alone.
+    let outlook = cfg.local.join("Microsoft").join("Windows").join("INetCache").join("Content.Outlook");
+    let mut v = vec![temp.join("claude"), cfg.data_dir.clone(), outlook];
     if let Ok(rd) = fs::read_dir(&temp) {
         for e in rd.flatten() {
             let n = e.file_name().to_string_lossy().to_lowercase();

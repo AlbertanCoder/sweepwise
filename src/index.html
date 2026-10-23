@@ -277,13 +277,13 @@ main:focus { outline:none; }
       <button data-view="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span data-i18n="nav.settings">Settings</span></button>
     </nav>
     <div class="footlinks"><button data-view="help" data-i18n="nav.help">Help</button><button data-view="support" data-i18n="nav.support">Support Sweepwise</button><button data-view="about" data-i18n="nav.about">About &amp; privacy</button></div>
-    <span data-i18n="foot.promise">Nothing personal changes without your OK. Everything can be undone except uninstalls.</span><div class="ver" id="verText">Sweepwise</div></div>
+    <span data-i18n="foot.promise">Nothing personal changes without your OK. Changes you approve can be undone, except uninstalls and app updates.</span><div class="ver" id="verText">Sweepwise</div></div>
 </aside>
 <main id="main" tabindex="-1">
   <div class="banner" id="updBanner" role="status" hidden><div><b id="updTitle">A new version of Sweepwise is ready</b><span id="updSub"></span></div><button class="btn sm" id="updNotes" data-i18n="button.whats_new">What's new</button><button class="btn sm primary" id="updGo" data-i18n="button.update">Update</button><button class="btn sm" id="updHide" data-i18n="button.not_now">Not now</button></div>
   <section class="view on" id="v-home">
     <h1 data-i18n="h1.your_pc">Your PC</h1><p class="sub" id="homeSub" data-i18n="sub.homeSub">Checking...</p>
-    <div class="banner" id="remBanner" hidden><div><b data-i18n="rem.title">It's been a week since your last clean-up</b><span data-i18n="rem.desc">Want Sweepwise to run Scan &amp; Clean now? Nothing personal changes without your OK.</span></div><button class="btn sm primary" id="remGo" data-i18n="button.scan_clean">Scan &amp; Clean</button><button class="btn sm" id="remHide" data-i18n="button.not_now">Not now</button></div>
+    <div class="banner" id="remBanner" hidden><div><b data-i18n="rem.title">Time for your weekly clean-up</b><span data-i18n="rem.desc">Want Sweepwise to run Scan &amp; Clean now? Nothing personal changes without your OK.</span></div><button class="btn sm primary" id="remGo" data-i18n="button.scan_clean">Scan &amp; Clean</button><button class="btn sm" id="remHide" data-i18n="button.not_now">Not now</button></div>
     <div class="card hero2">
       <div class="ring sm"><svg width="150" height="150" viewBox="0 0 200 200"><circle cx="100" cy="100" r="86" fill="none" stroke="#1d2a47" stroke-width="14"/>
         <circle id="ringArc" cx="100" cy="100" r="86" fill="none" stroke="url(#rg)" stroke-width="14" stroke-linecap="round" stroke-dasharray="540.4" stroke-dashoffset="540.4" style="transition:stroke-dashoffset 1s"/>
@@ -293,7 +293,7 @@ main:focus { outline:none; }
         <h2 id="scoreWord">Checking your PC</h2>
         <div class="attn-row" id="attn"></div>
         <div class="hero-actions">
-          <button class="big" id="bigBtn" data-i18n="button.scan_clean" title="Cleans junk, scans for viruses, then lists suggestions for your OK.">Scan &amp; Clean</button>
+          <button class="big" id="bigBtn" data-i18n="button.scan_clean" title="Cleans junk, checks for viruses where it can, then lists suggestions for your OK.">Scan &amp; Clean</button>
           <button class="btn" data-run="quick" data-i18n="tile.quick_scan.title">Quick Scan</button>
           <button class="btn" data-ask="full" data-i18n="tile.full_scan.title">Full Scan</button>
           <button class="btn" data-ask="deep" data-i18n="tile.deep_clean.title">Deep Clean</button>
@@ -316,7 +316,7 @@ main:focus { outline:none; }
   </section>
 
   <section class="view" id="v-work">
-    <h1 id="workTitle">Working...</h1><p class="sub">You can keep using your PC. Nothing personal changes until you approve it.</p>
+    <h1 id="workTitle">Working...</h1><p class="sub">You can keep using your PC. Sweepwise changes nothing personal until you approve it (your virus scanner may still quarantine a virus it finds).</p>
     <div class="card work">
       <div class="done-mark" id="doneMark"><svg viewBox="0 0 54 54" fill="none"><circle class="ring2" cx="27" cy="27" r="24" stroke="#2dd4bf" stroke-width="3"/><path d="M16 28l7 7 15-16" stroke="#2dd4bf" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg><div class="burst" id="burst"></div><b style="font-size:18px">All done</b></div>
       <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:center"><div style="display:flex; gap:10px; align-items:center"><svg class="spin" id="workSpin" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#1d2a47" stroke-width="3"/><circle cx="12" cy="12" r="9" stroke="#2dd4bf" stroke-width="3" stroke-linecap="round" stroke-dasharray="14 60"/></svg><b id="workStep">Starting...</b></div><span class="pill" id="workTemp"></span></div>
@@ -336,7 +336,7 @@ main:focus { outline:none; }
   </section>
 
   <section class="view" id="v-history">
-    <h1 data-i18n="h1.history_undo">History &amp; Undo</h1><p class="sub">Every Sweepwise run. Undo puts back what was moved, binned, trashed or turned off in that run.</p>
+    <h1 data-i18n="h1.history_undo">History &amp; Undo</h1><p class="sub">Your last 40 clean-ups, duplicate searches, AI Organizer plans and email clean-ups (Deep Clean and virus scans aren't listed). Undo puts back what was moved, binned, trashed or turned off in that run.</p>
     <h2 data-i18n="h2.trends" style="margin-top:6px">Trends</h2>
     <div class="trends">
       <div class="card trend"><div class="k">Health score</div><div class="v" id="tScore">--</div><div class="s" id="tScoreS"></div><svg id="cScore" aria-label="Health score over time"></svg></div>
@@ -350,7 +350,7 @@ main:focus { outline:none; }
   </section>
 
   <section class="view" id="v-organizer">
-    <h1 data-i18n="h1.ai_organizer">AI Organizer</h1><p class="sub">The AI looks at the <b>names</b> in the folders you pick (never what is inside) and plans a tidy-up: new folders, moves and clearer names. Every step waits for your OK, and Undo puts it all back. Code projects and private-looking files are never touched.</p>
+    <h1 data-i18n="h1.ai_organizer">AI Organizer</h1><p class="sub">The AI looks at the <b>names</b> in the folders you pick (never what is inside) and plans a tidy-up: new folders, moves and clearer names. Every step waits for your OK, and Undo puts it all back. Code projects are never touched, and private-looking files are never shown to the AI.</p>
     <div class="card seccard" id="orgSetup">
       <h3>1. Pick the folders</h3>
       <div class="chips" id="orgRoots" style="margin:8px 0 14px">
@@ -358,7 +358,7 @@ main:focus { outline:none; }
       </div>
       <h3>2. Anything specific? <span style="color:var(--muted); font-weight:400; font-size:13px">(optional)</span></h3>
       <div class="form" style="margin-top:6px"><input id="orgAsk" maxlength="500" placeholder="e.g. put all my resumes and cover letters in one folder" aria-label="What to organize"></div>
-      <div class="links" style="margin-top:14px"><button class="btn primary" id="orgGo" data-i18n="button.3_make_a_plan">3. Make a plan</button><span class="pill" id="orgNote">Uses your own AI key; usually under a minute.</span></div>
+      <div class="links" style="margin-top:14px"><button class="btn primary" id="orgGo" data-i18n="button.3_make_a_plan">3. Make a plan</button><span class="pill" id="orgNote">Uses your own AI key.</span></div>
     </div>
     <div id="orgPlan" style="margin-top:22px"></div>
     <div class="actions" id="orgActions" style="display:none"><button class="btn primary" id="orgApprove" data-i18n="button.approve_ticked_steps">Approve ticked steps</button><button class="btn" id="orgUndo" disabled>Undo this plan</button><span id="orgStatus" style="color:var(--muted); flex:1 1 260px; font-size:14px"></span></div>
@@ -371,18 +371,18 @@ main:focus { outline:none; }
   </section>
 
   <section class="view" id="v-finder">
-    <h1 data-i18n="h1.storage">Storage</h1><div class="tabs" role="tablist" aria-label="Storage"><button role="tab" aria-selected="false" data-show="diskmap" data-i18n="tab.disk_map">Disk map</button><button role="tab" aria-selected="true" data-show="finder" data-i18n="tab.space_finder">Duplicates &amp; big files</button></div><p class="sub">Finds exact duplicate files (same content, checked by fingerprint) and big files you have not opened in 6 months. Nothing is binned until you tick and approve, and Undo brings it back.</p>
+    <h1 data-i18n="h1.storage">Storage</h1><div class="tabs" role="tablist" aria-label="Storage"><button role="tab" aria-selected="false" data-show="diskmap" data-i18n="tab.disk_map">Disk map</button><button role="tab" aria-selected="true" data-show="finder" data-i18n="tab.space_finder">Duplicates &amp; big files</button></div><p class="sub">Finds exact duplicate files (same content, checked by fingerprint) and big files that, going by your computer's last-opened dates, you have not opened in 6 months. Nothing is binned until you tick and approve, and Undo brings it back.</p>
     <div class="card seccard"><h3>Where to look</h3>
       <div class="chips" id="fdRoots" style="margin:8px 0 12px"><button class="chip on" data-froot="Desktop">Desktop</button><button class="chip on" data-froot="Documents">Documents</button><button class="chip on" data-froot="Downloads">Downloads</button><button class="chip on" data-froot="Pictures">Pictures</button><button class="chip on" data-froot="Videos">Videos</button></div>
       <div class="links" style="margin:0"><button class="btn primary" id="fdGo" data-i18n="button.find">Find</button><span class="pill">Private-looking files, code projects and AppData are never opened.</span></div></div>
     <div id="fdBody" style="margin-top:20px"></div>
     <div class="actions" id="fdActions" style="display:none"><button class="btn primary" id="fdApprove" data-i18n="button.bin_ticked_files">Bin ticked files</button><button class="btn" id="fdUndo" disabled>Undo</button><span id="fdStatus" style="color:var(--muted); flex:1 1 260px; font-size:14px"></span></div>
-    <h2>Browser caches <span class="count">every Chrome and Edge profile; emptied by Scan &amp; Clean while the browser is closed</span></h2>
+    <h2>Browser caches <span class="count">every Chrome and Edge profile; cleared by Scan &amp; Clean while the browser is closed (files from the last day stay)</span></h2>
     <div class="card rows" id="fdBrowsers"></div>
   </section>
 
   <section class="view" id="v-brain">
-    <button class="back" data-show="settings">&#8249; Settings</button><h1 data-i18n="h1.sweepwise_brain">What Sweepwise learned</h1><p class="sub">What Sweepwise has learned about how you like things, out in the open. Nothing is learned silently: every new rule waits for your OK, and you can change or delete any of it.</p>
+    <button class="back" data-show="settings">&#8249; Settings</button><h1 data-i18n="h1.sweepwise_brain">What Sweepwise learned</h1><p class="sub">What Sweepwise has learned about how you like things, out in the open. Everything Sweepwise learns is shown here. New rules wait for your OK, and you can change or delete any of it.</p>
     <h2>Sweepwise noticed <span class="count" id="brSugCount"></span></h2><div id="brSug"></div>
     <h2 data-i18n="h2.your_rules">Your rules</h2><div class="card rows" id="brRules"></div>
     <h2>About you <span class="count">shared with your AI helper when it plans or chats; names only</span></h2>
@@ -391,9 +391,9 @@ main:focus { outline:none; }
         <textarea id="brNotes" rows="3" maxlength="2000" style="width:100%; background:var(--input); color:var(--text); border:1px solid var(--line); border-radius:10px; padding:10px 12px; font:inherit; resize:vertical"></textarea>
         <div class="links" style="margin:0"><button class="btn primary" id="brSave" data-i18n="button.save_notes">Save notes</button></div></div></div>
     <h2 data-i18n="h2.habits">How you use your PC</h2>
-    <div class="card seccard"><p class="s" data-i18n="habits.desc">Learned on this PC only, from the files and apps you open. Files you opened in the last two weeks are left out of tidy-ups. The AI only ever sees folder and app names.</p><div id="habitsBody"></div><div class="links"><button class="btn sm" id="habitsForget" data-i18n="button.forget_habits">Forget habits</button></div></div>
+    <div class="card seccard"><p class="s" data-i18n="habits.desc">Learned on this PC only, from the files and apps you open. Scan &amp; Clean won't suggest binning a file you opened in the last two weeks (unless it is an exact copy) and marks it when it suggests a move. The AI only ever sees folder and app names.</p><div id="habitsBody"></div><div class="links"><button class="btn sm" id="habitsForget" data-i18n="button.forget_habits">Forget habits</button></div></div>
     <h2 data-i18n="h2.things_you_said_no_to">Things you said no to</h2>
-    <div class="card seccard"><p class="s">When you leave a suggestion unticked and approve the rest, Sweepwise remembers. Once: it starts unticked. Twice: it is hidden. Forget it to have it suggested again.</p><div id="learnBody"></div></div>
+    <div class="card seccard"><p class="s">When Sweepwise ticks a suggestion for you and you untick it before approving, it remembers. Once: it starts unticked. Twice: it is hidden. Forget it to have it suggested again.</p><div id="learnBody"></div></div>
   </section>
 
   <section class="view" id="v-security">
@@ -404,32 +404,32 @@ main:focus { outline:none; }
 
   <section class="view" id="v-settings">
     <h1 data-i18n="h1.settings">Settings</h1><p class="sub">Sweepwise runs on your PC only. Keys are kept encrypted on this computer, never shown again, and never leave it except to sign in to their own service.</p>
-    <div class="card set"><div><b data-i18n="set.learned.title">What Sweepwise learned</b><span data-i18n="set.learned.desc">Rules it noticed, your own rules, how you use your PC and the things you said no to. Nothing is learned silently.</span></div><button class="btn" data-show="brain"><span data-i18n="button.open">Open</span><span class="badge" id="navBrain" style="margin-left:8px"></span></button></div>
+    <div class="card set"><div><b data-i18n="set.learned.title">What Sweepwise learned</b><span data-i18n="set.learned.desc">Rules it noticed, your own rules, how you use your PC and the things you said no to. New rules wait for your OK, and you can change or forget any of it.</span></div><button class="btn" data-show="brain"><span data-i18n="button.open">Open</span><span class="badge" id="navBrain" style="margin-left:8px"></span></button></div>
 
     <h2 data-i18n="h2.appearance">Appearance</h2>
     <div class="card set"><div><b data-i18n="set.theme.title">Theme</b><span data-i18n="set.theme.desc">Dark is Sweepwise's signature look. Light is easier in bright rooms.</span></div><div class="seg" role="radiogroup" aria-label="Theme"><button role="radio" aria-checked="true" data-theme-pick="dark" id="themeDark">Dark</button><button role="radio" aria-checked="false" data-theme-pick="light" id="themeLight">Light</button></div></div>
-    <div class="card set"><div><b data-i18n="set.advanced.title">Show advanced details</b><span data-i18n="set.advanced.desc">Extra detail for tech-savvy people: full file paths and the rule behind each suggestion.</span></div><button class="switch" role="switch" aria-checked="false" id="advSwitch" aria-label="Show advanced details"><i></i></button></div>
+    <div class="card set"><div><b data-i18n="set.advanced.title">Show advanced details</b><span data-i18n="set.advanced.desc">Extra detail for tech-savvy people: full file paths and, when a suggestion has one, the rule behind it.</span></div><button class="switch" role="switch" aria-checked="false" id="advSwitch" aria-label="Show advanced details"><i></i></button></div>
     <h2 data-i18n="h2.reminders_updates">Reminders and updates</h2>
-    <div class="card set"><div><b data-i18n="set.reminder.title">Weekly reminder</b><span data-i18n="set.reminder.desc">On Sundays at 6 pm Sweepwise asks whether to run. It never runs on its own, and stays quiet if you cleaned that week.</span></div><button class="switch" role="switch" aria-checked="false" id="remSwitch" aria-label="Weekly reminder"><i></i></button></div>
+    <div class="card set"><div><b data-i18n="set.reminder.title">Weekly reminder</b><span data-i18n="set.reminder.desc">On Sundays at 6 pm Sweepwise asks whether to run. The reminder never cleans by itself, and stays quiet if you cleaned that week.</span></div><button class="switch" role="switch" aria-checked="false" id="remSwitch" aria-label="Weekly reminder"><i></i></button></div>
     <div class="card set"><div><b data-i18n="set.auto.title">Weekly auto-clean</b><span data-i18n="set.auto_link.desc">Temporary files and caches only, every Sunday, if you switch it on on the Speed Boost page.</span></div><button class="btn" data-show="boost" data-i18n="button.set_up">Set up</button></div>
-    <div class="card set"><div><b data-i18n="set.updates.title">Check for updates once a day</b><span id="updState">Asks GitHub which version is newest. Nothing about you is sent. Never updates without your click.</span></div><button class="btn sm" id="updCheck" data-i18n="button.check_now">Check now</button><button class="switch" role="switch" aria-checked="true" id="updSwitch" aria-label="Check for updates once a day"><i></i></button></div>
+    <div class="card set"><div><b data-i18n="set.updates.title">Check for updates once a day</b><span id="updState">Asks GitHub which version is newest, sending only Sweepwise's version number. It never installs anything by itself.</span></div><button class="btn sm" id="updCheck" data-i18n="button.check_now">Check now</button><button class="switch" role="switch" aria-checked="true" id="updSwitch" aria-label="Check for updates once a day"><i></i></button></div>
     <h2 data-i18n="h2.ai_helper">AI helper</h2>
     <div class="card seccard"><h3>AI key (Claude or OpenAI) <span class="tag" id="aiState">checking</span></h3>
-      <p class="s">Optional, and off until you add a key. It powers the AI Organizer, the chat and smarter suggestions for files Sweepwise is unsure about. Only names, sizes and dates are sent, never what is inside a file, and anything that looks private (passwords, IDs, bank, tax, legal) is never sent. Use your own key from Anthropic (Claude) or OpenAI: their small charges go to your account with them, never to Sweepwise. Sweepwise checks the key for free and keeps it encrypted for your Windows account.</p>
+      <p class="s">Optional, and off until you add a key. It powers the AI Organizer, the chat and smarter suggestions for files Sweepwise is unsure about. Names, sizes, dates and Sweepwise's own results are sent (plus email senders and subject lines, and anything you type), never what is inside a file. Names that look private (passwords, IDs, bank, tax, legal) are left out. Use your own key from Anthropic (Claude) or OpenAI: their small charges go to your account with them, never to Sweepwise. Sweepwise checks the key for free and keeps it encrypted on this computer, for your account only.</p>
       <div class="form"><input id="aiKey" type="password" placeholder="sk-ant-... (Claude) or sk-... (OpenAI)" aria-label="AI key, Claude or OpenAI" autocomplete="off">
         <div class="links" style="margin:0"><button class="btn primary" id="aiSave" type="button">Save and check key</button><button class="btn sm" id="aiGuide" type="button" data-i18n="button.key_guide">How to get a key</button><button class="btn sm" data-open="anthropic_keys" type="button">Get a Claude key</button><button class="btn sm" data-open="openai_keys" type="button">Get an OpenAI key</button><button class="btn sm" id="aiRemove" type="button">Remove key</button></div></div>
     </div>
     <h2 data-i18n="h2.more">More</h2>
-    <div class="card set"><div><b data-i18n="tile.review_folder.title">Review folder</b><span data-i18n="tile.review_folder.desc">Files Sweepwise was unsure about go to Documents\_Review for you to sort.</span></div><button class="btn" data-open="review">Open folder</button></div>
+    <div class="card set"><div><b data-i18n="tile.review_folder.title">Review folder</b><span data-i18n="tile.review_folder.desc">Files Sweepwise was unsure about go to a _Review folder in Documents for you to sort.</span></div><button class="btn" data-open="review">Open folder</button></div>
     <div class="card set win-only"><div><b data-i18n="tile.windows_security.title">Windows Security</b><span data-i18n="tile.windows_security.desc">Protection history, quarantine and real-time protection settings.</span></div><button class="btn" data-open="security">Open</button></div>
     <h2 data-i18n="h2.support_about">Support and about</h2>
     <div class="card set"><div><b data-i18n="set.support.title">Support Sweepwise</b><span data-i18n="set.support.desc">Free for everyone, kept going by people who chip in. Optional, and it unlocks nothing: everything is already free.</span></div><button class="btn primary" data-show="support" data-i18n="button.support">Support Sweepwise</button></div>
-    <div class="card set"><div><b data-i18n="set.about.title">About &amp; privacy</b><span data-i18n="set.about.desc">Version, licence, and exactly what Sweepwise does and doesn't send.</span></div><button class="btn" data-show="about" data-i18n="button.open">Open</button></div>
+    <div class="card set"><div><b data-i18n="set.about.title">About &amp; privacy</b><span data-i18n="set.about.desc">Version, licence, and what Sweepwise sends for its update check and AI helper.</span></div><button class="btn" data-show="about" data-i18n="button.open">Open</button></div>
   </section>
   <section class="view" id="v-email">
-    <h1 data-i18n="h1.email">Email</h1><p class="sub" data-i18n="sub.email">Clears old newsletters and promotions out of your inbox. Sweepwise reads only sender and subject lines, never your emails, and never touches mail from people you write to, banks, government, health, security alerts or receipts. Everything goes to your own Trash, and Undo puts it back.</p>
+    <h1 data-i18n="h1.email">Email</h1><p class="sub" data-i18n="sub.email">Clears old newsletters and promotions out of your inbox. Sweepwise reads only the top lines of each email (sender, subject, date and the like), never what your emails say. It skips people you wrote to in the past year and mail that looks like bank, government or health mail, security alerts or receipts, spotted by keywords, so look over the list. Everything goes to your own Trash, and Undo puts it back while it is still there.</p>
     <div class="card seccard"><h3 data-i18n="email.accounts.title">Your email accounts</h3><div id="mailAccounts"></div>
-      <p class="s" data-i18n="email.add.desc">Gmail, Yahoo and iCloud use an app password: a separate password just for Sweepwise, so your real password is never shared. Outlook and Hotmail use Microsoft's own sign-in page.</p>
+      <p class="s" data-i18n="email.add.desc">Gmail, Yahoo and iCloud use an app password: a separate password just for Sweepwise, so your real password is never shared. Outlook and Hotmail can't be connected yet; they will use Microsoft's own sign-in page.</p>
       <div class="form">
         <select id="mailProvider" aria-label="Email provider" style="background:var(--input); color:var(--text); border:1px solid var(--line); border-radius:10px; padding:10px 12px; font:inherit"></select>
         <input id="mailEmail" type="email" placeholder="you@gmail.com" aria-label="Email address" autocomplete="off">
@@ -444,17 +444,17 @@ main:focus { outline:none; }
   </section>
 
   <section class="view" id="v-boost">
-    <h1 data-i18n="h1.boost">Speed Boost</h1><p class="sub" data-i18n="sub.boost">Make your PC feel new again with Microsoft's own tools: fewer programs starting with Windows, less junk, lighter settings on slow PCs and up-to-date apps. Every change waits for your OK, and Windows makes a restore point first.</p>
+    <h1 data-i18n="h1.boost">Speed Boost</h1><p class="sub" data-i18n="sub.boost">Make your PC feel new again: fewer programs starting with Windows, less junk, lighter settings on slow PCs and up-to-date apps. Find speed-ups runs a Scan &amp; Clean, which clears temp files and caches; everything else waits for your OK, and bigger changes wait for a Windows restore point.</p>
     <div class="card seccard" id="boostReport"></div>
     <div class="links" style="margin:14px 0 6px"><button class="btn primary" id="boostFind" data-i18n="button.find_speedups">Find speed-ups</button><button class="btn" id="boostReview" data-i18n="button.review_speedups">Review speed-ups</button><button class="btn" id="boostMeasure" data-i18n="button.measure_now">Measure now</button></div>
     <h2 data-i18n="h2.keep_new">Keep it like new</h2>
     <div class="card set"><div><b data-i18n="set.auto.title">Weekly auto-clean</b><span data-i18n="set.auto.desc">Off unless you switch it on. Every Sunday at 5 pm Sweepwise quietly clears temporary files and caches only: never your files, never moves anything. Each one shows in History.</span></div><button class="switch" role="switch" aria-checked="false" id="autoSwitch" aria-label="Weekly auto-clean"><i></i></button></div>
     <div class="card set win-only"><div><b data-i18n="set.storage_sense.title">Storage Sense</b><span data-i18n="set.storage_sense.desc">Windows' own automatic clean-up. If you turn it on in Windows Settings, check it is not set to empty your Recycle Bin or Downloads unless you want that.</span></div><button class="btn" data-open="storage_sense" data-i18n="button.open">Open</button></div>
-    <div class="card set win-only"><div><b data-i18n="set.drivers.title">Driver updates</b><span data-i18n="set.drivers.desc">Drivers come only from Windows Update (optional updates). Sweepwise never uses third-party driver tools.</span></div><button class="btn" data-open="optional_updates" data-i18n="button.open">Open</button></div>
+    <div class="card set win-only"><div><b data-i18n="set.drivers.title">Driver updates</b><span data-i18n="set.drivers.desc">For drivers, use Windows Update (optional updates). Sweepwise never uses third-party driver tools.</span></div><button class="btn" data-open="optional_updates" data-i18n="button.open">Open</button></div>
   </section>
 
   <section class="view" id="v-help">
-    <h1 data-i18n="h1.help">Help</h1><p class="sub" data-i18n="sub.help">Plain-English answers to common questions. Still stuck? Ask on GitHub: questions are answered there in public, so the next person finds the answer too.</p>
+    <h1 data-i18n="h1.help">Help</h1><p class="sub" data-i18n="sub.help">Plain-English answers to common questions. When Sweepwise goes public, you can also ask on GitHub, where questions are answered in public so the next person finds the answer too.</p>
     <div id="helpList"></div>
     <div class="links"><button class="btn" data-open="discussions" data-i18n="button.ask_question">Ask a question</button><button class="btn" data-open="issues" data-i18n="button.report_problem">Report a problem</button><button class="btn" data-open="data_folder" data-i18n="button.open_data_folder">Open Sweepwise's own records</button></div>
   </section>
@@ -462,31 +462,31 @@ main:focus { outline:none; }
   <section class="view" id="v-support">
     <h1 data-i18n="h1.support">Support Sweepwise</h1><p class="sub" data-i18n="sub.support">Sweepwise is free for everyone: no ads, no tracking, no paid version. It's made by one person, AlbertanCoder, and kept going by people who choose to chip in.</p>
     <div class="supgrid">
-      <div class="card seccard"><h3 data-i18n="support.once.title">Buy me a coffee</h3><p class="s" data-i18n="support.once.desc">One time, any amount. US$3 buys a coffee; $5 or $10 helps a lot. Card or PayPal through Ko-fi, no account needed.</p><button class="btn primary" data-open="kofi" data-i18n="button.kofi">Buy me a coffee on Ko-fi</button></div>
-      <div class="card seccard"><h3 data-i18n="support.monthly.title">Support every month</h3><p class="s" data-i18n="support.monthly.desc">From US$2 a month, on Ko-fi or GitHub Sponsors. Stop any time.</p><button class="btn" data-open="sponsors" data-i18n="button.sponsors">Sponsor on GitHub</button></div>
+      <div class="card seccard"><h3 data-i18n="support.once.title">Buy me a coffee</h3><p class="s" data-i18n="support.once.desc">One time, through Ko-fi. US$3 buys a coffee; $5 or $10 helps a lot.</p><button class="btn primary" data-open="kofi" data-i18n="button.kofi">Buy me a coffee on Ko-fi</button></div>
+      <div class="card seccard"><h3 data-i18n="support.monthly.title">Support every month</h3><p class="s" data-i18n="support.monthly.desc">Every month on Ko-fi (GitHub Sponsors opens when Sweepwise goes public). Stop any time.</p><button class="btn" data-open="sponsors" data-i18n="button.sponsors">Sponsor on GitHub</button></div>
     </div>
-    <p class="fine" data-i18n="support.fine">This isn't a charity, so support isn't tax-deductible. Ko-fi and GitHub handle the payment; Sweepwise never sees your card details. Every feature stays free either way, and if you like, your name can go on the Supporters page on the website.</p>
+    <p class="fine" data-i18n="support.fine">This isn't a charity, so support isn't tax-deductible. Ko-fi handles the payment; Sweepwise never sees your card details. Every feature stays free either way.</p>
     <h2 data-i18n="h2.other_ways">Other ways to help</h2>
-    <div class="card seccard"><p class="s" data-i18n="support.other">Tell a friend who needs a tidier PC, report a problem, or suggest an idea on GitHub. Translations into other languages are welcome too.</p><div class="links"><button class="btn sm" data-open="issues" data-i18n="button.report_problem">Report a problem</button><button class="btn sm" data-open="discussions" data-i18n="button.suggest_idea">Suggest an idea</button></div></div>
+    <div class="card seccard"><p class="s" data-i18n="support.other">Tell a friend who needs a tidier PC or report a problem on GitHub. When Sweepwise goes public, you can suggest ideas there too. Translations into other languages are welcome.</p><div class="links"><button class="btn sm" data-open="issues" data-i18n="button.report_problem">Report a problem</button><button class="btn sm" data-open="discussions" data-i18n="button.suggest_idea">Suggest an idea</button></div></div>
   </section>
 
   <section class="view" id="v-about">
     <h1 data-i18n="h1.about">About &amp; privacy</h1><p class="sub" id="aboutVer">Sweepwise</p>
     <div class="secgrid">
-      <div class="card seccard"><h3 data-i18n="about.privacy.title">We collect nothing</h3><p class="s" data-i18n="about.privacy.desc">No account, no tracking, no analytics, no crash reports. Your files, scans and choices stay on this PC.</p>
-        <div class="check"><i class="dot info"></i><div><b data-i18n="about.update.title">Update check</b><span data-i18n="about.update.desc">Once a day Sweepwise asks GitHub which version is newest. Nothing about you or your PC is sent. You can switch it off in Settings.</span></div></div><div class="check"><i class="dot info"></i><div><b data-i18n="about.ai.title">AI helper (only if you add a key)</b><span data-i18n="about.ai.desc">Names, sizes and dates go to Claude or OpenAI, never what is inside your files. Private-looking names are never sent.</span></div></div><div class="check"><i class="dot info"></i><div><b data-i18n="about.records.title">Your records</b><span data-i18n="about.records.desc">Sweepwise keeps its history, settings and Undo records in its own folder on this PC. Open it any time.</span></div></div>
+      <div class="card seccard"><h3 data-i18n="about.privacy.title">We collect nothing</h3><p class="s" data-i18n="about.privacy.desc">No account, no tracking, no analytics, no crash reports. Your files and scans stay on this PC, except what the AI helper sends if you use it (see below).</p>
+        <div class="check"><i class="dot info"></i><div><b data-i18n="about.update.title">Update check</b><span data-i18n="about.update.desc">Once a day Sweepwise asks GitHub which version is newest. Only Sweepwise's own version number goes with the question; like any website, GitHub sees your internet address. You can switch it off in Settings.</span></div></div><div class="check"><i class="dot info"></i><div><b data-i18n="about.ai.title">AI helper (only if you add a key)</b><span data-i18n="about.ai.desc">When you use it, Claude or OpenAI (never the developer) gets names, sizes and dates of files and folders, Sweepwise's own results, your recent apps and folders, your notes and what you type; for email, senders and subject lines. Never what is inside your files. Names and subjects with private-looking words (like bank or tax) are left out.</span></div></div><div class="check"><i class="dot info"></i><div><b data-i18n="about.records.title">Your records</b><span data-i18n="about.records.desc">Sweepwise keeps its history, settings and Undo records in its own folder on this PC. Open it any time.</span></div></div>
         <div class="links"><button class="btn sm" data-open="data_folder" data-i18n="button.open_data_folder">Open Sweepwise's own records</button></div></div>
-      <div class="card seccard"><h3 data-i18n="about.licence.title">Free and open source</h3><p class="s" data-i18n="about.licence.desc">Sweepwise is free software under the GNU General Public License, version 3. You can use it, study it, share it and change it. Anyone who shares a changed version must share their code under the same licence, so Sweepwise can never be taken closed and sold.</p>
+      <div class="card seccard"><h3 data-i18n="about.licence.title">Free, and open source at launch</h3><p class="s" data-i18n="about.licence.desc">Sweepwise is free. When it launches, its code will be open source under the GNU General Public License, version 3, so anyone can use it, study it, share it and change it. Anyone who shares a changed version must share their code under the same licence, so Sweepwise can never be taken closed and sold.</p>
         <p class="s" data-i18n="about.warranty">Sweepwise comes with absolutely no warranty, to the extent permitted by law. Made by AlbertanCoder.</p>
         <div class="links"><button class="btn sm" data-open="license" data-i18n="button.read_licence">Read the licence</button><button class="btn sm" data-open="source" data-i18n="button.source_code">Source code on GitHub</button></div></div>
     </div>
     <h2 data-i18n="h2.promises">Safety promises</h2>
-    <div class="card seccard"><ul class="promises" style="margin:0"><li data-i18n="about.promise.1">Nothing personal changes without your OK.</li><li data-i18n="about.promise.2">Everything can be undone, except uninstalling a program.</li><li data-i18n="about.promise.3">Your files only ever go to the Recycle Bin, and Sweepwise never empties it.</li><li data-i18n="about.promise.4">Windows maintenance uses Microsoft's own tools only: no registry cleaners, no tricks.</li></ul></div>
+    <div class="card seccard"><ul class="promises" style="margin:0"><li data-i18n="about.promise.1">Nothing personal changes without your OK.</li><li data-i18n="about.promise.2">Changes you approve can be undone, except uninstalls and app updates.</li><li data-i18n="about.promise.3">Your own files are never deleted for good: they are only moved or sent to the Recycle Bin, and Sweepwise never empties it.</li><li data-i18n="about.promise.4">Windows repairs and system clean-ups use Microsoft's own tools, and Sweepwise clears temp files and caches itself: no registry cleaners, no tricks.</li></ul></div>
   </section>
 </main>
 <button id="chatFab" aria-label="Ask Sweepwise" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg><span>Ask Sweepwise</span></button>
 <aside id="chat" aria-label="Chat with Sweepwise">
-  <div class="chat-head"><b data-i18n="tile.ask_sweepwise.title">Ask Sweepwise</b><span data-i18n="tile.ask_sweepwise.desc">Answers from Sweepwise's own data. Anything it suggests waits for your click.</span><button class="btn sm" id="chatClose" aria-label="Close chat">Close</button></div>
+  <div class="chat-head"><b data-i18n="tile.ask_sweepwise.title">Ask Sweepwise</b><span data-i18n="tile.ask_sweepwise.desc">Your AI helper answers and looks things up in Sweepwise's own data. Anything it suggests waits for your click.</span><button class="btn sm" id="chatClose" aria-label="Close chat">Close</button></div>
   <div class="chat-body" id="chatBody">
     <div class="msg bot">Hi there. Ask me anything about your PC: what's using space, whether you're safe, or what to tidy.</div>
     <div class="starters" id="chatStarters"><button>What's using my space?</button><button>Is my PC safe right now?</button><button>Tidy my Downloads</button><button>What should I do next?</button></div>
@@ -496,7 +496,7 @@ main:focus { outline:none; }
 <div class="welcome-back" id="terms" role="dialog" aria-modal="true" aria-labelledby="tTitle" hidden>
   <div class="welcome terms">
     <h2 id="tTitle" tabindex="-1" data-i18n="terms.title">Before you start: the Sweepwise test terms</h2>
-    <p data-i18n="terms.intro">Please read the terms. Sweepwise only runs once you agree to them.</p>
+    <p data-i18n="terms.intro">Please read the terms. You can only use Sweepwise once you agree to them.</p>
     <div class="terms-box" id="termsBox" tabindex="0" aria-label="Sweepwise Test Terms"><p data-i18n="terms.loading">Loading the terms...</p></div>
     <label class="terms-tick" for="termsAgree"><input type="checkbox" id="termsAgree"><span data-i18n="terms.agree">I have read the Sweepwise Test Terms (version 1) and agree to be legally bound by them.</span></label>
     <p class="terms-msg" id="termsMsg" role="status"></p>
@@ -510,19 +510,19 @@ main:focus { outline:none; }
       <div style="margin-top:18px"><svg width="64" height="64" viewBox="0 0 100 100" aria-hidden="true"><defs><linearGradient id="lgW" x1="20%" y1="5%" x2="80%" y2="96%"><stop offset="0" stop-color="#5eead4"/><stop offset="1" stop-color="#0d9488"/></linearGradient><clipPath id="shieldClipW"><path d="M50 5 C62 13 76 16 90 17 C92 52 80 80 50 96 C20 80 8 52 10 17 C24 16 38 13 50 5 Z"/></clipPath></defs><path d="M50 5 C62 13 76 16 90 17 C92 52 80 80 50 96 C20 80 8 52 10 17 C24 16 38 13 50 5 Z" fill="url(#lgW)"/><g clip-path="url(#shieldClipW)"><g transform="translate(1.3,1.6)" fill="rgba(4,40,40,.28)"><line x1="70.5" y1="20.5" x2="45.6" y2="55.2" stroke="rgba(4,40,40,.28)" stroke-width="4.6" stroke-linecap="round"/><path d="M37.18 53.98 L49.27 62.86 L44.07 82.61 C35 80.6 25 73 19.89 64.85 Z"/></g><line x1="70.5" y1="20.5" x2="45.6" y2="55.2" stroke="#fff" stroke-width="4.6" stroke-linecap="round"/><path d="M37.18 53.98 L49.27 62.86 L44.07 82.61 C35 80.6 25 73 19.89 64.85 Z" fill="#fff"/><path d="M39.95 51.05 L51.23 59.34 L48.87 62.56 L37.58 54.27 Z" fill="#0a1020"/><path d="M69 55 Q69 62 76 62 Q69 62 69 69 Q69 62 62 62 Q69 62 69 55 Z" fill="#fff"/><path d="M78.5 44 Q78.5 48 82.5 48 Q78.5 48 78.5 52 Q78.5 48 74.5 48 Q78.5 48 78.5 44 Z" fill="#ccfbf1"/></g><path d="M50 5 C62 13 76 16 90 17 C92 52 80 80 50 96 C20 80 8 52 10 17 C24 16 38 13 50 5 Z" fill="none" stroke="rgba(255,255,255,.43)" stroke-width="1.8"/></svg></div>
       <h2 id="wTitle" data-i18n="welcome.1.title">Welcome to Sweepwise</h2>
       <p data-i18n="welcome.1.desc">Sweepwise clears out junk, checks that your PC is protected and suggests tidy-ups, in plain English. Three promises:</p>
-      <ul class="promises"><li data-i18n="welcome.promise.1">Nothing personal changes without your OK.</li><li data-i18n="welcome.promise.2">Everything can be undone (except uninstalling a program).</li><li data-i18n="welcome.promise.3">Nothing is collected: no account, no tracking.</li></ul>
+      <ul class="promises"><li data-i18n="welcome.promise.1">Nothing personal changes without your OK.</li><li data-i18n="welcome.promise.2">Changes you approve can be undone, except uninstalls and app updates.</li><li data-i18n="welcome.promise.3">Nothing is collected: no account, no tracking.</li></ul>
       <div class="row2"><button class="btn primary" data-wnext="2" data-i18n="button.next">Next</button></div>
     </div>
     <div class="wstep" data-step="2" hidden>
       <h2 data-i18n="welcome.2.title">Two quick choices</h2>
-      <div class="card set"><div><b data-i18n="set.reminder.title">Weekly reminder</b><span data-i18n="welcome.reminder.desc">On Sundays at 6 pm Sweepwise asks whether to run. It never runs on its own.</span></div><button class="switch" role="switch" aria-checked="true" id="wRem" aria-label="Weekly reminder"><i></i></button></div>
+      <div class="card set"><div><b data-i18n="set.reminder.title">Weekly reminder</b><span data-i18n="welcome.reminder.desc">On Sundays at 6 pm Sweepwise asks whether to run. The reminder never cleans by itself.</span></div><button class="switch" role="switch" aria-checked="true" id="wRem" aria-label="Weekly reminder"><i></i></button></div>
       <div class="card seccard"><h3 data-i18n="welcome.ai.title">AI helper (optional)</h3><p class="s" data-i18n="welcome.ai.desc">Have a Claude or OpenAI key? Add it for the AI Organizer and chat. You can skip this and add one later in Settings.</p>
         <div class="form"><input id="wKey" type="password" placeholder="sk-ant-... or sk-..." aria-label="AI key, optional" autocomplete="off"><div class="links" style="margin:0"><button class="btn sm" id="wGuide" type="button" data-i18n="button.how_get_key">How do I get one?</button></div></div></div>
       <div class="row2"><button class="btn" data-wnext="1" data-i18n="button.back">Back</button><button class="btn primary" id="wNext2" data-i18n="button.next">Next</button></div>
     </div>
     <div class="wstep" data-step="3" hidden>
       <h2 data-i18n="welcome.3.title">Your first scan</h2>
-      <p data-i18n="welcome.3.desc">Sweepwise will measure the junk on your PC and show you exactly what it would remove. Nothing is deleted until you press Clean now.</p>
+      <p data-i18n="welcome.3.desc">Sweepwise will measure the junk on your PC and show you how much each kind takes up. Nothing is deleted until you press Clean now.</p>
       <div class="row2"><button class="btn" id="wLater" data-i18n="button.not_now">Not now</button><button class="btn primary" id="wScan" data-i18n="button.start_first_scan">Start my first scan</button></div>
     </div>
   </div>
@@ -717,7 +717,7 @@ main:focus { outline:none; }
     var pick = 'deep';
     var old = wo.offer ? '<label class="opt" style="cursor:pointer"><input type="checkbox" id="dcOld" style="margin-top:4px; width:18px; height:18px; accent-color:var(--teal)"><div><b>Also remove the old copy of Windows (Windows.old)</b><span>Left from an upgrade ' + esc(wo.days) + ' days ago. It frees a lot of space, but going back to your previous version of Windows will no longer be possible.</span></div></label>' : '';
     var L = OS !== 'windows';
-    modal('Deep Clean', (OS === 'mac' ? '<p>Clears old system files with admin rights, so macOS will ask for your password. Time Machine makes a snapshot first when it can.</p>' : L ? '<p>Clears system files that need admin rights, so your system will ask for your password. If Timeshift is installed, it makes a snapshot first.</p>' : '<p>Uses Microsoft\'s own tools with admin rights. Windows will show an "Allow changes?" box: click <b>Yes</b>. Windows makes a restore point first.</p>') +
+    modal('Deep Clean', (OS === 'mac' ? '<p>Clears old system files with admin rights, so macOS will ask for your password. Time Machine makes a snapshot first when it can.</p>' : L ? '<p>Clears system files that need admin rights, so your system will ask for your password.</p>' : '<p>Uses Microsoft\'s own tools with admin rights. Windows will show an "Allow changes?" box: click <b>Yes</b>. Sweepwise asks Windows for a restore point first and tells you if one couldn\'t be made.</p>') +
       '<div class="opts"><button class="opt sel" data-m="deep"><div><b>Clean system files</b><span>' + (L ? esc(t('tile.clean_system_files.desc')) : 'Old Windows Update leftovers, error reports, setup logs, caches, and a quick drive optimize. 5-15 minutes. Never empties your Recycle Bin or touches Downloads.') + '</span></div></button>' +
       '<button class="opt" data-m="deep_repair"><div><b>' + (L ? esc(t('tile.clean_check_and_repair_windows.title')) : 'Clean + check and repair Windows') + '</b><span>' + (L ? esc(t('tile.clean_check_and_repair_windows.desc')) : 'Also runs Microsoft\'s DISM and SFC repair checks. Adds 20-30 minutes and makes your PC work harder.') + '</span></div></button>' + old + '</div>',
       'Start Deep Clean', function () { var w = $('dcOld'); run(pick, { windows_old: !!(w && w.checked) }); });
@@ -728,10 +728,10 @@ main:focus { outline:none; }
   function ask(kind) {
     (function () {
       if (kind === 'full') {
-        var t = lastTemp == null ? '' : ' Right now it is <b>' + lastTemp + '°C</b>' + (lastTemp > 70 ? ', so Sweepwise will wait for it to cool first.' : ', so it can start straight away.');
-        modal('Full Scan', (OS !== 'windows' ? '<p>ClamAV checks every file on your computer. It can take an hour or more, and you can keep working.</p>' +
-          '<p>Sweepwise only starts it when your computer is under 70°C with enough free memory.' + t + '</p>' : '<p>Windows Security checks every file on your PC. It usually takes 30-90 minutes and you can keep working.</p>' +
-          '<p>Windows will not let a scan be paused once it starts, so Sweepwise only starts it when your PC is under 70°C with enough free memory.' + t + '</p>') +
+        var t = lastTemp == null ? '' : ' Right now it is <b>' + lastTemp + '°C</b>' + (lastTemp > 70 ? ', so Sweepwise will wait for it to cool first.' : ', so it can start straight away if enough memory is free.');
+        modal('Full Scan', (OS !== 'windows' ? '<p>If ClamAV is installed, it checks the files on your computer (system folders and other drives are skipped). It can take an hour or more, and you can keep working.</p>' +
+          '<p>Sweepwise waits until your computer is under 70°C with enough free memory (if it can\'t read the temperature, it starts straight away).' + t + '</p>' : '<p>Windows Security checks every file on your PC. It usually takes 30-90 minutes and you can keep working.</p>' +
+          '<p>Windows will not let a scan be paused once it starts, so Sweepwise waits until your PC is under 70°C with enough free memory (if your PC doesn\'t report its temperature, it starts straight away).' + t + '</p>') +
           '<p>Tip: set your laptop on a hard surface or a stand while it runs.</p>', 'Start Full Scan', function () { run('full'); });
       } else {
         api('/api/deep/info').then(function (inf) { deepModal((inf && inf.windows_old) || {}); }).catch(function () { deepModal({}); });
@@ -798,19 +798,19 @@ main:focus { outline:none; }
     files: ['Files to tidy', 'Loose files on your Desktop and in Downloads, sorted into folders. Moves start unticked; only clear junk is ticked. Private-looking files go to a hidden Documents\\_Private folder, unclear ones to Documents\\_Review.'],
     ai_leftovers: ['AI leftovers', 'Old scratch folders, caches and downloaded models from AI tools. Only clear junk is ticked, and everything goes to the Recycle Bin. Code projects and models are never ticked for you.'],
     speed: ['Speed-ups', 'Proven Windows settings that make a PC faster. Each can be switched back with Undo, and Windows makes a restore point first.'],
-    program_leftovers: ['Left behind by removed programs', 'Folders that belong to no installed program and have not changed for 6 months. Nothing is ticked: check each one. They go to the Recycle Bin.'],
+    program_leftovers: ['Left behind by removed programs', 'Folders whose names match no installed program and that have not changed for 6 months (a year on Mac and Linux). Nothing is ticked: check each one. They go to the Recycle Bin.'],
     updates: ['App updates', 'Newer versions of your apps, installed with winget (Microsoft\'s own app installer). Nothing is ticked. Close an app before updating it. Updates cannot be undone automatically.'],
     startup: ['Programs that start with Windows', 'Turning one off only stops it opening by itself. Some need admin; switch those off in Task Manager.'],
     uninstall: ['Programs not used in 6 months', 'Nothing is ticked. Each program\'s own uninstaller opens. Uninstalls cannot be undone.']
   };
   if (OS === 'mac') {
-    info.speed[1] = 'Proven settings that make a computer faster. Each can be switched back with Undo, and Time Machine makes a snapshot first when it can.';
+    info.speed[1] = 'Sweepwise has no speed-up settings for Macs yet.';
     info.updates[1] = 'Newer versions of apps you installed with Homebrew. Nothing is ticked. Close an app before updating it. Updates cannot be undone automatically.';
     info.startup = ['Programs that start when you sign in', 'Turning one off only stops it opening by itself, just for you. Undo turns it back on.'];
     info.uninstall = ['Apps not opened in 6 months', 'Nothing is ticked. Apps go to the Trash, so Undo or Finder\'s Put Back brings them back.'];
   }
   if (OS !== 'windows') {
-    info.files[1] = 'Loose files on your Desktop and in Downloads, sorted into folders. Moves start unticked; only clear junk is ticked. Private-looking files go to a hidden Documents/_Private folder, unclear ones to Documents/_Review.';
+    info.files[1] = 'Loose files on your Desktop and in Downloads, sorted into folders. Moves start unticked; only clear junk is ticked. Private-looking files go to Documents/_Private (hidden on Windows), unclear ones to Documents/_Review.';
   }
   if (OS === 'linux') {
     info.speed[1] = 'Proven settings that make a computer faster. Each can be switched back with Undo, and Timeshift makes a snapshot first when it is installed.';
@@ -865,7 +865,7 @@ main:focus { outline:none; }
       if (d.ai_on) chips += '<button class="chip" id="aiAsk" style="margin-left:auto; color:var(--ai)">✨ Ask AI about unclear items</button>';
       $('chips').innerHTML = chips;
       if ($('aiAsk')) $('aiAsk').addEventListener('click', function () {
-        var b = $('aiAsk'); b.disabled = true; b.textContent = 'Asking the AI (names only)...';
+        var b = $('aiAsk'); b.disabled = true; b.textContent = 'Asking the AI (names, sizes and dates only)...';
         api('/api/ai/suggest', { run: listRun }).then(function (r) {
           var n = Object.keys((r.files && r.files.suggestions) || {}).length;
           toast('AI helper: ' + n + ' file suggestion(s), ' + (r.senders || []).length + ' sender suggestion(s).' + (r.files && r.files.skipped_private ? ' ' + r.files.skipped_private + ' private-looking file(s) were not sent.' : ''));
@@ -909,10 +909,10 @@ main:focus { outline:none; }
     var un = ids.filter(function (i) { return i.charAt(0) === 'u'; }).length;
     arm($('approveBtn'), 'Click again to approve ' + ids.length + ' item(s)', function () {
       $('approveBtn').disabled = true;
-      $('listStatus').textContent = 'Working on ' + ids.length + ' item(s)...' + (un ? ' Uninstall windows will open; follow them.' : '');
+      $('listStatus').textContent = 'Working on ' + ids.length + ' item(s)...' + (un ? (OS === 'windows' ? ' Uninstall windows will open; follow them.' : OS === 'mac' ? ' Apps go to the Trash.' : ' Your system may ask for your password.') : '');
       api('/api/approve', { run: listRun, ids: ids, unticked: unticked }).then(function (d) {
         var res = d.results || [], ok = res.filter(function (r) { return r.ok; }).length;
-        $('listStatus').textContent = ok + ' of ' + res.length + ' done. Undo this run puts everything back except uninstalls.';
+        $('listStatus').textContent = ok + ' of ' + res.length + ' done. Undo this run puts back everything except ' + (OS === 'mac' ? 'app updates.' : 'app updates and uninstalled programs.');
         loadList(); brainBadge(); toast(ok + ' of ' + res.length + ' done.');
       }).catch(function (e) { $('listStatus').textContent = e.message; }).then(function () { $('approveBtn').disabled = false; });
     });
@@ -922,7 +922,7 @@ main:focus { outline:none; }
       btn.disabled = true; statusEl.textContent = 'Undoing...';
       api('/api/undo', { run: id }).then(function (d) {
         var lines = (d.results || []).map(function (r) { return (r.ok ? '✓ ' : '✗ ') + (r.title ? r.title + ': ' : '') + r.message; });
-        statusEl.textContent = lines.length ? lines.length + ' change(s) reversed. ' + lines.slice(0, 3).join('  ·  ') + (lines.length > 3 ? ' ...' : '') : 'Nothing to undo.';
+        statusEl.textContent = lines.length ? (d.results || []).filter(function (r) { return r.ok; }).length + ' of ' + lines.length + ' change(s) reversed. ' + lines.slice(0, 3).join('  ·  ') + (lines.length > 3 ? ' ...' : '') : 'Nothing to undo.';
         toast('Undo finished.'); if (current === 'list') loadList(); if (current === 'history') loadHistory(); if (current === 'organizer') loadOrganizer(); if (current === 'finder') loadFinder();
       }).catch(function (e) { statusEl.textContent = e.message; btn.disabled = false; });
     });
@@ -1015,18 +1015,18 @@ main:focus { outline:none; }
       var u = r.updates || {};
       var uLevel = u.restart_pending ? 'warn' : u.ok ? '' : 'warn';
       html += '<div class="card seccard"><h3>' + (OS !== 'windows' ? 'System updates' : 'Windows Update') + ' <span class="tag ' + (uLevel ? 'warn' : 'good') + '">' + (u.restart_pending ? 'restart needed' : u.ok ? 'up to date' : 'check it') + '</span></h3><p class="s">Updates fix the security holes viruses use.</p>' +
-        chk(u.restart_pending ? 'warn' : '', u.restart_pending ? 'A restart is needed' : 'No restart needed', u.restart_pending ? (OS !== 'windows' ? 'Updates were installed that finish when you restart.' : 'Windows installed updates that finish when you restart.') : 'Nothing is waiting on a restart.') +
+        chk(u.restart_pending ? 'warn' : '', u.restart_pending ? 'A restart is needed' : (OS === 'mac' ? 'Restart not checked' : 'No restart needed'), u.restart_pending ? (OS !== 'windows' ? 'Updates were installed that finish when you restart.' : 'Windows installed updates that finish when you restart.') : (OS === 'mac' ? 'Sweepwise can\'t tell on a Mac whether updates are waiting for a restart.' : OS === 'linux' ? 'Your system isn\'t asking for a restart.' : 'Nothing is waiting on a restart.')) +
         (OS !== 'windows' && u.pending != null ? chk(u.pending ? 'warn' : '', 'Updates waiting', u.pending ? u.pending + ' update(s) are ready to install.' : 'Everything is up to date.') : '') +
         chk(u.ok ? '' : 'warn', 'Last update installed', u.last_update ? esc(when(u.last_update)) + ' (' + u.days_since + ' days ago)<br>' + esc(u.last_title || '') : 'Unknown') +
         '<div class="links">' + (OS === 'mac' ? openBtn('software_updates', 'Open Software Update') : OS === 'linux' ? openBtn('software_updates', 'Open Software Updater') : openBtn('windows_update', 'Open Windows Update')) + '</div></div>';
       var auto = r.autoruns || [];
-      html += '<div class="card seccard"><h3>' + (OS !== 'windows' ? 'Programs that start by themselves' : 'Startup items and scheduled tasks') + ' <span class="tag ' + (auto.length ? 'warn' : 'good') + '">' + (auto.length ? auto.length + ' to look at' : 'nothing odd') + '</span></h3><p class="s">Programs that run by themselves from unusual places, hidden scripts, unsigned programs, or entries pointing at deleted programs. Sweepwise only lists them.</p>' +
+      html += '<div class="card seccard"><h3>' + (OS !== 'windows' ? 'Programs that start by themselves' : 'Startup items and scheduled tasks') + ' <span class="tag ' + (auto.length ? 'warn' : 'good') + '">' + (auto.length ? auto.length + ' to look at' : 'nothing odd') + '</span></h3><p class="s">' + (OS !== 'windows' ? 'Programs that run by themselves from unusual places, hidden scripts, or entries pointing at deleted programs.' : 'Programs that run by themselves from unusual places, hidden scripts, unsigned programs, or entries pointing at deleted programs.') + ' Sweepwise only lists them.</p>' +
         (auto.length ? auto.map(function (a) { return chk('warn', a.name + ' · ' + a.kind, esc((a.reasons || []).join('; ')) + '<br><span style="font-family:Consolas,monospace;font-size:12px">' + esc(String(a.command).slice(0, 160)) + '</span>'); }).join('') : chk('', 'Nothing suspicious', 'Every startup item and task looks normal.')) +
         (OS !== 'windows' ? '' : '<div class="links">' + openBtn('startup_apps', 'Open Startup apps') + openBtn('task_scheduler', 'Open Task Scheduler') + '</div>') + '</div>';
       var ext = (r.extensions || []).filter(function (e) { return e.level !== 'ok'; }).sort(function (a, b) { return (a.level === 'check' ? 0 : 1) - (b.level === 'check' ? 0 : 1); });
       var nCheck = ext.filter(function (e) { return e.level === 'check'; }).length;
       html += '<div class="card seccard"><h3>Browser extensions <span class="tag ' + (nCheck ? 'warn' : 'good') + '">' + (nCheck ? nCheck + ' worth a look' : 'nothing risky') + '</span></h3><p class="s">Extensions can see what you do online. Yellow ones deserve a real look; blue ones are powerful but normal for their kind. Remove any you do not use.</p>' +
-        (ext.length ? ext.map(function (e) { return chk(e.level === 'check' ? 'warn' : 'info', e.name + ' · ' + e.profile, esc((e.reasons || []).join('; '))); }).join('') : chk('', 'All clear', 'No extensions with risky permissions.')) +
+        (ext.length ? ext.map(function (e) { return chk(e.level === 'check' ? 'warn' : 'info', e.name + ' · ' + e.profile, esc((e.reasons || []).join('; '))); }).join('') : chk('', 'All clear', 'No Chrome or Edge extensions with risky permissions.')) +
         '<div class="links">' + openBtn('chrome_extensions', 'Open Chrome extensions') + '</div></div>';
       var post = r.posture || [];
       if (post.length) {
@@ -1035,8 +1035,8 @@ main:focus { outline:none; }
           post.map(function (p) { return chk(p.level === 'good' ? '' : p.level === 'warn' ? 'warn' : 'info', p.name, esc(p.detail), p.fix && p.level !== 'good' ? '<div class="links">' + openBtn(p.fix, 'Open settings') + '</div>' : ''); }).join('') + '</div>';
       }
       var hij = r.hijack || [], hc = hij.filter(function (h) { return h.level === 'check'; }).length;
-      html += '<div class="card seccard"><h3>Browser and network hijacks <span class="tag ' + (hc ? 'warn' : 'good') + '">' + (hc ? hc + ' worth a look' : 'nothing odd') + '</span></h3><p class="s">Search engine, proxy, hosts file and settings forced on your browsers.</p>' +
-        (hij.length ? hij.map(function (h) { return chk(h.level === 'check' ? 'warn' : 'info', h.name, esc(h.detail)); }).join('') : chk('', 'All clear', 'Nothing is redirecting your browsing.')) + '</div>';
+      html += '<div class="card seccard"><h3>Browser and network hijacks <span class="tag ' + (hc ? 'warn' : 'good') + '">' + (hc ? hc + ' worth a look' : 'nothing odd') + '</span></h3><p class="s">' + (OS === 'mac' ? 'Search engine, proxy and hosts file.' : 'Search engine, proxy, hosts file and settings forced on your browsers.') + '</p>' +
+        (hij.length ? hij.map(function (h) { return chk(h.level === 'check' ? 'warn' : 'info', h.name, esc(h.detail)); }).join('') : chk('', 'All clear', (OS === 'mac' ? 'No changed search engine, proxy or hosts file entry found.' : 'No changed search engine, proxy, hosts file entry or forced browser setting found.'))) + '</div>';
       var pv = r.privacy || [];
       if (pv.length) html += '<div class="card seccard"><h3>Camera and microphone</h3><p class="s">Apps that used them in the last 30 days (Windows\' own record).</p>' +
         pv.map(function (p) { return chk(p.level === 'warn' ? 'warn' : 'info', p.name, esc(p.detail), p.fix ? '<div class="links">' + openBtn(p.fix, 'Privacy settings') + '</div>' : ''); }).join('') + '</div>';
@@ -1156,7 +1156,7 @@ main:focus { outline:none; }
   $('termsYes').addEventListener('click', function () {
     var b = $('termsYes'); b.disabled = true; $('termsMsg').textContent = '';
     api('/api/terms/accept', {}).then(function () {
-      $('terms').hidden = true;
+      $('terms').hidden = true; startUpdates();
       if (!welcomeDone) openWelcome(); else $('main').focus();
     }, function (e) { b.disabled = !$('termsAgree').checked; $('termsMsg').textContent = String(e.message || e); });
   });
@@ -1165,6 +1165,7 @@ main:focus { outline:none; }
     $('termsNo').disabled = true; $('termsYes').disabled = true;
     setTimeout(function () { api('/api/quit', {}).catch(function () {}); }, 1200);
   });
+  function startUpdates() { if (startUpdates.on) return; startUpdates.on = true; loadUpdate(); setTimeout(loadUpdate, 30000); setInterval(loadUpdate, 3600000); }
   function openWelcome(step) { $('welcome').hidden = false; wGo(step || 1); }
   function wGo(n) {
     Array.prototype.forEach.call(document.querySelectorAll('.wstep'), function (x) { x.hidden = x.dataset.step !== String(n); });
@@ -1194,7 +1195,7 @@ main:focus { outline:none; }
     welcomeDone = !!st.welcome_done;
     if (!st.terms_ok) openTerms(); else if (!welcomeDone) openWelcome();
     startScreen(s.start_screen);
-    loadUpdate(); setTimeout(loadUpdate, 30000); setInterval(loadUpdate, 3600000);
+    if (st.terms_ok) startUpdates();
   }
   // For screenshots and testing only (SWEEPWISE_SCREEN): open a given screen or step at start.
   function startScreen(name) {
@@ -1231,7 +1232,7 @@ main:focus { outline:none; }
       var items = d.learned || [];
       $('learnBody').innerHTML = items.length ? items.map(function (x) {
         return '<div class="check"><i class="dot info"></i><div style="flex:1"><b data-i18n="tile.esc_x_title.title">' + esc(x.title) + '</b><span data-i18n="tile.esc_x_title.desc">' + esc(x.section.replace('_', ' ')) + ' · said no ' + x.count + ' time(s)' + (x.hidden ? ' · hidden' : ' · starts unticked') + '</span></div><button class="btn sm" data-forget="' + esc(x.key) + '">Forget</button></div>';
-      }).join('') + '<div class="links"><button class="btn sm" data-forget="*">Forget everything</button></div>' : '<p class="s" style="margin:0">Nothing yet. Leave a suggestion unticked when you approve, and Sweepwise will remember.</p>';
+      }).join('') + '<div class="links"><button class="btn sm" data-forget="*">Forget everything</button></div>' : '<p class="s" style="margin:0">Nothing yet. Untick something Sweepwise ticked for you before you approve, and Sweepwise will remember.</p>';
       function bind(sel, fn) { Array.prototype.forEach.call(document.querySelectorAll(sel), fn); }
       bind('[data-forget]', function (b) { b.addEventListener('click', function () { api('/api/learned/forget', { key: b.dataset.forget }).then(loadBrain); }); });
       bind('[data-acc]', function (b) { b.addEventListener('click', function () { api('/api/rules/accept', { key: b.dataset.acc }).then(function () { toast('Rule added. Sweepwise uses it from the next scan.'); loadBrain(); }).catch(function (e) { toast(e.message); }); }); });
@@ -1398,7 +1399,7 @@ main:focus { outline:none; }
     if (n.children && n.children.length) h += '<button class="btn sm primary" id="dmIn" data-i18n="button.look_inside">Look inside</button>';
     if (n.path && n.name !== '(files here)') h += '<button class="btn sm" id="dmOpen" data-i18n="button.open_in_file_explorer">' + esc(t('button.open_in_file_explorer', 'Open in File Explorer')) + '</button><button class="btn sm" id="dmFind" data-i18n="button.find_duplicates_and_big_files_here">Find duplicates and big files here</button>';
     if (root) h += '<button class="btn sm" id="dmOrg" data-i18n="button.tidy_it_with_the_ai_organizer">Tidy it with the AI Organizer</button>';
-    if (/AppData/i.test(n.path || '')) h += '<p class="s" style="margin-top:8px">AppData holds app settings and caches. Sweepwise\'s Clean and Deep Clean empty the safe parts; ask Sweepwise in the chat what the big folders are.</p>';
+    if (/AppData/i.test(n.path || '')) h += '<p class="s" style="margin-top:8px">AppData holds app settings and caches. Sweepwise\'s Clean and Deep Clean clear the safe parts; with an AI key you can ask Sweepwise in the chat what the big folders are.</p>';
     $('dmSide').innerHTML = h + '</div>';
     if ($('dmIn')) $('dmIn').addEventListener('click', function () { dmPath.push(parentIndex(n)); dmSel = null; drawMap(); });
     if ($('dmOpen')) $('dmOpen').addEventListener('click', function () { api('/api/folder', { path: n.path }).catch(function (e) { toast(e.message); }); });
@@ -1447,7 +1448,7 @@ main:focus { outline:none; }
   function fdRow(i, res) {
     var r = res[i.id], done = r && r.ok;
     var box = !done ? '<input type="checkbox" class="fpick" value="' + esc(i.id) + '"' + (i.checked ? ' checked' : '') + ' aria-label="Bin ' + esc(i.title) + '">' : '';
-    return '<div class="row' + (done ? ' done' : r ? ' failed' : '') + '"><div>' + box + '</div><div><span class="t">' + esc(i.title) + '</span><span class="w">' + esc(i.why) + (i.note ? ' <strong>' + esc(i.note) + '</strong>' : '') + '</span><span class="w" style="word-break:break-all">' + esc(short(i.path)) + '</span></div><div class="what">' + size(i.size) + ' to Recycle Bin</div><div class="res">' + (r ? (r.ok ? '✓ ' : '✗ ') + esc(r.message) : '') + '</div></div>';
+    return '<div class="row' + (done ? ' done' : r ? ' failed' : '') + '"><div>' + box + '</div><div><span class="t">' + esc(i.title) + '</span><span class="w">' + esc(i.why) + (i.note ? ' <strong>' + esc(i.note) + '</strong>' : '') + '</span><span class="w" style="word-break:break-all">' + esc(short(i.path)) + '</span></div><div class="what">' + size(i.size) + ' to ' + BIN + '</div><div class="res">' + (r ? (r.ok ? '✓ ' : '✗ ') + esc(r.message) : '') + '</div></div>';
   }
   function loadFinder() {
     if (!$('fdBody').innerHTML) $('fdBody').innerHTML = skel(2);
@@ -1470,7 +1471,7 @@ main:focus { outline:none; }
     api('/api/browsers').then(function (d) {
       var b = d.browsers || [];
       $('fdBrowsers').innerHTML = b.length ? b.map(function (x) {
-        return '<div class="row"><div></div><div><span class="t">' + esc(x.browser) + ' · ' + esc(x.profile) + '</span><span class="w">' + (x.open ? esc(x.browser) + ' is open; close it, then run Scan & Clean to empty this.' : 'Emptied the next time you run Scan & Clean.') + '</span></div><div class="what">' + size(x.bytes) + '</div><div class="res"></div></div>';
+        return '<div class="row"><div></div><div><span class="t">' + esc(x.browser) + ' · ' + esc(x.profile) + '</span><span class="w">' + (x.open ? esc(x.browser) + ' is open; close it, then run Scan & Clean to clear it (files from the last day stay).' : 'Cleared the next time you run Scan & Clean (files from the last day stay).') + '</span></div><div class="what">' + size(x.bytes) + '</div><div class="res"></div></div>';
       }).join('') + '<div class="row"><div></div><div><span class="w">Passwords, history, cookies, bookmarks and offline site data are never touched.</span></div><div class="what"><button class="btn sm primary" id="fdClean" data-i18n="button.run_clean_now">Run Clean now</button></div><div></div></div>' : '<div class="empty" style="padding:18px">No Chrome or Edge caches found.</div>';
       if ($('fdClean')) $('fdClean').addEventListener('click', function () { run('clean'); });
     }).catch(function () {});
@@ -1493,7 +1494,7 @@ main:focus { outline:none; }
   });
   $('fdUndo').addEventListener('click', function () { undoRun(fdRun, $('fdUndo'), $('fdStatus')); });
 
-  $('habitsForget').addEventListener('click', function () { api('/api/habits/forget', {}).then(function () { toast('Habits forgotten. Sweepwise learns them again from scratch.'); loadBrain(); }).catch(function (e) { toast(e.message); }); });
+  $('habitsForget').addEventListener('click', function () { api('/api/habits/forget', {}).then(function () { toast('Habits cleared. The next Scan & Clean reads them again from your computer\'s list of recently opened files and apps.'); loadBrain(); }).catch(function (e) { toast(e.message); }); });
   // ---------- Speed Boost (answers 41, 47, 49) ----------
   function loadBoost() {
     api('/api/boost').then(function (b) {
@@ -1513,7 +1514,7 @@ main:focus { outline:none; }
           row('Health score', bf.score == null ? '-' : esc(bf.score), now.score == null ? '-' : esc(now.score)) + '</tbody></table>';
         var ch = b.changes || [];
         out += ch.length ? ch.map(function (c) { return chk('', c, ''); }).join('') : '<p class="s" style="margin-top:10px">No big changes yet. Approve some speed-ups, restart your PC, then measure again.</p>';
-        if (!b.boot_known) out += '<p class="fine">' + (OS === 'mac' ? 'macOS does not record how long it takes to start, so startup time is left out.' : OS === 'linux' ? 'Startup time comes from systemd\'s own record, which this system did not provide.' : 'Startup time comes from Windows\' own record, which Sweepwise can read when it has admin permission (during Deep Clean or a restore point).') + '</p>';
+        if (!b.boot_known) out += '<p class="fine">' + (OS === 'mac' ? 'Sweepwise can\'t read how long this Mac takes to start, so startup time is left out.' : OS === 'linux' ? 'Startup time comes from systemd\'s own record, which this system did not provide.' : 'Startup time comes from Windows\' own record, which Sweepwise can read when it has admin permission (during Deep Clean or a restore point).') + '</p>';
       }
       $('boostReport').innerHTML = out;
     }).catch(function (e) { $('boostReport').innerHTML = '<p class="s">' + esc(e.message) + '</p>'; });
@@ -1608,7 +1609,7 @@ main:focus { outline:none; }
   }
   $('mailGuide').addEventListener('click', function () { mailGuide($('mailProvider').value); });
   $('mailScan').addEventListener('click', function () { run('email'); });
-  $('mailAi').addEventListener('click', function () { var b = $('mailAi'); b.disabled = true; api('/api/email/ai', { run: mailRun }).then(function () { toast('The AI looked at sender names and subject lines only.'); loadEmail(); }).catch(function (e) { toast(e.message); }).then(function () { b.disabled = false; }); });
+  $('mailAi').addEventListener('click', function () { var b = $('mailAi'); b.disabled = true; api('/api/email/ai', { run: mailRun }).then(function () { toast('The AI looked at sender addresses, email counts and a few subject lines only.'); loadEmail(); }).catch(function (e) { toast(e.message); }).then(function () { b.disabled = false; }); });
   $('mailApprove').addEventListener('click', function () {
     var ids = Array.prototype.map.call(document.querySelectorAll('input.mpick:checked'), function (x) { return x.value; });
     var unticked = Array.prototype.map.call(document.querySelectorAll('input.mpick:not(:checked)'), function (x) { return x.value; });

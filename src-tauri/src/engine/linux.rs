@@ -511,7 +511,7 @@ pub fn deep_steps(repair: bool, say: &dyn Fn(String)) {
         if pm == Some("apt-get") {
             let _ = run("dpkg", &["--configure", "-a"]);
             let r = run("apt-get", &["-f", "install", "-y"]);
-            say(format!("  {}", if r.map_or(false, |(c, _)| c == 0) { "Installed software is complete." } else { "The package manager reported a problem; nothing else was changed." }));
+            say(format!("  {}", if r.map_or(false, |(c, _)| c == 0) { "Installed software is complete." } else { "The package manager reported a problem; open your software updater to finish." }));
         }
     }
 }
@@ -553,7 +553,7 @@ pub fn timer(cfg: &Config, name: &str, calendar: &str, exe: &Path, arg: &str, on
 // ---------- Timeshift snapshot (the Linux "restore point", when installed) ----------
 pub fn timeshift_snapshot(why: &str) -> Result<String, String> {
     if !have("timeshift") {
-        return Ok("No snapshot tool (Timeshift) is installed, so no system snapshot was made. Sweepwise's own Undo still works.".into());
+        return Ok("No snapshot tool (Timeshift) is installed, so no system snapshot was made.".into());
     }
     let comment = format!("Sweepwise: before {}", why);
     match as_admin(&["timeshift", "--create", "--comments", &comment, "--scripted"])? {

@@ -341,6 +341,26 @@ pub fn recycle_capacity(path: &Path) -> Option<u64> {
     reg_u32(&key, "MaxCapacity").map(|mb| mb as u64 * 1024 * 1024)
 }
 
+/// How much the Recycle Bin on this path's drive already holds.
+pub fn recycle_used(path: &Path) -> Option<u64> {
+    use windows_sys::Win32::Storage::FileSystem::GetVolumePathNameW;
+    use windows_sys::Win32::UI::Shell::{SHQueryRecycleBinW, SHQUERYRBINFO};
+    let p = wide(path.as_os_str());
+    let mut root = [0u16; 260];
+    unsafe {
+        if GetVolumePathNameW(p.as_ptr(), root.as_mut_ptr(), root.len() as u32) == 0 {
+            return None;
+        }
+        let mut info: SHQUERYRBINFO = std::mem::zeroed();
+        info.cbSize = std::mem::size_of::<SHQUERYRBINFO>() as u32;
+        if SHQueryRecycleBinW(root.as_ptr(), &mut info) != 0 {
+            return None;
+        }
+        let used = info.i64Size;
+        Some(used.max(0) as u64)
+    }
+}
+
 // ---------- shortcuts ----------
 /// The local file a .lnk points to (reads the shell link's LinkInfo), if any.
 pub fn lnk_target(lnk: &Path) -> Option<PathBuf> {

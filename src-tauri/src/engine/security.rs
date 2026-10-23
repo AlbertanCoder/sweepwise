@@ -939,16 +939,16 @@ pub fn report(cfg: &Config) -> Value {
 
 pub fn job(eng: &Arc<Engine>, j: &Job) -> i32 {
     let cfg = &eng.cfg;
-    j.step(1, 4, "checking your virus protection, firewall and Windows' safety switches...");
+    j.step(1, 4, if cfg!(windows) { "checking your virus protection, firewall and Windows' safety switches..." } else { "checking your virus protection, firewall and safety switches..." });
     let prot = protection(cfg);
     let post = posture(cfg);
     let priv_ = privacy(cfg);
-    j.step(2, 4, "checking programs that start with Windows and scheduled tasks...");
+    j.step(2, 4, if cfg!(windows) { "checking programs that start with Windows and scheduled tasks..." } else { "checking programs that start by themselves..." });
     let auto = autoruns(cfg);
     j.step(3, 4, "checking browser extensions and browser settings (search engine, proxy, hosts file)...");
     let ext = extensions(cfg);
     let hij = hijacks(cfg);
-    j.step(4, 4, "checking Windows Update...");
+    j.step(4, 4, if cfg!(windows) { "checking Windows Update..." } else { "checking for system updates..." });
     let upd = updates(cfg);
     let report = json!({ "checked": util::iso(util::now()), "protection": prot, "autoruns": auto, "extensions": ext, "hijack": hij, "posture": post, "privacy": priv_, "updates": upd });
     if let Err(e) = util::write_json(&cfg.data_dir.join("security.json"), &report) {

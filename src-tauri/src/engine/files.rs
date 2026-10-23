@@ -88,7 +88,7 @@ pub fn verdict_with(name: &str, size: u64, age_days: f64, area: &str, rules: &[s
         return v("skip", None, "skip", "download may still be in progress");
     }
     if is_private_name(name) {
-        let why = if id_words().is_match(&l) { "looks like an ID document; moved to a hidden folder" } else { "name suggests a password or key; moved to a hidden folder" };
+        let why = if id_words().is_match(&l) { "looks like an ID document; goes to your private folder when you approve" } else { "name suggests a password or key; goes to your private folder when you approve" };
         return v("move", Some("Private"), "S1", why);
     }
     if size == 0 {

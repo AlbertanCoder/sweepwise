@@ -403,7 +403,7 @@ pub fn helper(log: &Path, repair: bool, windows_old: bool) -> i32 {
             return finish(5);
         }
         let (free_before, _) = super::health::system_disk();
-        say(&format!("Snapshot: {}", super::mac::tm_snapshot("Deep Clean").unwrap_or_default()));
+        say(&format!("Snapshot: {}", match super::mac::tm_snapshot("Deep Clean") { Ok(m) | Err(m) => m }));
         super::mac::deep_steps(repair, &|m| say(&m));
         let (free_after, _) = super::health::system_disk();
         say(&format!("Deep Clean finished. Freed {}.", super::util::fmt_size(free_after.saturating_sub(free_before))));

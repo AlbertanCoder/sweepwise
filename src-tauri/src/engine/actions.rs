@@ -14,6 +14,12 @@ const ORDER: &[&str] = &["files", "ai_leftovers", "program_leftovers", "email", 
 /// Big changes: Windows makes a restore point before any of these run (PUBLIC_SPEC 46).
 const BIG: &[&str] = &["uninstall", "power_plan", "visual_effects", "app_update"];
 
+/// Changes that wait for a restore point (Windows), Time Machine snapshot (Mac) or Timeshift snapshot (Linux). On a Mac,
+/// removed apps go to the Trash and Undo brings them back, so removing one needs no snapshot.
+fn needs_safety_copy(action: &str) -> bool {
+    BIG.contains(&action) && !(cfg!(target_os = "macos") && action == "uninstall")
+}
+
 fn s<'a>(v: &'a Value, k: &str) -> &'a str {
     v.get(k).and_then(|x| x.as_str()).unwrap_or("")
 }
@@ -64,11 +70,26 @@ fn fresh_thread<T: Send + 'static>(f: impl FnOnce() -> Result<T, String> + Send 
 
 #[cfg(windows)]
 fn check_bin_fits(p: &Path, size: u64) -> Result<(), String> {
-    match super::win::recycle_capacity(p) {
-        Some(0) => Err("the Recycle Bin is switched off on that drive, so it was left alone (Sweepwise never deletes for good)".into()),
+    bin_verdict(size, super::win::recycle_capacity(p), super::win::recycle_used(p))
+}
+
+/// Whether an item of `size` fits in a Recycle Bin of `cap` bytes that already holds `used` bytes. A full Recycle Bin
+/// makes room by deleting its oldest items for good, so only what fits in the free part goes in.
+#[cfg_attr(not(windows), allow(dead_code))]
+fn bin_verdict(size: u64, cap: Option<u64>, used: Option<u64>) -> Result<(), String> {
+    match cap {
+        Some(0) => Err("the Recycle Bin is switched off on that drive, so it was left alone (Sweepwise never deletes your files for good)".into()),
         Some(cap) if size > cap => Err(format!("too big for the Recycle Bin ({} is more than its {}), so it was left alone", fmt_size(size), fmt_size(cap))),
+        Some(cap) => {
+            let free = cap.saturating_sub(used.unwrap_or(0));
+            if size > free {
+                Err(format!("the Recycle Bin is too full for it ({} free, it needs {}), so it was left alone; empty the Recycle Bin and approve it again", fmt_size(free), fmt_size(size)))
+            } else {
+                Ok(())
+            }
+        }
         None if size > 2 * 1024 * 1024 * 1024 => Err("too big to be sure it fits in the Recycle Bin, so it was left alone".into()),
-        _ => Ok(()),
+        None => Ok(()),
     }
 }
 #[cfg(not(windows))]
@@ -132,9 +153,9 @@ fn recycle(cfg: &Config, p: &Path) -> Result<(String, Option<String>), String> {
         None
     };
     if fs::symlink_metadata(p).is_ok() {
-        return Err("still there after sending to the Recycle Bin".into());
+        return Err(if cfg!(windows) { "still there after sending to the Recycle Bin" } else { "still there after sending to the Trash" }.into());
     }
-    Ok(("sent to the Recycle Bin".into(), binned))
+    Ok((if cfg!(windows) { "sent to the Recycle Bin" } else { "sent to the Trash" }.into(), binned))
 }
 
 /// Moves a file or folder. Across drives a file is copied, checked, and only then removed from where it was.
@@ -418,7 +439,7 @@ pub fn apply(cfg: &Config, proposals: &Value, ids: &[String], run_dir: &Path) ->
     };
     chosen.sort_by_key(|i| rank(i));
     // Windows' own safety net before big changes; without it those changes wait.
-    let needs_point = chosen.iter().any(|i| i["can_do"] == true && BIG.contains(&s(i, "action")));
+    let needs_point = chosen.iter().any(|i| i["can_do"] == true && needs_safety_copy(s(i, "action")));
     let blocked: Option<String> = if needs_point { super::restore::ensure(cfg, "approved changes").err() } else { None };
     // Linux: several system updates go in one go, so the password is asked once.
     #[cfg(target_os = "linux")]
@@ -437,8 +458,9 @@ pub fn apply(cfg: &Config, proposals: &Value, ids: &[String], run_dir: &Path) ->
             results.push(json!({ "id": id, "title": title, "ok": false, "message": "not allowed from here" }));
             continue;
         }
-        if let (Some(why), true) = (&blocked, BIG.contains(&s(item, "action"))) {
-            results.push(json!({ "id": id, "title": title, "ok": false, "message": why }));
+        if let (Some(why), true) = (&blocked, needs_safety_copy(s(item, "action"))) {
+            let message = format!("not done: this change waits for a safety copy of the system, and none could be made ({})", why);
+            results.push(json!({ "id": id, "title": title, "ok": false, "message": message }));
             continue;
         }
         #[cfg(target_os = "linux")]
@@ -671,6 +693,18 @@ pub fn undo_run(cfg: &Config, run: &str) -> Result<Value, String> {
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn binning_never_pushes_older_items_out_of_a_full_recycle_bin() {
+        let gb = 1024 * 1024 * 1024u64;
+        assert!(super::bin_verdict(gb, Some(0), Some(0)).unwrap_err().contains("switched off"));
+        assert!(super::bin_verdict(3 * gb, Some(2 * gb), Some(0)).unwrap_err().contains("too big"));
+        assert!(super::bin_verdict(gb, Some(2 * gb), Some(gb + 1)).unwrap_err().contains("too full"), "it would push older items out");
+        assert!(super::bin_verdict(gb, Some(2 * gb), Some(gb / 2)).is_ok());
+        assert!(super::bin_verdict(gb, None, None).is_ok() && super::bin_verdict(3 * gb, None, None).is_err());
+        assert!(super::needs_safety_copy("app_update") && !super::needs_safety_copy("recycle") && !super::needs_safety_copy("disable_startup"));
+        assert_eq!(super::needs_safety_copy("uninstall"), !cfg!(target_os = "macos"), "a removed Mac app can come back from the Trash");
+    }
+
     use super::*;
     use crate::engine::testutil;
 

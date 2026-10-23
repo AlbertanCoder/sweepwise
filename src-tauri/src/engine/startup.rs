@@ -84,8 +84,10 @@ pub fn proposals(cfg: &Config) -> Vec<Value> {
                 ("keep", "security, drivers or a Windows part; keep it")
             } else if script_re.is_match(&cmd) || script_re.is_match(&name) {
                 ("your call", "a script someone set up on purpose; check what it does before turning it off")
-            } else if off_re.is_match(&label) || publisher.is_empty() {
+            } else if off_re.is_match(&label) {
                 ("turn off", "chat, game or updater app; it still works when you open it yourself")
+            } else if publisher.is_empty() {
+                ("your call", "no maker name on this program; check what it is before turning it off")
             } else {
                 ("your call", "not sure; leave it unless you know you do not need it at startup")
             };
@@ -201,12 +203,15 @@ mod tests {
         let (run, _) = hk.create_subkey(format!("{}\\Run", cfg.reg_base)).unwrap();
         run.set_value("Discord", &"C:\\nowhere\\Discord\\Update.exe --processStart Discord.exe").unwrap();
         run.set_value("Backup script", &"C:\\nowhere\\backup.cmd").unwrap();
+        run.set_value("Mystery Tool", &"C:\\nowhere\\mystery.exe").unwrap();
         let (appr, _) = hk.create_subkey(format!("{}\\Explorer\\StartupApproved\\Run", cfg.reg_base)).unwrap();
         appr.set_raw_value("Backup script", &winreg::RegValue { bytes: vec![3u8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0].into(), vtype: winreg::enums::RegType::REG_BINARY }).unwrap();
         let items = proposals(&cfg);
         let d = items.iter().find(|i| i["title"] == "Discord").unwrap();
         assert_eq!(d["verdict"], "turn off");
         assert_eq!(d["checked"], true);
+        let m = items.iter().find(|i| i["title"] == "Mystery Tool").unwrap();
+        assert_eq!((m["verdict"].as_str(), m["checked"].as_bool()), (Some("your call"), Some(false)), "no maker name: not ticked");
         let b = items.iter().find(|i| i["title"] == "Backup script").unwrap();
         assert_eq!(b["note"], "already turned off");
         assert_eq!(b["can_do"], false);

@@ -276,9 +276,6 @@ pub fn program_leftovers(cfg: &Config) -> Vec<Value> {
     } else {
         vec![("~/.config", cfg.config.clone()), ("~/.local/share", cfg.local.clone())]
     };
-    if !cfg.test && cfg!(windows) {
-        roots.push(("ProgramData", PathBuf::from(std::env::var("ProgramData").unwrap_or_else(|_| "C:\\ProgramData".into()))));
-    }
     let running: Vec<PathBuf> = if cfg.test {
         Vec::new()
     } else {

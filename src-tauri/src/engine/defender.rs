@@ -166,7 +166,7 @@ pub fn quick_scan(cfg: &Config, _j: &Job) -> (String, String) {
 }
 
 pub fn quick_job(eng: &Arc<Engine>, j: &Job) -> i32 {
-    j.step(1, 1, "running a Windows Security quick virus scan (about 1-2 minutes)...");
+    j.step(1, 1, if cfg!(windows) { "running a Windows Security quick virus scan (about 1-2 minutes)..." } else { "running a ClamAV quick virus scan (about 1-2 minutes)..." });
     let (result, detail) = quick_scan(&eng.cfg, j);
     j.say(detail);
     if result == "failed" {
@@ -196,7 +196,7 @@ pub fn clamav_install_job(eng: &Arc<Engine>, j: &Job) -> i32 {
         j.say("Your system will ask for your password to install it.");
         return match super::linux::as_admin(&cmd) {
             Ok((0, _)) => {
-                j.say("ClamAV is installed. Its virus list downloads by itself in the next few minutes; then Quick Scan and Full Scan work.");
+                j.say("ClamAV is installed. On Ubuntu, Mint and Debian its virus list downloads by itself in the next few minutes; on other systems run 'sudo freshclam' once. Then Quick Scan and Full Scan work.");
                 0
             }
             Ok((c, _)) => {
@@ -320,12 +320,12 @@ pub fn full_job(eng: &Arc<Engine>, j: &Job) -> i32 {
             last = msg;
         }
         if waited.elapsed() >= max_wait {
-            j.say("Gave up: the PC never cooled down enough. Nothing was scanned.");
+            j.say("Gave up: the PC never got cool enough or never had enough free memory. Nothing was scanned.");
             return 3;
         }
         std::thread::sleep(tick);
     }
-    j.step(2, 2, "full virus scan running. Every file is checked; this usually takes 30-90 minutes. You can keep working.");
+    j.step(2, 2, if cfg!(windows) { "full virus scan running. Every file is checked; this usually takes 30-90 minutes. You can keep working." } else { "full virus scan running (ClamAV skips system folders); this can take an hour or more. You can keep working." });
     let start = util::now();
     let began = Instant::now();
     let Some(mut child) = start_scanner(cfg, &["-Scan", "-ScanType", "2"]) else {

@@ -371,7 +371,7 @@ pub fn facts(cfg: &Config) -> Vec<String> {
         f.push(format!("Has said no twice to: {}.", no.join(", ")));
     }
     f.extend(super::habits::facts(cfg));
-    f.push("Code projects (folders with .git) must never be moved. Private files (passwords, IDs, bank, tax, legal) are never touched.".into());
+    f.push("Code projects (folders with .git) must never be moved. Private-looking files (passwords, IDs, bank, tax, legal) are never sent to the AI, and they only move when the owner approves.".into());
     f
 }
 

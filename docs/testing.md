@@ -10,7 +10,8 @@ two whenever Sweepwise reminds you, for two to three weeks.
   back. Temporary files and caches (junk that Windows and your apps rebuild) are deleted for good, after Sweepwise
   shows you the list the first time.
   Even so, this is a test version, so it's a good idea to have a backup of anything precious, as always.
-- Nothing about you or your computer is sent to anyone. See [PRIVACY.md](../PRIVACY.md).
+- Nothing about you is collected or sent to the developer. A few things do go online, like the daily check for a new
+  Sweepwise version and the app-update check during a scan; [PRIVACY.md](../PRIVACY.md) lists them all.
 
 ## Install
 
@@ -37,7 +38,8 @@ two whenever Sweepwise reminds you, for two to three weeks.
 Optional, only if you are comfortable:
 
 - [ ] **Email:** connect a Gmail, Yahoo or iCloud account with an app password (the Email page shows how). Check the
-      suggestions before approving anything; everything goes to your email's Trash and can be undone.
+      suggestions before approving anything; everything goes to your email's Trash, and Undo brings it back while it
+      is still there (your provider may empty its Trash after 30 days).
 - [ ] **AI helper:** if you already have a Claude or OpenAI key, add it in Settings and try the AI Organizer or Ask
       Sweepwise.
 
@@ -49,14 +51,13 @@ Anything that surprised, confused or worried you counts, as well as anything tha
 - a screenshot if you can (Windows key + Shift + S);
 - your Windows version (Settings > System > About) and the Sweepwise version (bottom left of the window).
 
-Report on GitHub: [open an issue](https://github.com/AlbertanCoder/sweepwise/issues/new) or post in
-[Discussions](https://github.com/AlbertanCoder/sweepwise/discussions). If you don't use GitHub, reply to the message
-that invited you.
+Reply to the message that invited you. Reporting on GitHub opens when Sweepwise goes public.
 
 If Sweepwise shows an error, its own records folder (About & privacy > Open Sweepwise's own records) has a small file
 of screen errors that can help find the problem. It never leaves your computer unless you choose to send it.
 
 ## When the test ends
 
-Keep using Sweepwise if you like it; it will offer the public version when it's out. To remove it, uninstall it from
-Settings > Apps like any other app, then delete its records folder if you want every trace gone.
+Keep using Sweepwise if you like it; it will offer the public version when it's out. To remove it, first switch off
+the weekly reminder and auto-clean in Sweepwise's Settings if you turned them on. Then uninstall it from Settings > Apps
+like any other app, and tick "Delete the application data" to remove its records folder too.

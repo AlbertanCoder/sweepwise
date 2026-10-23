@@ -391,7 +391,7 @@ pub fn job(eng: &Arc<Engine>, j: &Job, req: Request) -> i32 {
         return 4;
     };
     let names: Vec<String> = req.roots.iter().map(|(n, _)| n.clone()).collect();
-    j.step(1, 3, &format!("reading the names in {} (names only, nothing is opened)...", names.join(", ")));
+    j.step(1, 3, &format!("reading the names in {} (names, sizes and dates only; no file is opened)...", names.join(", ")));
     let mut planner = Planner::new(&req.roots);
     let lines = planner.listing();
     j.say(format!("  {} lines to share; {} private-looking item(s) kept out.", lines.len(), planner.private_skipped));
