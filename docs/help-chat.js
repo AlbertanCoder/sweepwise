@@ -78,7 +78,7 @@
   document.body.appendChild(panel);
 
   function say(text, who) {
-    var m = el('div', 'hc-m ' + (who === 'me' ? 'hc-me' : 'hc-bot'), text);
+    var m = el('div', 'hc-m ' + (who === 'me' ? 'hc-me' : 'hc-bot'), who === 'me' ? text : String(text).replace(/\*\*|__|`/g, '').replace(/^#+\s*/gm, ''));
     log.appendChild(m);
     log.scrollTop = log.scrollHeight;
     return m;

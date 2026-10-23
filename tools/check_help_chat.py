@@ -5,6 +5,7 @@ company, GitHub or Discord is ever contacted. Run: python -I tools/check_help_ch
 import http.server
 import json
 import pathlib
+import re
 import sys
 import threading
 import functools
@@ -60,7 +61,7 @@ def main():
                 if u.startswith(local):
                     if u.rstrip('/') == local.rstrip('/') or u.endswith('index.html'):
                         resp = r.fetch()
-                        html = resp.text().replace('data-endpoint=""', 'data-endpoint="%s"' % endpoint)
+                        html = re.sub(r'data-endpoint="[^"]*"', 'data-endpoint="%s"' % endpoint, resp.text())
                         return r.fulfill(response=resp, body=html)
                     return r.continue_()
                 blocked.append(u)
@@ -89,10 +90,11 @@ def main():
         check(posts[-1][0] == '/chat' and posts[-1][1] == {'messages': [{'role': 'user', 'content': 'Is it free?'}]}, 'a question posts just the typed messages to /chat: %s' % (posts[-1],))
         pg.fill('.hc-in', 'And the Store?')
         pg.press('.hc-in', 'Enter')
-        pg.wait_for_function("() => document.querySelectorAll('.hc-bot').length >= 3")
+        pg.wait_for_function("() => !document.querySelector('.hc-form button').disabled && document.querySelectorAll('.hc-bot').length >= 3")
         check([m['role'] for m in posts[-1][1]['messages']] == ['user', 'assistant', 'user'], 'the second question carries the earlier turns')
 
         mode['chat'] = 'handoff'
+        pg.wait_for_function("() => !document.querySelector('.hc-form button').disabled")
         pg.fill('.hc-in', 'It crashes')
         pg.press('.hc-in', 'Enter')
         pg.wait_for_selector('.hc-card')
@@ -101,6 +103,7 @@ def main():
         n = len(posts)
         pg.click('.hc-card .hc-btn:has-text("No thanks")')
         check(len(posts) == n and pg.locator('.hc-card').count() == 0, '"No thanks" sends nothing')
+        pg.wait_for_function("() => !document.querySelector('.hc-form button').disabled")
         pg.fill('.hc-in', 'It crashes again')
         pg.press('.hc-in', 'Enter')
         pg.wait_for_selector('.hc-card')
@@ -109,6 +112,7 @@ def main():
         check(posts[-1][0] == '/handoff' and posts[-1][1].get('consent') is True and posts[-1][1].get('summary') == 'The app closes when pressing Approve.', '"Send it" posts consent and the shown summary: %s' % (posts[-1],))
 
         mode['chat'] = 'resting'
+        pg.wait_for_function("() => !document.querySelector('.hc-form button').disabled")
         pg.fill('.hc-in', 'hello')
         pg.press('.hc-in', 'Enter')
         pg.wait_for_selector('.hc-bot:has-text("resting")')
