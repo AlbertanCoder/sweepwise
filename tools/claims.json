@@ -8417,18 +8417,16 @@
  {
   "id": "C110",
   "source": "docs/index.html",
-  "why": "Clearly marked as coming soon; there are no releases yet.",
-  "status": "proven",
-  "text": "Download for Windows <small>(coming soon)</small>",
+  "why": "The button opens the Store page for the package built by tools/msix.",
+  "status": "fixed",
+  "text": "Get it from the Microsoft Store",
   "proof": [
    {
-    "file": "src-tauri/src/engine/update.rs",
-    "contains": "No releases yet (or the project is not public yet): nothing to tell."
+    "file": "tools/msix/AppxManifest.xml.template",
+    "contains": "Executable=\"sweepwise.exe\""
    }
   ],
-  "tests": [
-   "no_releases_yet_is_quiet"
-  ]
+  "tests": []
  },
  {
   "id": "C111",
@@ -9082,17 +9080,13 @@
  {
   "id": "C143",
   "source": "docs/index.html",
-  "why": "Only an NSIS installer is built; there is no Microsoft Store version (canon point 9).",
+  "why": "The Windows build is packaged for the Microsoft Store.",
   "status": "fixed",
-  "text": "<p>An installer from GitHub (coming soon).</p>",
+  "text": "<p>From the Microsoft Store.</p>",
   "proof": [
    {
-    "file": ".github/workflows/ci.yml",
-    "contains": "path: src-tauri/target/release/bundle/nsis/*.exe"
-   },
-   {
-    "file": "src-tauri/src/engine/update.rs",
-    "contains": "pub const RELEASES_PAGE: &str = \"https://github.com/AlbertanCoder/sweepwise/releases\";"
+    "file": "tools/msix/AppxManifest.xml.template",
+    "contains": "Windows.Desktop"
    }
   ],
   "tests": []
@@ -9387,13 +9381,13 @@
  {
   "id": "C159",
   "source": "docs/index.html",
-  "why": "No signing step exists in the Tauri config or the CI build.",
-  "status": "proven",
-  "text": "The download from GitHub isn't signed with a paid certificate yet, so Windows shows \"Windows protected your PC\".",
+  "why": "Store packages are signed by Microsoft after certification; the GitHub installer is unsigned.",
+  "status": "fixed",
+  "text": "Not from the Microsoft Store: Microsoft signs that version. A copy downloaded straight from GitHub isn't signed with a paid certificate, so Windows shows \"Windows protected your PC\".",
   "proof": [
    {
-    "file": ".github/workflows/ci.yml",
-    "contains": "run: npx tauri build --bundles ${{ matrix.bundles }}"
+    "file": "tools/msix/README.md",
+    "contains": "Microsoft signs it after certification"
    }
   ],
   "tests": []
