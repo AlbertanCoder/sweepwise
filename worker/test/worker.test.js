@@ -154,3 +154,11 @@ test('a reply that stops early is tried once more and never shown half-written',
   assert.equal(bad.status, 502);
   assert.equal(n, 2);
 });
+
+test('the fact sheet does not promise a download that does not exist yet', async () => {
+  const calls = fakeFetch();
+  await worker.fetch(req('/chat', ask('how do I get it?')), makeEnv());
+  const sys = calls.find((c) => c.url.includes('/chat/completions')).body.messages[0].content;
+  assert.match(sys, /There is no download yet/);
+  assert.ok(!/download it from GitHub|from GitHub is not signed|Windows protected your PC/.test(sys), 'no GitHub download is promised');
+});

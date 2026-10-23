@@ -20,8 +20,8 @@ WHAT IT DOES
 - History & Undo puts back moved or binned files, trashed email and changed settings.
 
 GETTING AND UPDATING IT
-- Windows 10 and 11. The Microsoft Store version is called Sweepwise PC Care and is signed by Microsoft, so Windows does not warn. Store copies update through the Store.
-- A copy downloaded straight from GitHub is not signed with a paid certificate, so Windows may show "Windows protected your PC". They can click More info, then Run anyway. GitHub copies check once a day for a newer version (this can be switched off in Settings) and show a banner; nothing updates without a click.
+- Windows 10 and 11. There is no download yet. Sweepwise is in Microsoft Store review under the name Sweepwise PC Care; the website shows the Store link as soon as it is approved. Do not tell anyone they can download it today and do not give any other download address.
+- Once installed from the Store, it updates through the Store and Windows does not warn about it.
 - Website: https://albertancoder.github.io/sweepwise/  Code: https://github.com/AlbertanCoder/sweepwise
 
 IS IT SAFE
