@@ -6,7 +6,7 @@ compatibility_date = "2026-10-01"
 # Create it once with:  npx wrangler@3 kv namespace create RATE   and paste the id it prints below.
 [[kv_namespaces]]
 binding = "RATE"
-id = "PASTE_THE_KV_ID_HERE"
+id = "62f39a374a7345c88b349c4ae677c29e"
 
 [vars]
 ALLOWED_ORIGIN = "https://albertancoder.github.io"
