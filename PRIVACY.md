@@ -1,7 +1,7 @@
 # Privacy
 
 **Sweepwise collects nothing.** There is no account, no tracking, no analytics and no crash reporting, and there are
-no Sweepwise servers to send anything to. Your files, scans and choices stay on your computer, apart from what the
+no Sweepwise servers in the app to send anything to. Your files, scans and choices stay on your computer, apart from what the
 table below lists.
 
 ## What can leave your computer, and only then
@@ -30,3 +30,12 @@ table below lists.
 - Remove your AI key in Settings, or an email account on the Email page, at any time; Sweepwise deletes its saved copy.
 - Before uninstalling, switch off the weekly reminder and auto-clean in Settings. After uninstalling, delete
   Sweepwise's folder to remove its records (on Windows, the uninstaller's "Delete the application data" box does this).
+
+## The help chat on the website (not in the app)
+
+The optional help chat on the Sweepwise website is the one place a Sweepwise server is involved. What you type goes to a small
+Sweepwise service running on Cloudflare, which passes it to an AI company (DeepSeek) to write the answer. Emails, user folder
+names, phone-like numbers, keys and links are removed first, and Sweepwise does not store your messages: only a daily counter
+tied to a scrambled form of your connection, used to cap use, is kept. Cloudflare and DeepSeek handle the messages under
+their own policies. If you choose "Send it" when the chat offers to pass a problem to the maker, a short summary with
+personal details removed is posted publicly as a GitHub issue. The Sweepwise app never talks to this service.

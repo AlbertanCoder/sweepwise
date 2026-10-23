@@ -7184,7 +7184,7 @@
   "source": "PRIVACY.md",
   "why": "Every web address the engine calls belongs to GitHub, Anthropic, OpenAI, your mail server or Microsoft's sign-in, and nothing reports usage or crashes.",
   "status": "proven",
-  "text": "**Sweepwise collects nothing.** There is no account, no tracking, no analytics and no crash reporting, and there are\nno Sweepwise servers to send anything to.",
+  "text": "**Sweepwise collects nothing.** There is no account, no tracking, no analytics and no crash reporting, and there are\nno Sweepwise servers in the app to send anything to.",
   "proof": [
    {
     "file": "src-tauri/src/engine/update.rs",
@@ -8576,9 +8576,9 @@
  {
   "id": "C117",
   "source": "docs/index.html",
-  "why": "Every web address the engine calls belongs to GitHub, Anthropic, OpenAI, a mail server or Microsoft's sign-in; nothing tracks or reports.",
-  "status": "proven",
-  "text": "No account, no tracking, no analytics, no crash reports. There are no Sweepwise servers at all.",
+  "why": "The app still has no Sweepwise servers; the website help chat (worker/) is the one exception and is named.",
+  "status": "fixed",
+  "text": "No account, no tracking, no analytics, no crash reports. The app has no Sweepwise servers; the optional help chat on this website is the only thing that uses one.",
   "proof": [
    {
     "file": "src-tauri/src/engine/update.rs",
@@ -8591,6 +8591,10 @@
    {
     "file": "src-tauri/tauri.conf.json",
     "contains": "connect-src 'self' ipc: http://ipc.localhost"
+   },
+   {
+    "file": "worker/wrangler.toml",
+    "contains": "ALLOWED_ORIGIN = \"https://albertancoder.github.io\""
    }
   ],
   "tests": []
@@ -11082,5 +11086,65 @@
   ],
   "tests": [],
   "why": "Opening an issue or a discussion on GitHub needs a GitHub account."
+ },
+ {
+  "id": "docs-chat1",
+  "source": "docs/index.html",
+  "status": "fixed",
+  "text": "Your messages go to a Sweepwise server on Cloudflare, which passes them to an AI company (DeepSeek) to write the answer.",
+  "proof": [
+   {
+    "file": "worker/wrangler.toml",
+    "contains": "API_BASE = \"https://api.deepseek.com\""
+   }
+  ],
+  "tests": [],
+  "why": "The Worker forwards chat messages to DeepSeek by default."
+ },
+ {
+  "id": "docs-chat2",
+  "source": "docs/index.html",
+  "status": "fixed",
+  "text": "Sweepwise does not store them.",
+  "proof": [
+   {
+    "file": "worker/src/index.js",
+    "contains": "It stores no messages."
+   }
+  ],
+  "tests": [],
+  "why": "Only counters are kept (worker test: messages are not stored)."
+ },
+ {
+  "id": "docs-chat3",
+  "source": "docs/index.html",
+  "status": "fixed",
+  "text": "a short summary with personal details removed is posted publicly on GitHub.",
+  "proof": [
+   {
+    "file": "worker/src/index.js",
+    "contains": "labels: ['from-help-chat']"
+   },
+   {
+    "file": "worker/src/index.js",
+    "contains": "body.consent !== true"
+   }
+  ],
+  "tests": [],
+  "why": "The hand-off needs consent and redacts the summary before filing the issue."
+ },
+ {
+  "id": "docs-chat4",
+  "source": "docs/index.html",
+  "status": "fixed",
+  "text": "Please don't share personal details.",
+  "proof": [
+   {
+    "file": "docs/help-chat.js",
+    "contains": "share personal details"
+   }
+  ],
+  "tests": [],
+  "why": "The chat bubble carries the same warning."
  }
 ]
