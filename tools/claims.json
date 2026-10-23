@@ -11091,15 +11091,19 @@
   "id": "docs-chat1",
   "source": "docs/index.html",
   "status": "fixed",
-  "text": "Your messages go to a Sweepwise server on Cloudflare, which passes them to an AI company (DeepSeek) to write the answer.",
+  "text": "Your messages go to a Sweepwise server on Cloudflare, which passes them to OpenRouter and an AI model (DeepSeek) to write the answer.",
   "proof": [
    {
     "file": "worker/wrangler.toml",
-    "contains": "API_BASE = \"https://api.deepseek.com\""
+    "contains": "API_BASE = \"https://openrouter.ai/api/v1\""
+   },
+   {
+    "file": "worker/wrangler.toml",
+    "contains": "MODEL = \"deepseek/deepseek-v4-flash\""
    }
   ],
   "tests": [],
-  "why": "The Worker forwards chat messages to DeepSeek by default."
+  "why": "The Worker sends chat messages to OpenRouter, which runs DeepSeek V4 Flash."
  },
  {
   "id": "docs-chat2",

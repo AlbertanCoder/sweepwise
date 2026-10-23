@@ -57,7 +57,7 @@
   closeBtn.type = 'button';
   closeBtn.setAttribute('aria-label', 'Close the chat');
   head.appendChild(closeBtn);
-  var note = el('p', 'hc-note', 'This is an AI assistant. Your messages go to a Sweepwise server and an AI company (DeepSeek) to write the answer, and are not stored. Please don’t share personal details.');
+  var note = el('p', 'hc-note', 'This is an AI assistant. Your messages go to a Sweepwise server, OpenRouter and an AI model (DeepSeek) to write the answer, and Sweepwise does not store them. Please don’t share personal details.');
   var log = el('div', 'hc-log');
   log.setAttribute('aria-live', 'polite');
   var form = el('form', 'hc-form');

@@ -34,8 +34,8 @@ table below lists.
 ## The help chat on the website (not in the app)
 
 The optional help chat on the Sweepwise website is the one place a Sweepwise server is involved. What you type goes to a small
-Sweepwise service running on Cloudflare, which passes it to an AI company (DeepSeek) to write the answer. Emails, user folder
+Sweepwise service running on Cloudflare, which passes it to OpenRouter and an AI model (DeepSeek) to write the answer. Emails, user folder
 names, phone-like numbers, keys and links are removed first, and Sweepwise does not store your messages: only a daily counter
-tied to a scrambled form of your connection, used to cap use, is kept. Cloudflare and DeepSeek handle the messages under
+tied to a scrambled form of your connection, used to cap use, is kept. Cloudflare, OpenRouter and DeepSeek handle the messages under
 their own policies. If you choose "Send it" when the chat offers to pass a problem to the maker, a short summary with
 personal details removed is posted publicly as a GitHub issue. The Sweepwise app never talks to this service.
