@@ -3,6 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- CSP as a meta tag: GitHub Pages cannot set response headers. Update connect-src if the help worker address changes.
+       frame-ancestors / X-Frame-Options cannot be set via meta on GitHub Pages, so clickjacking is left to the browser here. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'unsafe-inline'; img-src 'self'; connect-src https://sweepwise-help.albertancoder.workers.dev; base-uri 'none'; form-action 'none'; object-src 'none'">
 <title>Sweepwise: free PC care that asks first</title>
 <meta name="description" content="Sweepwise clears junk, checks your protection and speeds up your computer, in plain English. Free for everyone, it collects nothing, and it is open source (GPL-3.0).">
 <meta property="og:type" content="website">
