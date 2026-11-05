@@ -25,8 +25,8 @@ two whenever Sweepwise reminds you, for two to three weeks.
 
 ## Day one: please try these
 
-- [ ] **Scan & Clean.** The first time, Sweepwise shows what it would remove and waits. Does the list make sense? Press
-      Clean now.
+- [ ] **Scan & Clean.** Sweepwise shows what it would remove and waits. Does the list make sense? Press
+      Clean.
 - [ ] **Approve list.** Look through the suggestions. Is anything suggested that you would never want touched? Tick a
       few safe ones and press Approve.
 - [ ] **Undo.** Open History & Undo and undo that run. Did everything come back where it was?

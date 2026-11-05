@@ -21,8 +21,8 @@ account.
 ## What it does
 
 - **Scan & Clean:** clears temporary files and caches, runs a quick virus scan (Windows Security on Windows; ClamAV on
-  Linux and Mac once it is installed) and gives your computer a health score with the reasons behind it. The very
-  first time, it shows how much each kind of junk takes up and waits for you to press Clean now.
+  Linux and Mac once it is installed) and gives your computer a health score with the reasons behind it. It always
+  shows how much each kind of junk takes up first, and waits for you to press Clean.
 - **Approve list:** loose files on your Desktop and in Downloads sorted into folders; old leftovers from AI tools
   (scratch folders on Windows, editor caches on Windows and Mac, downloaded models); programs that start by
   themselves; programs you haven't used in six months (on Linux, your Flatpak and Snap apps); folders left behind by
